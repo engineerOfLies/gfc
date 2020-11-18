@@ -45,6 +45,16 @@ void gfc_matrix_make_translation(
 );
 
 /**
+ * @brief translate a given matrix by the vector given
+ * @param out the matrix to translate
+ * @param move the vector to translat the matrix by
+ */
+void gfc_matrix_translate(
+    Matrix4 out,
+    Vector3D move
+);
+
+/**
  * @brief setup a view matrix for a frustum centered at position, pointed at target, with up as the up direction
  * @note adapted from glm
  * @param out output matrix
@@ -103,6 +113,18 @@ void gfc_matrix_multiply_vector4d(
     Matrix4    mat,
     Vector4D   vec
 );
+
+/**
+ * @brief multiply a matrix by a scaling matrix
+ * @param out the resulting scaled matrix
+ * @param scale the amount to scale the matrix by
+ * @param in the matrix to scale
+ */
+void gfc_matrix_scale(
+        Matrix4 out,
+        Vector3D scale,
+        Matrix4 in);
+
 
 /**
  * @brief multiply a matrix by the rotation matrix
