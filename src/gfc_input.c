@@ -349,6 +349,22 @@ SDL_Scancode gfc_input_key_to_scancode(const char * buffer)
         {
             kc = SDL_SCANCODE_BACKSPACE;
         }
+        else if (strcmp(buffer,"RIGHT") == 0)
+        {
+            kc = SDL_SCANCODE_RIGHT;
+        }
+        else if (strcmp(buffer,"LEFT") == 0)
+        {
+            kc = SDL_SCANCODE_LEFT;
+        }
+        else if (strcmp(buffer,"UP") == 0)
+        {
+            kc = SDL_SCANCODE_UP;
+        }
+        else if (strcmp(buffer,"DOWN") == 0)
+        {
+            kc = SDL_SCANCODE_DOWN;
+        }
         else if (strcmp(buffer,"LALT") == 0)
         {
             kc = SDL_SCANCODE_LALT;
