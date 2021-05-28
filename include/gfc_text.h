@@ -73,8 +73,8 @@ typedef char TextLine[128];
 /**
  * @brief 512 character buffer used for text blocks
  */
-typedef char TextBlock[512];
-#define GFCTEXTLEN   512
+typedef char TextBlock[1024];
+#define GFCTEXTLEN   1024
 #define gfc_block_cmp(a,b) (strncmp(a,b,GFCTEXTLEN))
 #define gfc_block_icmp(a,b) (strincmp(a,b,GFCTEXTLEN))
 #define gfc_block_cpy(dst,src) (strncpy(dst,src,GFCTEXTLEN))
