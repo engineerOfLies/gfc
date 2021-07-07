@@ -41,7 +41,6 @@ void gfc_audio_init(
     {
         slog("failed to initialize some audio support: %s",SDL_GetError());
     }
-    atexit(Mix_Quit);
     atexit(gfc_audio_close);
     gfc_sound_init(maxSounds);
     slog("audio system initialized");
@@ -49,6 +48,8 @@ void gfc_audio_init(
 
 void gfc_audio_close()
 {
+    Mix_CloseAudio();
+    Mix_Quit();
     slog("audio system closed");    
 }
 
