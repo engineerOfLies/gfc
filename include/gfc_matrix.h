@@ -44,11 +44,6 @@ void gfc_matrix_make_translation(
     Vector3D move
 );
 
-/**
- * @brief translate a given matrix by the vector given
- * @param out the matrix to translate
- * @param move the vector to translat the matrix by
- */
 void gfc_matrix_translate(
     Matrix4 out,
     Vector3D move
@@ -115,18 +110,6 @@ void gfc_matrix_multiply_vector4d(
 );
 
 /**
- * @brief multiply a matrix by a scaling matrix
- * @param out the resulting scaled matrix
- * @param scale the amount to scale the matrix by
- * @param in the matrix to scale
- */
-void gfc_matrix_scale(
-        Matrix4 out,
-        Vector3D scale,
-        Matrix4 in);
-
-
-/**
  * @brief multiply a matrix by the rotation matrix
  * @param out the output matrix
  * @param in  the input matrix
@@ -139,5 +122,16 @@ void gfc_matrix_rotate(
     float       degree,
     Vector3D    axis
 );
+
+/**
+ * @brief scale a matrix based on the input scale vector
+ * @param out the matrix to be scaled.  it is changed by this function
+ * @param scale the amount to scale it by
+ */
+void gfc_matrix_scale(
+    Matrix4 out,
+    Vector3D scale
+);
+
 
 #endif
