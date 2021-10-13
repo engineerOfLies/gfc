@@ -165,6 +165,7 @@ Sound *gfc_sound_load(char *filename,float volume,int defaultChannel)
     }
     sound->volume = volume;
     sound->defaultChannel = defaultChannel;
+    gfc_line_cpy(sound->filepath,filename);
     return sound;
 }
 

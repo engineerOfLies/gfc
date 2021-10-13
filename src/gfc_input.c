@@ -7,9 +7,36 @@ static List *gfc_input_list = NULL;
 static const Uint8 * gfc_input_keys = NULL;
 static Uint8 * gfc_input_old_keys = NULL;
 static int gfc_input_key_count = 0;
+static int mouse_wheel_x = 0;
+static int mouse_wheel_y = 0;
+static int mouse_wheel_x_old = 0;
+static int mouse_wheel_y_old = 0;
 
 Input *gfc_input_get_by_name(const char *name);
 
+Uint8 gfc_input_mouse_wheel_up()
+{
+    if (mouse_wheel_y > 0)return 1;
+    return 0;
+}
+
+Uint8 gfc_input_mouse_wheel_down()
+{
+    if (mouse_wheel_y < 0)return 1;
+    return 0;
+}
+
+Uint8 gfc_input_mouse_wheel_left()
+{
+    if (mouse_wheel_x < 0)return 1;
+    return 0;
+}
+
+Uint8 gfc_input_mouse_wheel_right()
+{
+    if (mouse_wheel_x > 0)return 1;
+    return 0;
+}
 
 void gfc_input_delete(Input *in)
 {
@@ -191,9 +218,40 @@ void gfc_input_update()
 {
     Uint32 c,i;
     void *data;
-
+    SDL_Event event = {0};
+    
     memcpy(gfc_input_old_keys,gfc_input_keys,sizeof(Uint8)*gfc_input_key_count);
+    mouse_wheel_x_old = mouse_wheel_x;
+    mouse_wheel_y_old = mouse_wheel_y;
+    mouse_wheel_x = 0;
+    mouse_wheel_y = 0;
+
     SDL_PumpEvents();   // update SDL's internal event structures
+    //grab all the input from SDL now
+    while(SDL_PollEvent(&event))
+    {
+        if(event.type == SDL_MOUSEWHEEL)
+        {
+            if(event.wheel.y > 0) // scroll up
+            {
+                mouse_wheel_y = 1;
+            }
+            else if(event.wheel.y < 0) // scroll down
+            {
+                mouse_wheel_y = -1;
+            }
+
+            if(event.wheel.x > 0) // scroll right
+            {
+                mouse_wheel_x = 1;
+            }
+            else if(event.wheel.x < 0) // scroll left
+            {
+                mouse_wheel_x = -1;
+            }
+        }
+    }
+
     gfc_input_keys = SDL_GetKeyboardState(&gfc_input_key_count);
 
     c = gfc_list_get_count(gfc_input_list);
@@ -348,6 +406,22 @@ SDL_Scancode gfc_input_key_to_scancode(const char * buffer)
         else if (strcmp(buffer,"BACKSPACE") == 0)
         {
             kc = SDL_SCANCODE_BACKSPACE;
+        }
+        else if (strcmp(buffer,"RIGHT") == 0)
+        {
+            kc = SDL_SCANCODE_RIGHT;
+        }
+        else if (strcmp(buffer,"LEFT") == 0)
+        {
+            kc = SDL_SCANCODE_LEFT;
+        }
+        else if (strcmp(buffer,"UP") == 0)
+        {
+            kc = SDL_SCANCODE_UP;
+        }
+        else if (strcmp(buffer,"DOWN") == 0)
+        {
+            kc = SDL_SCANCODE_DOWN;
         }
         else if (strcmp(buffer,"LALT") == 0)
         {

@@ -56,6 +56,15 @@ void *gfc_list_get_nth(List *list,Uint32 n);
 List *gfc_list_append(List *list,void *data);
 
 /**
+ * @brief add an element to the beginning of the list
+ * @note must catch the returned list to replace the list you had
+ * @param list the list to add to
+ * @param data the data to assign to the new element
+ * @return NULL on error, your list otherwise
+ */
+List *gfc_list_prepend(List *list,void *data);
+
+/**
  * @brief instert a new element at the position provided
  * @param list the list to insert into
  * @param data the data to assin to the new element

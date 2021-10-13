@@ -76,6 +76,15 @@ Uint8 gfc_input_key_held(const char *key);
 Uint8 gfc_input_key_down(const char *key);
 
 /**
+ * @brief check if the mouse wheel is moving in the indicated direction
+ * @return 0 if it is not, 1 if it is
+ */
+Uint8 gfc_input_mouse_wheel_up();
+Uint8 gfc_input_mouse_wheel_down();
+Uint8 gfc_input_mouse_wheel_left();
+Uint8 gfc_input_mouse_wheel_right();
+
+/**
  * @brief configure callbacks for an input
  * @param command the name of the input to configure
  * @param onPress the function to call when the input is pressed
