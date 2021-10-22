@@ -71,6 +71,13 @@ SDL_Rect gfc_sdl_rect(Sint32 x,Sint32 y,Uint32 w, Uint32 h);
  */
 void *gfc_allocate_array(size_t typeSize,size_t count);
 
+/**
+ * @brief get the size of a file in byte (chars)
+ * @param file the file to take a look at
+ * @return the size of the file in bytes
+ */
+long get_file_Size(FILE *file);
+
 #if defined(WIN32)
 #ifndef snprintf
 #define snprintf _snprintf
