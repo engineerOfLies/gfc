@@ -131,6 +131,17 @@ void vector3d_cross_product(Vector3D *out, Vector3D v1, Vector3D v2);
 #define vector3d_dot_product(a,b)      (a.x*b.x+a.y*b.y+a.z*b.z)
 #define vector2d_dot_product(a,b)      (a.x*b.x+a.y*b.y)
 
+
+/**
+ * @brief multiply two vectors together (x *x, y*y, etc)
+ * @param a component of the multiplication
+ * @param b component of the multiplication
+ * @return a vector multiplication product
+ */
+Vector2D vector2d_multiply(Vector2D a, Vector2D b);
+Vector3D vector3d_multiply(Vector3D a, Vector3D b);
+Vector4D vector4d_multiply(Vector4D a, Vector4D b);
+
 /**
  * @brief copies the data from one vector into another
  *

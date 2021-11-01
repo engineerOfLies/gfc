@@ -5,12 +5,165 @@
 #include "gfc_matrix.h"
 #include "simple_logger.h"
 
+
+/*
+ * Code has been adapted from glm to C for this project
+ */
+Vector3D gfc_unproject(Vector3D in,Matrix4 model, Matrix4 proj,Vector4D viewport)
+{
+    Vector3D out = {0,0,0};
+    Matrix4 Inverse;
+    Vector4D tmp,obj;
+    
+    if ((!viewport.z)||(!viewport.w))
+    {
+        slog("cannot unproject into a view of zero width or height");
+        return out;
+    }
+    
+    gfc_matrix_multiply(Inverse,proj,model);
+    gfc_matrix_invert(Inverse,Inverse);
+    
+    vector4d_set(tmp,in.x,in.y,in.z,1);
+    tmp.x = (tmp.x - viewport.x) / viewport.z;
+    tmp.y = (tmp.y - viewport.y) / viewport.w;
+    
+    gfc_matrix_multiply_vector4d(
+        &obj,
+        Inverse,
+        tmp);
+    
+    out.x = obj.x/obj.w;
+    out.y = obj.y/obj.w;
+    out.z = obj.z/obj.w;
+    
+    return out;
+}
+
 void gfc_matrix_slog(Matrix4 mat)
 {
     slog("%f,%f,%f,%f",mat[0][0],mat[0][1],mat[0][2],mat[0][3]);
     slog("%f,%f,%f,%f",mat[1][0],mat[1][1],mat[1][2],mat[1][3]);
     slog("%f,%f,%f,%f",mat[2][0],mat[2][1],mat[2][2],mat[2][3]);
     slog("%f,%f,%f,%f",mat[3][0],mat[3][1],mat[3][2],mat[3][3]);
+}
+
+
+/*
+ * Code has been adapted from glm to C for this project
+ */
+int gfc_matrix_invert(Matrix4 out, Matrix4 m)
+{
+    float Coef00,Coef02,Coef03,Coef04,Coef06,Coef07,Coef08,
+          Coef10,Coef11,Coef12,Coef14,Coef15,Coef16,Coef18,
+          Coef19,Coef20,Coef22,Coef23,Dot1,OneOverDeterminant;
+          
+    Vector4D Fac0,Fac1,Fac2,Fac3,Fac4,Fac5,Vec0,Vec1,Vec2,
+             Vec3,Inv0 = {0},Inva,Invb,Invc,Inv1 = {0},Inv2 = {0},Inv3 = {0},SignA,SignB,Row0,Dot0;
+             
+    Matrix4 Inverse = {0};
+    
+    Coef00 = m[2][2] * m[3][3] - m[3][2] * m[2][3];
+    Coef02 = m[1][2] * m[3][3] - m[3][2] * m[1][3];
+    Coef03 = m[1][2] * m[2][3] - m[2][2] * m[1][3];
+
+    Coef04 = m[2][1] * m[3][3] - m[3][1] * m[2][3];
+    Coef06 = m[1][1] * m[3][3] - m[3][1] * m[1][3];
+    Coef07 = m[1][1] * m[2][3] - m[2][1] * m[1][3];
+
+    Coef08 = m[2][1] * m[3][2] - m[3][1] * m[2][2];
+    Coef10 = m[1][1] * m[3][2] - m[3][1] * m[1][2];
+    Coef11 = m[1][1] * m[2][2] - m[2][1] * m[1][2];
+
+    Coef12 = m[2][0] * m[3][3] - m[3][0] * m[2][3];
+    Coef14 = m[1][0] * m[3][3] - m[3][0] * m[1][3];
+    Coef15 = m[1][0] * m[2][3] - m[2][0] * m[1][3];
+
+    Coef16 = m[2][0] * m[3][2] - m[3][0] * m[2][2];
+    Coef18 = m[1][0] * m[3][2] - m[3][0] * m[1][2];
+    Coef19 = m[1][0] * m[2][2] - m[2][0] * m[1][2];
+
+    Coef20 = m[2][0] * m[3][1] - m[3][0] * m[2][1];
+    Coef22 = m[1][0] * m[3][1] - m[3][0] * m[1][1];
+    Coef23 = m[1][0] * m[2][1] - m[2][0] * m[1][1];
+
+    vector4d_set(Fac0,Coef00, Coef00, Coef02, Coef03);
+    vector4d_set(Fac1,Coef04, Coef04, Coef06, Coef07);
+    vector4d_set(Fac2,Coef08, Coef08, Coef10, Coef11);
+    vector4d_set(Fac3,Coef12, Coef12, Coef14, Coef15);
+    vector4d_set(Fac4,Coef16, Coef16, Coef18, Coef19);
+    vector4d_set(Fac5,Coef20, Coef20, Coef22, Coef23);
+
+    vector4d_set(Vec0,m[1][0], m[0][0], m[0][0], m[0][0]);
+    vector4d_set(Vec1,m[1][1], m[0][1], m[0][1], m[0][1]);
+    vector4d_set(Vec2,m[1][2], m[0][2], m[0][2], m[0][2]);
+    vector4d_set(Vec3,m[1][3], m[0][3], m[0][3], m[0][3]);
+
+    
+    
+    Inva = vector4d_multiply(Vec1, Fac0);
+    Invb = vector4d_multiply(Vec2, Fac1);
+    Invc = vector4d_multiply(Vec3, Fac2);
+    vector2d_add(Inv0,Inva,Invc);
+    vector2d_sub(Inv0,Inv0,Invb);
+    
+    Inva = vector4d_multiply(Vec0,Fac0);
+    Invb = vector4d_multiply(Vec2,Fac3);
+    Invc = vector4d_multiply(Vec3,Fac4);
+    vector2d_add(Inv1,Inva,Invc);
+    vector2d_sub(Inv1,Inv1,Invb);
+    
+    Inva = vector4d_multiply(Vec0,Fac1);
+    Invb = vector4d_multiply(Vec1,Fac3 );
+    Invc = vector4d_multiply(Vec3,Fac5);
+    vector2d_add(Inv2,Inva,Invc);
+    vector2d_sub(Inv2,Inv2,Invb);
+
+
+    Inva = vector4d_multiply(Vec0,Fac2);
+    Invb = vector4d_multiply(Vec1,Fac4);
+    Invc = vector4d_multiply(Vec2,Fac5);
+    vector2d_add(Inv3,Inva,Invc);
+    vector2d_sub(Inv3,Inv3,Invb);
+
+    vector4d_set(SignA,+1, -1, +1, -1);
+    vector4d_set(SignB,-1, +1, -1, +1);
+    
+    Inverse[0][0] = Inv0.x * SignA.x;
+    Inverse[0][1] = Inv0.y * SignA.y;
+    Inverse[0][2] = Inv0.z * SignA.z;
+    Inverse[0][3] = Inv0.w * SignA.w;
+    
+    Inverse[1][0] = Inv1.x * SignB.x;
+    Inverse[1][1] = Inv1.y * SignB.y;
+    Inverse[1][2] = Inv1.z * SignB.z;
+    Inverse[1][3] = Inv1.w * SignB.w;
+    
+    Inverse[2][0] = Inv2.x * SignA.x;
+    Inverse[2][1] = Inv2.y * SignA.y;
+    Inverse[2][2] = Inv2.z * SignA.z;
+    Inverse[2][3] = Inv2.w * SignA.w;
+
+    Inverse[2][0] = Inv3.x * SignB.x;
+    Inverse[2][1] = Inv3.y * SignB.y;
+    Inverse[2][2] = Inv3.z * SignB.z;
+    Inverse[2][3] = Inv3.w * SignB.w;
+
+    Row0 = vector4d(Inverse[0][0], Inverse[1][0], Inverse[2][0], Inverse[3][0]);
+
+    Dot0 = vector4d_multiply(vector4d(m[0][0],m[0][1],m[0][2],m[0][3]),Row0);
+    Dot1 = (Dot0.x + Dot0.y) + (Dot0.z + Dot0.w);
+    
+    if (!Dot1)
+    {
+        slog("gfc_matrix_invert: matrix not invertable");
+        return 0;
+    }
+
+    OneOverDeterminant = 1.0 / Dot1;
+
+    gfc_matrix_multiply_scalar(out,Inverse,OneOverDeterminant);
+    return 1;
 }
 
 void gfc_matrix_copy(
@@ -24,10 +177,34 @@ void gfc_matrix_copy(
 }
 
 
+void gfc_matrix_multiply_scalar(Matrix4 out,Matrix4 m1,float s)
+{
+  out[0][0] = s*m1[0][0];
+  out[0][1] = s*m1[0][1];
+  out[0][2] = s*m1[0][2];
+  out[0][3] = s*m1[0][3];
+
+  out[1][0] = s*m1[1][0];
+  out[1][1] = s*m1[1][1];
+  out[1][2] = s*m1[1][2];
+  out[1][3] = s*m1[1][3];
+
+  out[2][0] = s*m1[2][0];
+  out[2][1] = s*m1[2][1];
+  out[2][2] = s*m1[2][2];
+  out[2][3] = s*m1[2][3];
+
+  out[3][0] = s*m1[3][0];
+  out[3][1] = s*m1[3][1];
+  out[3][2] = s*m1[3][2];
+  out[3][3] = s*m1[3][3];
+}
+
+
 void gfc_matrix_multiply(
     Matrix4 out,
-    Matrix4 m1,
-    Matrix4 m2
+    Matrix4 m2,
+    Matrix4 m1
   )
 {
 
@@ -228,8 +405,8 @@ void gfc_matrix_scale(
     
     gfc_matrix_multiply(
         out,
-        m,
-        out
+        out,
+        m
     );
 }
 
@@ -252,6 +429,6 @@ void gfc_matrix_translate(
 {
     Matrix4 translate,temp;
     gfc_matrix_make_translation(translate,move);
-    gfc_matrix_multiply(temp,translate,out);
+    gfc_matrix_multiply(temp,out,translate);
     gfc_matrix_copy(out,temp);
 }
