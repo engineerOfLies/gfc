@@ -20,7 +20,6 @@ typedef struct
 {
     TextLine command;
     List *keyCodes;                      /**<list of keys that must be pressed together to count as a single input*/
-    int numKeyCodes;                    /**<how many key codes are set*/
     Uint32 pressTime;                   /**<clock ticks when button was pressed*/
     InputEventType state;               /**<updated each frame*/
     void (*onPress)(void *data);        /**<callback for press event*/

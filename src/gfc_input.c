@@ -213,10 +213,43 @@ InputEventType gfc_input_command_get_state(const char *command)
     return in->state;
 }
 
+List *gfc_input_get_by_keysym(SDL_Keysym keysym)
+{
+    int i,c,kc,ki;
+    Input *in;
+    List *keylist = NULL;
+    keylist = gfc_list_new();
+    
+    c = gfc_list_get_count(gfc_input_list);
+    for (i = 0;i < c;i++)
+    {
+        in = (Input *)gfc_list_get_nth(gfc_input_list,i);
+        if (!in)continue;
+        kc = gfc_list_get_count(in->keyCodes);
+        if (!kc)continue;
+        for (ki = 0;ki < kc;ki++)
+        {
+            if ((SDL_Keysym)gfc_list_get_nth(in->keyCodes,ki) == keysym)
+            {
+                keylist = gfc_list_append(keylist,in);
+                break;
+            }
+        }
+    }
+    
+    if (gfc_list_get_count(keylist) == 0)
+    {
+        gfc_list_delete(keylist);
+        return NULL;
+    }
+    return keylist;
+}
 
 void gfc_input_update()
 {
-    Uint32 c,i;
+    Input *in = NULL;
+    List *keylist = NULL;
+    Uint32 c,i,kc,ki;
     void *data;
     SDL_Event event = {0};
     
@@ -228,8 +261,41 @@ void gfc_input_update()
 
     SDL_PumpEvents();   // update SDL's internal event structures
     //grab all the input from SDL now
+
+    gfc_input_keys = SDL_GetKeyboardState(&gfc_input_key_count);
+
+    c = gfc_list_get_count(gfc_input_list);
+    for (i = 0;i < c;i++)
+    {
+        data = gfc_list_get_nth(gfc_input_list,i);
+        if (!data)continue;
+        gfc_input_update_command((Input*)data);        
+    }
     while(SDL_PollEvent(&event))
     {
+        if((event.type == SDL_KEYUP)||(event.type == SDL_KEYDOWN))
+        {
+            keylist = gfc_input_get_by_keysym(event.key.keysym);
+            if (keylist != NULL)
+            {
+                kc = gfc_list_get_count(keylist);
+                for (ki = 0; ki < kc; ki++)
+                {
+                    in = gfc_list_get_nth(keylist,ki);
+                    if (!in)continue;
+                    if (event.key.state == SDL_PRESSED)
+                    {
+                        in->state = IET_Press;
+                    }
+                    if (event.key.state == SDL_RELEASED)
+                    {
+                        in->state = IET_Release;
+                    }
+                }
+                gfc_list_free(keylist);
+                keylist = NULL;
+            }
+        }
         if(event.type == SDL_MOUSEWHEEL)
         {
             if(event.wheel.y > 0) // scroll up
@@ -252,15 +318,6 @@ void gfc_input_update()
         }
     }
 
-    gfc_input_keys = SDL_GetKeyboardState(&gfc_input_key_count);
-
-    c = gfc_list_get_count(gfc_input_list);
-    for (i = 0;i < c;i++)
-    {
-        data = gfc_list_get_nth(gfc_input_list,i);
-        if (!data)continue;
-        gfc_input_update_command((Input*)data);        
-    }
 }
 
 void gfc_input_init(char *configFile)
