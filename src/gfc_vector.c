@@ -24,6 +24,21 @@ Vector4D vector4d(float x, float y, float z, float w)
   return vec;
 }
 
+Vector2D vector2d_multiply(Vector2D a, Vector2D b)
+{
+    return vector2d(a.x * b.x, a.y * b.y);
+}
+
+Vector3D vector3d_multiply(Vector3D a, Vector3D b)
+{
+    return vector3d(a.x * b.x, a.y * b.y, a.z * b.z);
+}
+
+Vector4D vector4d_multiply(Vector4D a, Vector4D b)
+{
+    return vector4d(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
+}
+
 Bool vector2d_distance_between_less_than(Vector2D p1,Vector2D p2,float size)
 {
     if (vector2d_magnitude_between(p1,p2) < size)return 1;
@@ -481,10 +496,10 @@ void vector3d_angle_vectors(Vector3D angles, Vector3D *forward, Vector3D *right,
   angle = angles.x * (GFC_DEGTORAD);
   sy = sin(angle);
   cy = cos(angle);
-  angle = angles.y * (GFC_DEGTORAD);
+  angle = angles.z * (GFC_DEGTORAD);
   sp = sin(angle);
   cp = cos(angle);
-  angle = angles.z * (GFC_DEGTORAD);
+  angle = angles.y * (GFC_DEGTORAD);
   sr = sin(angle);
   cr = cos(angle);
   

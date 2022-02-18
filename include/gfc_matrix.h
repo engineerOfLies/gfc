@@ -35,6 +35,14 @@ void gfc_matrix_identity(Matrix4 one);
 void gfc_matrix_zero(Matrix4 zero);
 
 /**
+ * @brief invert a matrix
+ * @param out the resulting inverse matrix
+ * @param in the matrix to invert
+ * @return 1 on success, 0 if the matrix has no inverse.  On 0, out will not be changed
+ */
+int gfc_matrix_invert(Matrix4 out, Matrix4 in);
+
+/**
  * @brief create a translation matrix given the vector
  * @param out the output matrix, the contents of this matrix are overwritten
  * @param move the vector describing the translation
@@ -83,10 +91,22 @@ void gfc_matrix_perspective(
     float      far
 );
 
+/**
+ * @brief map screen coordinates into 3d world coordinate
+ * @note use this twice, with z value 0 and z value 1 to create a trace segment to determine what
+ *       is beneath the screen position
+ * @param in the screen coordinates to map
+ * @param modelview the view matrix of the scene
+ * @param proj the projection matrix of the scene
+ * @param viewport screen offset (x,y) and extent (z,w)
+ * @return 3d scene coordinates of the screen coordinates
+ */
+Vector3D gfc_unproject(Vector3D in,Matrix4 modelview, Matrix4 proj,Vector4D viewport);
 
 /**
  * @brief multiply the two input matrices together and save the result into out
  * @note this is not safe if out is one of the inputs
+ * @note operation is out = a * b
  * @param out the output matrix
  * @param a one multiplicand matrix
  * @param b another multiplicand matrix
@@ -108,6 +128,15 @@ void gfc_matrix_multiply_vector4d(
     Matrix4    mat,
     Vector4D   vec
 );
+
+/**
+ * @brief multiply a matrix by the scalar value
+ * @param out the output matrix
+ * @param m1 input matrix to multiply by
+ * @param s input scalar value to multiply by
+ */
+void gfc_matrix_multiply_scalar(Matrix4 out,Matrix4 m1,float s);
+
 
 /**
  * @brief multiply a matrix by the rotation matrix
