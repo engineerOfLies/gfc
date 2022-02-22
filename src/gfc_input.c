@@ -1,7 +1,7 @@
-#include "gfc_input.h"
-#include "gfc_list.h"
-#include "simple_logger.h"
 #include <simple_json.h>
+#include "simple_logger.h"
+#include "gfc_list.h"
+#include "gfc_input.h"
 
 static List *gfc_input_list = NULL;
 static const Uint8 * gfc_input_keys = NULL;
@@ -213,7 +213,7 @@ InputEventType gfc_input_command_get_state(const char *command)
     return in->state;
 }
 
-List *gfc_input_get_by_keysym(SDL_Keysym keysym)
+List *gfc_input_get_by_scancode(SDL_Scancode keysym)
 {
     int i,c,kc,ki;
     Input *in;
@@ -229,7 +229,7 @@ List *gfc_input_get_by_keysym(SDL_Keysym keysym)
         if (!kc)continue;
         for (ki = 0;ki < kc;ki++)
         {
-            if ((SDL_Keysym)gfc_list_get_nth(in->keyCodes,ki) == keysym)
+            if ((SDL_Scancode)gfc_list_get_nth(in->keyCodes,ki) == keysym)
             {
                 keylist = gfc_list_append(keylist,in);
                 break;
@@ -275,7 +275,7 @@ void gfc_input_update()
     {
         if((event.type == SDL_KEYUP)||(event.type == SDL_KEYDOWN))
         {
-            keylist = gfc_input_get_by_keysym(event.key.keysym);
+            keylist = gfc_input_get_by_scancode(event.key.keysym.scancode);
             if (keylist != NULL)
             {
                 kc = gfc_list_get_count(keylist);
@@ -292,7 +292,7 @@ void gfc_input_update()
                         in->state = IET_Release;
                     }
                 }
-                gfc_list_free(keylist);
+                gfc_list_delete(keylist);
                 keylist = NULL;
             }
         }
