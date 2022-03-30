@@ -200,6 +200,21 @@ void gfc_hashmap_delete_by_key(HashMap *map,const char *key)
     }
 }
 
+List *gfc_hashmap_get_all_values(HashMap *map)
+{
+    int i;
+    HashElement *element;
+    List *valueList = NULL;
+    if ((!map) || (!map->map))return NULL;
+    valueList = gfc_list_new();
+    for (i = 0; i < map->map->size; i++)
+    {
+        element = (HashElement *)map->map->elements[i].data;
+        if (!element)continue;
+        valueList = gfc_list_append(valueList,element);
+    }
+    return valueList;
+}
 
 
 

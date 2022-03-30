@@ -76,6 +76,14 @@ void *gfc_hashmap_get(HashMap *map,const char *key);
  */
 void gfc_hashmap_delete_by_key(HashMap *map,const char *key);
 
+/**
+ * @brief get a list of all of the values in the hashmap
+ * @param map the map to extract the data from
+ * @return NULL on bad map, or a list of HashElements otherwise.
+ * @note: DO NOT free the HashElements in the list, however the list itself
+ * will need to be freed by gfc_list_delete
+ */
+List *gfc_hashmap_get_all_values(HashMap *map);
 
 /**
  * @brief simple log the hash keys of the provided hashmap
