@@ -71,7 +71,7 @@ typedef char TextLine[128];
 #define gfc_line_clear(a)  (memset(a,0,sizeof(char)*GFCLINELEN))
 #define gfc_line_sprintf(a,...) snprintf(a,GFCLINELEN,__VA_ARGS__)
 /**
- * @brief 512 character buffer used for text blocks
+ * @brief 1024 character buffer used for text blocks
  */
 typedef char TextBlock[1024];
 #define GFCTEXTLEN   1024
@@ -79,7 +79,7 @@ typedef char TextBlock[1024];
 #define gfc_block_icmp(a,b) (strincmp(a,b,GFCTEXTLEN))
 #define gfc_block_cpy(dst,src) (strncpy(dst,src,GFCTEXTLEN))
 #define gfc_block_clear(a)  (memset(a,0,sizeof(char)*GFCTEXTLEN))
-#define gfc_block_sprintf(a,...) snprintf(a,GFCTEXTLEN,__VA_ARGS__)
+#define gfc_block_sprintf(a,...) snprintf(a,GFCTEXTLEN - 1,__VA_ARGS__)
 
 
 

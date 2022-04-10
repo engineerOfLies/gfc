@@ -512,9 +512,9 @@ SDL_Scancode gfc_input_key_to_scancode(const char * buffer)
         {
             kc = SDL_SCANCODE_RETURN;
         }
-        else if (strcmp(buffer,"BACKSPACE") == 0)
+        else if (strcmp(buffer,"DELETE") == 0)
         {
-            kc = SDL_SCANCODE_BACKSPACE;
+            kc = SDL_SCANCODE_DELETE;
         }
         else if (strcmp(buffer,"ESCAPE") == 0)
         {
