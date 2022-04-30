@@ -129,7 +129,7 @@ Sound *gfc_sound_new()
     return NULL;
 }
 
-Sound *gfc_sound_get_by_filename(char * filename)
+Sound *gfc_sound_get_by_filename(const char * filename)
 {
     int i;
     for (i = 0;i < sound_manager.max_sounds;i++)
@@ -142,7 +142,7 @@ Sound *gfc_sound_get_by_filename(char * filename)
     return NULL;// not found
 }
 
-Sound *gfc_sound_load(char *filename,float volume,int defaultChannel)
+Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
 {
     Sound *sound;
     sound = gfc_sound_get_by_filename(filename);

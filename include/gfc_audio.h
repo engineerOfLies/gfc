@@ -40,7 +40,7 @@ void gfc_audio_init(
  * @param defaultChannel which channel to play this sound on if not specified
  * @return NULL on error or a pointer to the sound file
  */
-Sound *gfc_sound_load(char *filename,float volume,int defaultChannel);
+Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel);
 
 /**
  * @brief play a sound file that has been loaded
