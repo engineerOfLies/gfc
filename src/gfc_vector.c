@@ -528,6 +528,21 @@ float vector2d_angle(Vector2D v)
   return vector_angle(v.x,v.y);
 }
 
+Vector2D vector2d_from_angle(float angle)
+{
+    return vector2d_rotate(vector2d(0,1), angle);
+}
+
+Vector2D vector2d_rotate_around_center(Vector2D point,float angle, Vector2D center)
+{
+    Vector2D delta;
+    
+    vector2d_sub(point,point,center);    
+    delta = vector2d_rotate(point, angle);
+    vector2d_add(delta,delta,center);
+    return delta;
+}
+
 Vector2D vector2d_rotate(Vector2D in, float angle)
 {
     Vector2D out;

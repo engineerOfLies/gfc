@@ -76,6 +76,13 @@ void vector3d_set_angle_by_radians(Vector3D *out,float radians);
 void vector2d_set_angle_by_radians(Vector2D *out,float radians);
 
 /**
+ * @brief get a unit vector rotated off of the vertical axis
+ * @param angle in radians off of vertical axis
+ * @return a unit vector
+ */
+Vector2D vector2d_from_angle(float angle);
+
+/**
  * @brief returns the angle of a vector in 2D space.
  * @param x the x component of the vector
  * @param y the y component of the vector
@@ -335,6 +342,15 @@ void vector3d_angle_vectors(Vector3D angles, Vector3D *forward, Vector3D *right,
  * @return the new vector
  */
 Vector2D vector2d_rotate(Vector2D in, float angle);
+
+/**
+ * @brief rotate a point around a center point
+ * @param point the point to rotate
+ * @param angle the amount to rotate in radians
+ * @param center the point around which to rotate
+ * @return the new location for the point
+ */
+Vector2D vector2d_rotate_around_center(Vector2D point,float angle, Vector2D center);
 
 /**
  * @brief rotate an Vector3D about another vector
