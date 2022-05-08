@@ -553,13 +553,7 @@ Vector2D vector2d_rotate(Vector2D in, float angle)
 
 float vector_angle(float x,float y)
 {
-  float angle = atan2(y, x) + M_PI;
-  float fraction = angle * 0.5 / M_PI;
-  if (fraction >= 1.0)
-  {
-    fraction -= 1.0;
-  }
-  return (fraction * 360)-180;
+    return (atan2(y,x) * GFC_RADTODEG) + 90;
 }
 
 void angle_clamp_degrees(float *a)

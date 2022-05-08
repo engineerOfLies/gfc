@@ -86,14 +86,14 @@ Vector2D vector2d_from_angle(float angle);
  * @brief returns the angle of a vector in 2D space.
  * @param x the x component of the vector
  * @param y the y component of the vector
- * @return the angle of the vector in radians.
+ * @return the angle of the vector in degrees from vertical.
  */
 float vector_angle(float x,float y);
 
 /**
  * @brief returns the angle of a vector in 2D space.
  * @param v the vector
- * @return the angle of the vector in radians.
+ * @return the angle of the vector in degrees.
  */
 float vector2d_angle(Vector2D v);
 
