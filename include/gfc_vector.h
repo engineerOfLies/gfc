@@ -213,6 +213,28 @@ Vector4D vector4d_multiply(Vector4D a, Vector4D b);
                                          dst.y = src.y *(factor),\
                                          dst.z = src.z *(factor),\
                                          dst.w = src.w *(factor))
+
+/**
+ * @brief Macro to scale a vector by a vector of the same dimensions
+ * varient ending in p takes a pointer to MglVect3D instead.
+ * Varients ending with 2D only operate on the x an y components of vectors
+ *
+ * @param dst result MglVect3D output
+ * @param src MglVect3D input
+ * @Param factpr the scalar value to scale the vector by.
+ */
+#define vector2d_scale_by(dst,src,factor) (dst.x = src.x *(factor.x),\
+                                         dst.y = src.y *(factor.y))
+
+#define vector3d_scale_by(dst,src,factor) (dst.x = src.x *(factor.x),\
+                                         dst.y = src.y *(factor.y),\
+                                         dst.z = src.z *(factor.z))
+
+#define vector4d_scale_by(dst,src,factor) (dst.x = src.x *(factor.x),\
+                                         dst.y = src.y *(factor.y),\
+                                         dst.z = src.z *(factor.z),\
+                                         dst.w = src.w *(factor.w))
+
 /**
  * @brief Macro that sets vector to zero.
  * @param a MglVect[2D|3D|4D] input
