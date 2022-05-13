@@ -1,3 +1,4 @@
+#include "simple_logger.h"
 #include "gfc_color.h"
 
 
@@ -56,9 +57,9 @@ Color gfc_color_to_float(Color color)
             return color;
         case CT_RGBA8:
             nc.r = color.r *factor;
-            nc.g = color.r *factor;
-            nc.b = color.r *factor;
-            nc.a = color.r *factor;
+            nc.g = color.g *factor;
+            nc.b = color.b *factor;
+            nc.a = color.a *factor;
             break;
         case CT_HSL:
             nc.a = color.a;
@@ -365,46 +366,30 @@ void gfc_color_add(Color *dst,Color a,Color b)
 
 void gfc_color_multiply(Color *dst,Color a,Color b)
 {
-    float hex;
+    ColorType ct;
     if (!dst)return;
-    switch (a.ct)
+    ct = a.ct;
+    a = gfc_color_to_float(a);
+    b = gfc_color_to_float(b);
+    dst->ct = CT_RGBAf;
+    dst->r  = a.r*b.r;
+    dst->g  = a.g*b.g;
+    dst->b  = a.b*b.b;
+    dst->a  = a.a*b.a;
+    switch(ct)
     {
-        case CT_HSL:
-            b = gfc_color_to_hsla(b);
-            *dst = gfc_color_hsl(
-                a.r*b.r,
-                a.g*b.g,
-                a.b*b.b,
-                a.a*b.a);
-        return;
-        case CT_HEX:
-            a = gfc_color_to_int8(a);
-            b = gfc_color_to_int8(b);
-            *dst = gfc_color8(
-                a.r*b.r,
-                a.g*b.g,
-                a.b*b.b,
-                a.a*b.a);
-            hex = gfc_color_to_hex(*dst);
-            *dst = gfc_color_hex(hex);
-        return;
-        case CT_RGBA8:
-            b = gfc_color_to_int8(b);
-            *dst = gfc_color8(
-                a.r*b.r,
-                a.g*b.g,
-                a.b*b.b,
-                a.a*b.a);
-        return;
         case CT_RGBAf:
-            b = gfc_color_to_float(b);
-            *dst = gfc_color(
-                a.r*b.r,
-                a.g*b.g,
-                a.b*b.b,
-                a.a*b.a);
-        return;
-    }    
+            return;//done
+        case CT_RGBA8:
+            *dst = gfc_color_to_int8(*dst);
+            return;
+        case CT_HSL:
+            *dst = gfc_color_to_hsla(*dst);
+            return;
+        case CT_HEX:
+            *dst = gfc_color_hex(gfc_color_to_hex(*dst));
+            return;
+    }
 }
 
 Color gfc_color_clamp(Color color)
