@@ -98,6 +98,14 @@ float vector_angle(float x,float y);
 float vector2d_angle(Vector2D v);
 
 /**
+ * @brief check if the current scale requires flipping of rotations
+ * @param scale the scaling factor.
+ * @return -1 if rotations need to be flipped, or 1 otherwise
+ * @note: zero size vectors return 1
+ */
+int vector2d_scale_flip_rotation(Vector2D scale);
+
+/**
  * @brief returns the angle between the two angles.
  * Takes into account wraping around 0 and 360
  * units are degrees

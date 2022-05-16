@@ -528,6 +528,13 @@ float vector2d_angle(Vector2D v)
   return vector_angle(v.x,v.y);
 }
 
+int vector2d_scale_flip_rotation(Vector2D scale)
+{
+    float factor = scale.x *scale.y;
+    if (factor < 0)return -1;
+    return 1;
+}
+
 Vector2D vector2d_from_angle(float angle)
 {
     return vector2d_rotate(vector2d(0,1), angle);
