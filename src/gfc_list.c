@@ -43,6 +43,18 @@ List *gfc_list_new_size(Uint32 count)
     return l;
 }
 
+void gfc_list_swap_indices(List *list,Uint32 a, Uint32 b)
+{
+    void *temp = NULL;
+    if (!list)return;
+    if (a == b)return;
+    if ((a >= list->count)||(b >= list->count))return;
+    if ((a >= list->size)||(b >= list->size))return;
+    temp = list->elements[a].data;
+    list->elements[a].data = list->elements[b].data;
+    list->elements[b].data = temp;
+}
+
 void *gfc_list_get_nth(List *list,Uint32 n)
 {
     if (!list)

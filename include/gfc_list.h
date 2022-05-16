@@ -121,6 +121,14 @@ Uint32 gfc_list_get_count(List *list);
 void gfc_list_foreach(List *list,void (*function)(void *data,void *context),void *contextData);
 
 /**
+ * @brief swap the locations of two items in the list.
+ * @param list the list to alter
+ * @param a the first item
+ * @param b the second item
+ */
+void gfc_list_swap_indices(List *list,Uint32 a, Uint32 b);
+
+/**
  * @brief add the elements from b into a
  * @note the data is not duplicated and b will still point to the same data that is now also referenced in a
  * @note the new address of a is returned
