@@ -105,18 +105,63 @@ void gfc_input_commands_purge()
 void gfc_input_update_command(Input *command)
 {
     Uint32 c,i;
-    SDL_Scancode kc;
+    Uint32 kc;
     int old = 0, new = 0;
     if (!command)return;
     c = gfc_list_get_count(command->keyCodes);
     if (!c)return;// no commands to update this with, do nothing
+    command->downCount = 0;
     for (i = 0; i < c; i++)
     {
 #pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
-        kc = (SDL_Scancode)gfc_list_get_nth(command->keyCodes,i);
+        kc = (Uint32)gfc_list_get_nth(command->keyCodes,i);
         if (!kc)continue;
-        if(gfc_input_old_keys[kc])old++;
-        if(gfc_input_keys[kc])new++;
+        if (kc == EMK_Shift)
+        {
+            //deal with mod keys
+            if (gfc_input_old_keys[SDL_SCANCODE_LSHIFT]||gfc_input_old_keys[SDL_SCANCODE_RSHIFT])old++;
+            if (gfc_input_keys[SDL_SCANCODE_LSHIFT]||gfc_input_keys[SDL_SCANCODE_RSHIFT])
+            {
+                new++;
+                command->downCount++;
+            }
+        }
+        else if (kc == EMK_Alt)
+        {
+            if (gfc_input_old_keys[SDL_SCANCODE_LALT]||gfc_input_old_keys[SDL_SCANCODE_RALT])old++;
+            if (gfc_input_keys[SDL_SCANCODE_LALT]||gfc_input_keys[SDL_SCANCODE_RALT])
+            {
+                new++;
+                command->downCount++;
+            }
+        }
+        else if (kc == EMK_Ctrl)
+        {
+            if (gfc_input_old_keys[SDL_SCANCODE_LCTRL]||gfc_input_old_keys[SDL_SCANCODE_RCTRL])old++;
+            if (gfc_input_keys[SDL_SCANCODE_LCTRL]||gfc_input_keys[SDL_SCANCODE_RCTRL])
+            {
+                command->downCount++;
+                new++;
+            }
+        }
+        else if (kc == EMK_Super)
+        {
+            if (gfc_input_old_keys[SDL_SCANCODE_LGUI]||gfc_input_old_keys[SDL_SCANCODE_RGUI])old++;
+            if (gfc_input_keys[SDL_SCANCODE_LGUI]||gfc_input_keys[SDL_SCANCODE_RGUI])
+            {
+                command->downCount++;
+                new++;
+            }
+        }
+        else
+        {
+            if(gfc_input_old_keys[kc])old++;
+            if(gfc_input_keys[kc])
+            {
+                command->downCount++;
+                new++;
+            }
+        }
     }
     if ((old == c)&&(new == c))
     {
@@ -174,7 +219,8 @@ Uint8 gfc_input_command_pressed(const char *command)
 {
     Input *in;
     in = gfc_input_get_by_name(command);
-    if ((in)&&(in->state == IET_Press))return 1;
+    if (!in)return 0;
+    if (in->state == IET_Press)return 1;
     return 0;
 }
 
@@ -200,7 +246,7 @@ Uint8 gfc_input_command_down(const char *command)
     in = gfc_input_get_by_name(command);
     if (in)
     {
-        if(in->state)return 1;
+        if((in->state == IET_Press)||(in->state == IET_Hold))return 1;
     }
     return 0;
 }
@@ -248,9 +294,7 @@ List *gfc_input_get_by_scancode(SDL_Scancode keysym)
 void gfc_input_update()
 {
     Input *in = NULL;
-    List *keylist = NULL;
-    Uint32 c,i,kc,ki;
-    void *data;
+    Uint32 c,i;
     SDL_Event event = {0};
     
     memcpy(gfc_input_old_keys,gfc_input_keys,sizeof(Uint8)*gfc_input_key_count);
@@ -267,36 +311,24 @@ void gfc_input_update()
     c = gfc_list_get_count(gfc_input_list);
     for (i = 0;i < c;i++)
     {
-        data = gfc_list_get_nth(gfc_input_list,i);
-        if (!data)continue;
-        gfc_input_update_command((Input*)data);        
+        in = gfc_list_get_nth(gfc_input_list,i);
+        if (!in)continue;
+        gfc_input_update_command(in);
     }
     while(SDL_PollEvent(&event))
     {
-        if((event.type == SDL_KEYUP)||(event.type == SDL_KEYDOWN))
+        if (event.type == SDL_WINDOWEVENT)
         {
-            keylist = gfc_input_get_by_scancode(event.key.keysym.scancode);
-            if (keylist != NULL)
+            if (event.window.event == SDL_WINDOWEVENT_CLOSE)
             {
-                kc = gfc_list_get_count(keylist);
-                for (ki = 0; ki < kc; ki++)
+                in = gfc_input_get_by_name("exit");
+                if (in)
                 {
-                    in = gfc_list_get_nth(keylist,ki);
-                    if (!in)continue;
-                    if (event.key.state == SDL_PRESSED)
-                    {
-                        in->state = IET_Press;
-                    }
-                    if (event.key.state == SDL_RELEASED)
-                    {
-                        in->state = IET_Release;
-                    }
+                    in->state = IET_Press;
                 }
-                gfc_list_delete(keylist);
-                keylist = NULL;
             }
         }
-        if(event.type == SDL_MOUSEWHEEL)
+        if (event.type == SDL_MOUSEWHEEL)
         {
             if(event.wheel.y > 0) // scroll up
             {
@@ -340,6 +372,16 @@ void gfc_input_init(char *configFile)
     }
     atexit(gfc_input_close);
     gfc_input_commands_load(configFile);
+}
+
+InputModKey gfc_input_key_mod_check(const char * buffer)
+{
+    if (!buffer)return EMK_None;
+    if (strcmp(buffer,"SHIFT")==0)return EMK_Shift;
+    if (strcmp(buffer,"ALT")==0)return EMK_Alt;
+    if (strcmp(buffer,"CTRL")==0)return EMK_Ctrl;
+    if (strcmp(buffer,"SUPER")==0)return EMK_Super;
+    return EMK_None;
 }
 
 SDL_Scancode gfc_input_key_to_scancode(const char * buffer)
@@ -573,7 +615,7 @@ void gfc_input_parse_command_json(SJson *command)
     const char * buffer;
     Input *in;
     int count,i;
-    SDL_Scancode kc = 0;
+    Uint32 kc = 0;
     if (!command)return;
     value = sj_object_get_value(command,"command");
     if (!value)
@@ -597,7 +639,12 @@ void gfc_input_parse_command_json(SJson *command)
             slog("error in key list, empty value");
             continue;   //error
         }
-        kc = gfc_input_key_to_scancode(buffer);
+        kc =  gfc_input_key_mod_check(buffer);
+        if (kc == EMK_None)
+        {
+            //not a meta mod key
+            kc = gfc_input_key_to_scancode(buffer);
+        }
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
         if (kc != -1)
         {

@@ -7,6 +7,15 @@
 
 typedef enum
 {
+    EMK_None = 0,
+    EMK_Shift = 1000,
+    EMK_Alt,
+    EMK_Ctrl,
+    EMK_Super
+}InputModKey;
+
+typedef enum
+{
     IET_Idle    = 0,
     IET_Press   = 1,
     IET_Hold    = 2,
@@ -20,6 +29,7 @@ typedef struct
 {
     TextLine command;
     List *keyCodes;                      /**<list of keys that must be pressed together to count as a single input*/
+    int downCount;
     Uint32 pressTime;                   /**<clock ticks when button was pressed*/
     InputEventType state;               /**<updated each frame*/
     void (*onPress)(void *data);        /**<callback for press event*/
