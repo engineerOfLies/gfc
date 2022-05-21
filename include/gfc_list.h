@@ -68,7 +68,7 @@ List *gfc_list_prepend(List *list,void *data);
  * @brief instert a new element at the position provided
  * @param list the list to insert into
  * @param data the data to assin to the new element
- * @return -1 on error, 0 otherwise
+ * @return NULL on error, or the provided list otherwise
  */
 List *gfc_list_insert(List *list,void *data,Uint32 n);
 
