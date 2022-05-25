@@ -47,6 +47,15 @@ void gfc_list_delete(List *list);
 void *gfc_list_get_nth(List *list,Uint32 n);
 
 /**
+ * @brief set the data stored at the nth element
+ * @param list the list to change
+ * @param n which element to change
+ * @param data the new data to set it to
+ * @note the old data WILL NOT be cleaned up
+ */
+void gfc_list_set_nth(List *list,Uint32 n,void *data);
+
+/**
  * @brief add an element to the end of the list
  * @note must catch the returned list to replace the list you had
  * @param list the list to add to
