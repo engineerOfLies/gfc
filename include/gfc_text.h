@@ -51,6 +51,14 @@ int gfc_stricmp(const char *a,const char *b);
 int gfc_strincmp(const char *a,const char *b,int n);
 
 /**
+ * @brief check if the str ends with the suffix
+ * @param str the string to query
+ * @param suffix the search criteria
+ * @returns 1 if the string ends with the suffix or 0 if not
+ */
+int gfc_str_suffix(const char *str, const char *suffix);
+
+/**
  * @brief 16 character buffer used for short tags
  */
 typedef char TextWord[16];

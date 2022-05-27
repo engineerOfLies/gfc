@@ -64,4 +64,16 @@ int gfc_strincmp(const char *a,const char *b,int n)
     while((v == 0) && (c < n));
     return v;
 }
+
+int gfc_str_suffix(const char *str, const char *suffix)
+{
+    // credit stack overflow
+    size_t lenstr,lensuffix;
+    if (!str || !suffix)
+        return 0;
+    lenstr = strlen(str);
+    lensuffix = strlen(suffix);
+    if (lensuffix >  lenstr)return 0;
+    return strncmp(str + (lenstr - lensuffix), suffix, lensuffix) == 0;
+}
 /*eol@eof*/
