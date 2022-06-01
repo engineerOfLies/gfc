@@ -32,10 +32,6 @@ void gfc_callback_call(Callback *callback)
     {
         callback->callback(callback->data);
     }
-    else
-    {
-        slog("callback not defined");
-    }
 }
 
 /*eol@eof*/
