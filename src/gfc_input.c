@@ -36,6 +36,7 @@ void gfc_controller_update(GFC_InputController *controller)
     {
         button = SDL_JoystickGetButton(controller->controller,i);
         controller->buttons[i] = button;
+//        if (controller->buttons[i])slog("controller button %i is %i",i,controller->buttons[i]);
     }
     for (i = 0; i < controller->num_axis;i++)
     {
