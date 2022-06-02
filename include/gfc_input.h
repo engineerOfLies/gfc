@@ -22,13 +22,28 @@ typedef enum
     IET_Release = 3
 }InputEventType;
 
+typedef struct
+{
+    Uint32 num_buttons;
+    Uint8 *buttons;
+    Uint8 *old_buttons;
+    Uint32 num_axis;
+    Sint16 *axis_maxes;
+    Sint16 *axis;
+    Sint16 *old_axis;
+    SDL_Joystick *controller;
+}GFC_InputController;
+
 /**
  * @brief Inputs abstract user input collection.  They can be setup to trigger callbacks and/or polled for current state
  */
 typedef struct
 {
     TextLine command;
-    List *keyCodes;                      /**<list of keys that must be pressed together to count as a single input*/
+    List *keyCodes;                     /**<list of keys that must be pressed together to count as a single input*/
+    Uint8 controller;                   /**<Index of the controller to use to update this input*/
+    List *buttons;                      /**<list of buttons that must be pressed together to count as a single input*/
+    List *axes;                         /**<list of axes that must be pressed together to count as a single input*/
     int downCount;
     Uint32 pressTime;                   /**<clock ticks when button was pressed*/
     InputEventType state;               /**<updated each frame*/
@@ -92,6 +107,34 @@ Uint8 gfc_input_mouse_wheel_up();
 Uint8 gfc_input_mouse_wheel_down();
 Uint8 gfc_input_mouse_wheel_left();
 Uint8 gfc_input_mouse_wheel_right();
+
+/**
+ * @brief check the state of a controller's button
+ * @param controller the controller index to check
+ * @param button, the SDL_GameControllerButton to check
+ * @return if the event is true for this update frame
+ */
+
+Uint8 gfc_input_controller_button_state_by_index(Uint8 controller, Uint32 button);
+Uint8 gfc_input_controller_button_held_by_index(Uint8 controller, Uint32 button);
+Uint8 gfc_input_controller_button_pressed_by_index(Uint8 controller, Uint32 button);
+Uint8 gfc_input_controller_button_released_by_index(Uint8 controller, Uint32 button);
+
+/**
+ * @brief get the state of a controller's button by its configured name
+ * @param controllerId the index of the controller to check
+ * @param button the name of the button
+ */
+Uint8 gfc_input_controller_button_state(Uint8 controllerId, const char *button);
+Uint8 gfc_input_controller_button_held(Uint8 controllerId, const char *button);
+Uint8 gfc_input_controller_button_pressed(Uint8 controllerId, const char *button);
+Uint8 gfc_input_controller_button_released(Uint8 controllerId, const char *button);
+
+/**
+ * @brief get the button index given the "name" of the button in the config file
+ * @return -1 on not found or error, or the index of the button otherwise
+ */
+int gfc_input_controller_get_button_index(const char *button);
 
 /**
  * @brief configure callbacks for an input
