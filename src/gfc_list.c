@@ -16,6 +16,19 @@ List *gfc_list_new()
     return gfc_list_new_size(16);
 }
 
+List *gfc_list_copy(List *old)
+{
+    List *new;
+    if (!old)return 0;
+    if (old->size <= 0)return NULL;
+    new = gfc_list_new_size(old->size);
+    if (!new)return NULL;
+    if (old->count <= 0)return new;
+    memcpy(new->elements,old->elements,sizeof(ListElementData)*old->count);
+    new->count = old->count;
+    return new;
+}
+
 List *gfc_list_new_size(Uint32 count)
 {
     List *l;

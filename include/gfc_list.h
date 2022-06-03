@@ -33,6 +33,15 @@ List *gfc_list_new();
 List *gfc_list_new_size(Uint32 count);
 
 /**
+ * @brief make a copy of a list.  
+ * @note: THIS DOES NOT COPY ANY DATA POINTED TO BY THE OLD LIST
+ * @param old the list to copy
+ * @return NULL on error or no old data to copy,  A new list that contains the same 
+ * information as the old list.  (data pointers will be copied)
+ */
+List *gfc_list_copy(List *old);
+
+/**
  * @brief deletes a list that has been previously allocated
  * @param list the list to delete;
  */
