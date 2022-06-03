@@ -351,6 +351,7 @@ void gfc_input_update_controller(Input *command)
     if (!gfc_input_data.controllers)return;
     controllerId = command->controller - 1;
     controller = gfc_list_get_nth(gfc_input_data.controllers,controllerId);
+    if (!controller)return;
     
     c = gfc_list_get_count(command->buttons);
     if (!c)
