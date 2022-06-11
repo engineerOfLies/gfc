@@ -48,6 +48,13 @@ List *gfc_list_copy(List *old);
 void gfc_list_delete(List *list);
 
 /**
+ * @brief clears out the list, but does NOT free any data that the list may have been pointing to
+ * @param list the list to clear
+ * @note effectively zeroes out the list without freeing any data
+ */
+void gfc_list_clear(List *list);
+
+/**
  * @brief get the data stored at the nth element
  * @param list the list to pull data from
  * @param n which element to look out

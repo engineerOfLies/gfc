@@ -145,6 +145,8 @@ Sound *gfc_sound_get_by_filename(const char * filename)
 Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
 {
     Sound *sound;
+    if (!filename)return NULL;
+    if (strlen(filename) == 0)return NULL;
     sound = gfc_sound_get_by_filename(filename);
     if (sound)
     {
@@ -174,6 +176,7 @@ void gfc_sound_play(Sound *sound,int loops,float volume,int channel,int group)
     int chan;
     float netVolume = 1;
     if (!sound)return;
+    if (!sound->sound)return;
     if (volume > 0)
     {
         netVolume *= volume;

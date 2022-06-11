@@ -245,6 +245,13 @@ int gfc_list_delete_data(List *list,void *data)
     return -1;
 }
 
+void gfc_list_clear(List *list)
+{
+    if (!list)return;
+    memset(list->elements,0,list->size);//zero out all the data;
+    list->count = 0;
+}
+
 int gfc_list_delete_nth(List *list,Uint32 n)
 {
     if (!list)
