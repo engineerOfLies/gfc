@@ -149,7 +149,7 @@ Sint64 gfc_hashmap_get_index(HashMap *map,const char *key)
         //keys don't match, so look at the next element in the array
         element = (HashElement *)map->map->elements[++i].data;
     }
-    while (element->hashValue == h);
+    while ((element)&&(element->hashValue == h));
     return -1;//not found
 }
 
