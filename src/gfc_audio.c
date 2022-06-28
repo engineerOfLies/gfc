@@ -1,6 +1,9 @@
-#include "gfc_audio.h"
-
 #include "simple_logger.h"
+#include "simple_json.h"
+
+#include "gfc_audio.h"
+#include "gfc_hashmap.h"
+
 
 typedef struct
 {
@@ -193,4 +196,94 @@ void gfc_sound_play(Sound *sound,int loops,float volume,int channel,int group)
     Mix_PlayChannel(chan, sound->sound, loops);
 
 }
+
+void gfc_sound_pack_play(HashMap *pack, const char *name,int loops,float volume,int channel,int group)
+{
+    Sound *sound;
+    if ((!pack)||(!name))return;
+    sound = gfc_hashmap_get(pack,name);
+    if (!sound)return;
+    gfc_sound_play(sound,loops,volume,channel,group);
+}
+
+
+void gfc_sound_pack_load_sound(HashMap *pack, const char *name,const char *file)
+{
+    Sound *sound;
+    if ((!pack)||(!name)||(!file))return;
+    sound = gfc_hashmap_get(pack,name);
+    if (sound)
+    {
+        gfc_sound_free(sound);//delete the old one
+        gfc_hashmap_delete_by_key(pack,name);
+    }
+    sound = gfc_sound_load(file,1,-1);
+    if (!sound)return;
+    gfc_hashmap_insert(pack,name,sound);
+}
+
+void gfc_sound_pack_free(HashMap *pack)
+{
+    int i,c;
+    Sound *sound;
+    List *sounds;
+    if (!pack)return;
+    sounds = gfc_hashmap_get_all_values(pack);
+    if (!sounds)return;
+    c = gfc_list_get_count(sounds);
+    for (i = 0;i < c;i++)
+    {
+        sound = gfc_list_get_nth(sounds,i);
+        if (!sound)continue;
+        gfc_sound_free(sound);
+    }
+    gfc_list_delete(sounds);
+    gfc_hashmap_free(pack);
+}
+
+HashMap *gfc_sound_pack_parse_file(const char *filename)
+{
+    SJson *file;
+    SJson *sounds;
+    HashMap *pack;
+    if (!filename)return NULL;
+    file = sj_load(filename);
+    if (!file)return NULL;
+    
+    sounds = sj_object_get_value(file,"sounds");
+    if (!sounds)
+    {
+        slog("failed to parse sound pack file, no 'sounds' object");
+        sj_free(file);
+        return NULL;
+    }
+    pack = gfc_sound_pack_parse(sounds);
+    sj_free(file);
+    return pack;
+}
+
+HashMap *gfc_sound_pack_parse(SJson *sounds)
+{
+    int i,c;
+    const char *name;
+    const char *text;
+    SJson *sound;
+    HashMap *pack = NULL;
+    if (!sounds)return NULL;
+    
+    c = sj_array_get_count(sounds);
+    if (!c)return NULL;
+    pack = gfc_hashmap_new();
+    if (!pack)return NULL;
+    for (i = 0; i < c; i++)
+    {
+        sound = sj_array_get_nth(sounds,i);
+        if (!sound)continue;
+        name = sj_get_string_value(sj_object_get_value(sound,"name"));
+        text = sj_get_string_value(sj_object_get_value(sound,"file"));
+        gfc_sound_pack_load_sound(pack, name,text);
+    }
+    return pack;
+}
+
 /*eol@eof*/

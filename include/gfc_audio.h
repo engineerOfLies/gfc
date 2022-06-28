@@ -3,9 +3,13 @@
 
 #include <SDL.h>
 #include <SDL_mixer.h>
+
+#include "simple_json.h"
+
 #include "gfc_types.h"
 #include "gfc_text.h"
 #include "gfc_list.h"
+#include "gfc_hashmap.h"
 
 typedef struct
 {
@@ -45,6 +49,7 @@ Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel);
 /**
  * @brief play a sound file that has been loaded
  * @param loops number of times to loop,  0 means play once, no loops
+ * @param volume how loud to play it
  * @param channel which channel to play on, -1 means use default
  * @param group which group to play on, -1 means use default
  */
@@ -60,5 +65,36 @@ void gfc_sound_free(Sound *sound);
  * @brief frees all sounds from memory.  This will invalidate any help Sound pointers
  */
 void gfc_sound_clear_all();
+
+/**
+ * @brief parse a sound pack (hashmap of sound names to sound files) from a json file
+ * @param filename the name of the json file containing the sounds list to parse
+ * @return NULL on error or the sound pack
+ */
+HashMap *gfc_sound_pack_parse_file(const char *filename);
+
+/**
+ * @brief parse a sound pack (hashmap of sound names to sound files) from a json object
+ * @param filename the name of the json file containing the sounds list to parse
+ * @return NULL on error or the sound pack
+ */
+HashMap *gfc_sound_pack_parse(SJson *sounds);
+
+/**
+ * @brief player a sound from a sound pack by its name
+ * @param pack the sound pack to play from
+ * @param name the name of the sound to play
+ * @param loops number of times to loop,  0 means play once, no loops
+ * @param volume how loud to play it
+ * @param channel which channel to play on, -1 means use default
+ * @param group which group to play on, -1 means use default
+ */
+void gfc_sound_pack_play(HashMap *pack, const char *name,int loops,float volume,int channel,int group);
+
+/**
+ * @brief free a previously loaded sound pack
+ * @param pack the sound pack to free
+ */
+void gfc_sound_pack_free(HashMap *pack);
 
 #endif
