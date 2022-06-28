@@ -147,6 +147,7 @@ Sint64 gfc_hashmap_get_index(HashMap *map,const char *key)
             return i;
         }
         //keys don't match, so look at the next element in the array
+        if ((i +1) >= map->size)return -1;// we seeked too far
         element = (HashElement *)map->map->elements[++i].data;
     }
     while ((element)&&(element->hashValue == h));
@@ -157,8 +158,10 @@ void *gfc_hashmap_get(HashMap *map,const char *key)
 {
     HashElement *element;
     Sint64 index;
+    if ((!map)||(!map->map)||(!map->map->elements))return NULL;
     index = gfc_hashmap_get_index(map,key);
     if (index < 0)return NULL;
+    if (index >= map->size)return NULL;
     element = (HashElement *)map->map->elements[index].data;
     return element->data;
 }
