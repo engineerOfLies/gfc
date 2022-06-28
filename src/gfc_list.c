@@ -218,9 +218,7 @@ int gfc_list_get_item_index(List *list,void *data)
             return i;
         }
     }
-    slog("data not found");
-    return -1;
-    
+    return -1;    
 }
 
 int gfc_list_delete_data(List *list,void *data)
