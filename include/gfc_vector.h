@@ -115,6 +115,16 @@ int vector2d_scale_flip_rotation(Vector2D scale);
  */
 float angle_between_degrees(float a, float b);
 
+/**
+ * @brief returns the angle between the two angles.
+ * Takes into account wraping around 0 and 2PI
+ * units are radians
+ * @Param a one of the angles in question
+ * @Param b one of the angles in question
+ * @return the angle, in degrees, between the two angles
+ */
+float angle_between_radians(float a, float b);
+
 void angle_clamp_degrees(float *a);
 
 /**

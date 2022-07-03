@@ -570,13 +570,26 @@ void angle_clamp_degrees(float *a)
   while (*a < 0)*a += 360;
 }
 
+float angle_between_radians(float a, float b)
+{
+  float angle;
+  angle = b - a;
+  if (angle > GFC_2PI)angle -= GFC_2PI;
+  if (angle < -GFC_2PI)angle += GFC_2PI;
+  if (angle > GFC_PI)return angle - GFC_2PI;
+  if (angle < -GFC_PI)return angle + GFC_2PI;
+  
+  return angle;
+}
+
 float angle_between_degrees(float a, float b)
 {
   float angle;
-  angle = fabs(a - b);
-  while (angle >= 360)angle -= 360;
-  while (angle < 0)angle += 360;
-  if (angle > 180)angle -= 180;
+  angle = b - a;
+  if (angle > 360) angle -= 360;
+  if (angle < 360) angle += 360;
+  if (angle > 180)return angle - 360;
+  if (angle < -180)return angle + 360;
   return angle;
 }
 
