@@ -162,4 +162,5 @@ void gfc_color_multiply(Color *dst,Color a,Color b);
  */
 Color gfc_color_clamp(Color color);
 
+
  #endif

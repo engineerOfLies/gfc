@@ -98,14 +98,6 @@ void gfc_hashmap_insert(HashMap *map,const char *key,void *data)
     i = h;
     while (map->map->elements[i].data != NULL)
     {   //collision
-        if (i >= map->map->size)
-        {
-            gfc_hashmap_rehash(map);
-            h = gfc_hash(map,key);
-            h = h %map->size;
-            i = h;
-            if (map->map->elements[i].data == NULL)break;
-        }
         collision = (HashElement *)map->map->elements[i].data;
         if (collision->hashValue != h)
         {
@@ -117,6 +109,14 @@ void gfc_hashmap_insert(HashMap *map,const char *key,void *data)
             if (map->map->elements[i].data == NULL)break;
         }
         i++;
+        if (i >= map->map->size)
+        {
+            gfc_hashmap_rehash(map);
+            h = gfc_hash(map,key);
+            h = h %map->size;
+            i = h;
+            if (map->map->elements[i].data == NULL)break;
+        }
     }
     element->hashValue = h;
     element->data = data;
