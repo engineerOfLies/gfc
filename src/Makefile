@@ -24,15 +24,10 @@ OBJECTS = $(patsubst %.c,%.o,$(wildcard *.c))
 INC_PATHS = ../include ../simple_json/include ../simple_logger/include
 INC_PARAMS =$(foreach d, $(INC_PATHS), -I$d)
 
-#GLIB_CFLAGS = `pkg-config --cflags glib-2.0`
-#GLIB_LDFLAGS = `pkg-config --libs glib-2.0`
 SDL_CFLAGS = `sdl2-config --cflags` $(INC_PARAMS)
 SDL_LDFLAGS = `sdl2-config --libs` -lSDL2_image -lpng -ljpeg -lz -lSDL2_ttf -lSDL2_mixer -lm
 LFLAGS = -g  -shared -Wl,-soname,lib$(PROJECT).so.1 -o $(LIB_PATH)/lib$(PROJECT).so.1 
 CFLAGS = -g  -fPIC -Wall -pedantic -std=gnu99 -fgnu89-inline -Wno-unknown-pragmas -Wno-variadic-macros
-# -fgnu89-inline 
-# -std=gnu99 
-# -ffast-math for relase version
 
 DOXYGEN = doxygen
 
