@@ -224,20 +224,8 @@ void gfc_sound_pack_load_sound(HashMap *pack, const char *name,const char *file)
 
 void gfc_sound_pack_free(HashMap *pack)
 {
-    int i,c;
-    Sound *sound;
-    List *sounds;
     if (!pack)return;
-    sounds = gfc_hashmap_get_all_values(pack);
-    if (!sounds)return;
-    c = gfc_list_get_count(sounds);
-    for (i = 0;i < c;i++)
-    {
-        sound = gfc_list_get_nth(sounds,i);
-        if (!sound)continue;
-        gfc_sound_free(sound);
-    }
-    gfc_list_delete(sounds);
+    gfc_hashmap_foreach(pack, (gfc_work_func*)gfc_sound_free);
     gfc_hashmap_free(pack);
 }
 

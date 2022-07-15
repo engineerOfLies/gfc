@@ -26,7 +26,6 @@
 #include "gfc_types.h"
 #include "gfc_list.h"
 
-
 typedef struct
 {
     TextLine key;
@@ -84,6 +83,13 @@ void gfc_hashmap_delete_by_key(HashMap *map,const char *key);
  * @note use this to clean up a hashmap before deleting it
  */
 List *gfc_hashmap_get_all_values(HashMap *map);
+
+/**
+ * @brief run a function on all values in a hashmap
+ * @param map the hashmap to work on
+ * @param func the function to be run on each item, it will be given each item from the hashmap
+ */
+void gfc_hashmap_foreach(HashMap *map, gfc_work_func func);
 
 /**
  * @brief simple log the hash keys of the provided hashmap

@@ -3,6 +3,9 @@
 
 #include <SDL.h>
 
+typedef void gfc_work_func(void*);/**<prototype for a work function*/
+typedef void gfc_work_func_context(void*,void*);/**<prototype for a work function*/
+
 typedef struct
 {
     void *data;
@@ -140,10 +143,17 @@ Uint32 gfc_list_get_count(List *list);
 /**
  * @brief iterate over each element in the array and call the function provided
  * @param list the list to iterate over
+ * @param function a pointer to a function that will be called.  Data will be set to the list data element
+ */
+void gfc_list_foreach(List *list,void (*function)(void *data));
+
+/**
+ * @brief iterate over each element in the array and call the function provided
+ * @param list the list to iterate over
  * @param function a pointer to a function that will be called.  Data will be set to the list data element, context will be the contextData provided
  * @param contextData the data that will also be provided to the function pointer for each element
  */
-void gfc_list_foreach(List *list,void (*function)(void *data,void *context),void *contextData);
+void gfc_list_foreach_context(List *list,void (*function)(void *data,void *context),void *contextData);
 
 /**
  * @brief swap the locations of two items in the list.

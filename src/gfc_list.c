@@ -279,7 +279,25 @@ Uint32 gfc_list_get_count(List *list)
     return list->count;
 }
 
-void gfc_list_foreach(List *list,void (*function)(void *data,void *context),void *contextData)
+void gfc_list_foreach(List *list,void (*function)(void *data))
+{
+    int i;
+    if (!list)
+    {
+        slog("no list provided");
+        return;
+    }
+    if (!function)
+    {
+        slog("no function provided");
+    }
+    for (i = 0;i < list->count;i++)
+    {
+        function(list->elements[i].data);
+    }
+}
+
+void gfc_list_foreach_context(List *list,void (*function)(void *data,void *context),void *contextData)
 {
     int i;
     if (!list)

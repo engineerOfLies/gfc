@@ -219,6 +219,41 @@ List *gfc_hashmap_get_all_values(HashMap *map)
     return valueList;
 }
 
+void gfc_hashmap_foreach(HashMap *map, gfc_work_func func)
+{
+    int i,c;
+    void *item;
+    List *items;
+    if ((!map)||(!func))return;
+    items = gfc_hashmap_get_all_values(map);
+    if (!items)return;
+    c = gfc_list_get_count(items);
+    for (i = 0;i < c;i++)
+    {
+        item = gfc_list_get_nth(items,i);
+        if (!item)continue;
+        func(item);
+    }
+    gfc_list_delete(item);
+}
+
+void gfc_hashmap_foreach_context(HashMap *map, gfc_work_func_context func,void *context)
+{
+    int i,c;
+    void *item;
+    List *items;
+    if ((!map)||(!func))return;
+    items = gfc_hashmap_get_all_values(map);
+    if (!items)return;
+    c = gfc_list_get_count(items);
+    for (i = 0;i < c;i++)
+    {
+        item = gfc_list_get_nth(items,i);
+        if (!item)continue;
+        func(item,context);
+    }
+    gfc_list_delete(item);
+}
 
 
 /**/
