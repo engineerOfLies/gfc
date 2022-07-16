@@ -89,6 +89,7 @@ void *gfc_list_get_nth(List *list,Uint32 n)
 List *gfc_list_expand(List *list)
 {
     List *l;
+    ListElementData *temp;
     if (!list)
     {
         slog("no list provided");
@@ -104,9 +105,12 @@ List *gfc_list_expand(List *list)
     {
         memcpy(l->elements,list->elements,sizeof(ListElementData)*list->count);
     }
+    temp = l->elements;
+    l->elements = list->elements;
+    list->elements = temp;
     l->count = list->count;
-    gfc_list_delete(list);
-    return l;
+    gfc_list_delete(l);
+    return list;
 }
 
 List *gfc_list_append(List *list,void *data)
