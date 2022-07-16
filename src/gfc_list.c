@@ -1,5 +1,7 @@
-#include "gfc_list.h"
 #include "simple_logger.h"
+
+#include "gfc_types.h"
+#include "gfc_list.h"
 
 void gfc_list_delete(List *list)
 {
@@ -45,14 +47,13 @@ List *gfc_list_new_size(Uint32 count)
     }
     memset(l,0,sizeof(List));
     l->size = count;
-    l->elements = (ListElementData*)malloc(sizeof(ListElementData)*count);
+    l->elements = gfc_allocate_array(sizeof(ListElementData),count);
     if (!l->elements)
     {
         slog("failed to allocate space for list elements");
         free(l);
         return NULL;
     }
-    memset(l->elements,0,sizeof(ListElementData)*count);
     return l;
 }
 
@@ -89,7 +90,6 @@ void *gfc_list_get_nth(List *list,Uint32 n)
 List *gfc_list_expand(List *list)
 {
     List *l;
-    ListElementData *temp;
     if (!list)
     {
         slog("no list provided");
@@ -105,12 +105,9 @@ List *gfc_list_expand(List *list)
     {
         memcpy(l->elements,list->elements,sizeof(ListElementData)*list->count);
     }
-    temp = l->elements;
-    l->elements = list->elements;
-    list->elements = temp;
     l->count = list->count;
-    gfc_list_delete(l);
-    return list;
+    gfc_list_delete(list);
+    return l;
 }
 
 List *gfc_list_append(List *list,void *data)
