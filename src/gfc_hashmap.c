@@ -252,7 +252,7 @@ void gfc_hashmap_foreach_context(HashMap *map, gfc_work_func_context func,void *
         if (!item)continue;
         func(item,context);
     }
-    gfc_list_delete(item);
+    gfc_list_delete(items);
 }
 
 
