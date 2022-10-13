@@ -20,7 +20,7 @@ typedef struct
     int defaultChannel;
 }Sound;
 
-/**defaultChannel
+/**
  * @brief initializes the audio system based on the passed in parameters
  * @param maxSounds the maximum number of sounds that can be loaded into memory at once
  * @param channels the nrumber of allocated audio channels (excluding music channel)

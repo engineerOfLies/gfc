@@ -137,9 +137,42 @@ void gfc_matrix_multiply_vector4d(
  */
 void gfc_matrix_multiply_scalar(Matrix4 out,Matrix4 m1,float s);
 
+/**
+ * @brief rotate a matrix around the cardinal axis by the provided amount
+ * @param out the result of the rotation
+ * @param m the matrix to rotate
+ * @param theta the amount to rotate by
+ */
+void gfc_matrix_rotate_x(
+    Matrix4     out,
+    Matrix4     m,
+    float       theta
+);
+void gfc_matrix_rotate_y(
+    Matrix4     out,
+    Matrix4     m,
+    float       theta
+);
+void gfc_matrix_rotate_z(
+    Matrix4     out,
+    Matrix4     m,
+    float       theta
+);
 
 /**
- * @brief multiply a matrix by the rotation matrix
+ * @brief sequentially apply the cardinal axis rotations about the x, y, and z axis accordingly
+ * @param out the result of the rotation
+ * @param m the matrix to rotate
+ * @param v the amount to rotate by in the x, y, and z axis
+ */
+void gfc_matrix_rotate_by_vector(
+    Matrix4     out,
+    Matrix4     m,
+    Vector3D    v
+);
+
+/**
+ * @brief multiply a matrix around a specific axis
  * @param out the output matrix
  * @param in  the input matrix
  * @param degree the amount, in radians, to rotate by
