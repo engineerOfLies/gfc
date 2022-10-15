@@ -289,7 +289,7 @@ void gfc_matrix_rotate_x(
     
     gfc_matrix_identity(Result);
     Result[1][1] = cos(-theta);
-    Result[1][2] = sin(-theta);
+    Result[1][2] = -sin(-theta);
     Result[2][1] = sin(-theta);
     Result[2][2] = cos(-theta);
     gfc_matrix_multiply(out,m,Result);
