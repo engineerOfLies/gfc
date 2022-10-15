@@ -221,6 +221,18 @@ Vector4D gfc_color_to_vector4(Color color)
     return vector;
 }
 
+Vector4D gfc_color_to_vector4f(Color color)
+{
+    Vector4D vector;
+    color = gfc_color_to_float(color);
+    vector.x = color.r;
+    vector.y = color.g;
+    vector.z = color.b;
+    vector.w = color.a;
+    return vector;
+}
+
+
 float gfc_color_get_hue(Color color)
 {
     color = gfc_color_to_hsla(color);

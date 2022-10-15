@@ -111,8 +111,17 @@ Color gfc_color_from_vector4(Vector4D vector);
  * @brief convert a color to a vector where x = r, y = g, z = b, w = a
  * @param color the color to convert
  * @return a vector set to the color provided
+ * @note: will be in values from 0-255
  */
 Vector4D gfc_color_to_vector4(Color color);
+
+/**
+ * @brief convert a color to a vector where x = r, y = g, z = b, w = a
+ * @param color the color to convert
+ * @return a vector set to the color provided
+ * @note: will be in values from 0-1.0f
+ */
+Vector4D gfc_color_to_vector4f(Color color);
 
 /**
  * @brief Get the Hue value of a color.  It may convert internally as needed.
