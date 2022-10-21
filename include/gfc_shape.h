@@ -8,6 +8,11 @@
 #include "gfc_vector.h"
 #include "gfc_color.h"
 
+
+/**
+ * @purpose gfc_shapes is meant to provide a common way to represent simple 2D shapes and test collisions based on them
+ */
+
 typedef struct
 {
     double x1,y1,x2,y2;
