@@ -95,6 +95,15 @@ Sphere gfc_sphere(float x, float y, float z, float r);
  */
 Plane3D gfc_plane3d(float x, float y, float z, float d);
 
+/**
+ * @brief make a triangle based on 3 points
+ * @param a a point
+ * @param b a point
+ * @param c a point
+ * @return a set triangle
+ */
+Triangle3D gfc_triangle(Vector3D a,Vector3D b,Vector3D c);
+
 //tests
 /**
  * @brief check if a point is within a bounding box
@@ -129,8 +138,22 @@ Uint8 gfc_point_in_sphere(Vector3D p,Sphere s);
 Uint8 gfc_sphere_overlap(Sphere A, Sphere B);
 
 /**
+ * @brief given a triangle, get its plane
+ * @param t the triangle in question
+ * @return the plane determined by the triangle
+ */
+Plane3D gfc_triangle_get_plane(Triangle3D t);
+
+/**
+ * @brief get the normal of the triangle
+ * @param t the triangle
+ * @return the normal vector
+ */
+Vector3D gfc_triangle_get_normal(Triangle3D t);
+
+/**
  * @brief check if the edge intersects the triangle
- * @param e the edge to test with
+ * @param e the edge to test with (from a to b)
  * @param t the triangle to test
  * @param contact [optional] if provided it will be populated with the point of collision
  * @return 0 if no intersection, 1 if there is
@@ -142,15 +165,31 @@ Uint8 gfc_triangle_edge_test(
 
 /**
  * @brief determine if the 3D edge intersects the sphere and find the point of contact and normal at contact point
- * @param e the 3d edge to test with
+ * @param e the edge to test with (from a to b)
  * @param s the sphere to test
  * @param poc [optional] if provided this will populate with the point of collision
  * @param normal [optional] if provided this will populate with the normal at point of collision
+ * @note if start of the edge (e.a) is inside the sphere, the POC will be set to e.a and normal will not be set
  * @return 0 if not overlap, 1 if there is
  */
 Uint8 gfc_edge3d_to_sphere_intersection(
     Edge3D e,
     Sphere s,
+    Vector3D *poc,
+    Vector3D *normal);
+
+/**
+ * @brief determine if the 3D edge intersects the box and find the point of contact and normal at contact point
+ * @param e the edge to test with (from a to b)
+ * @param b the box to test
+ * @param poc [optional] if provided this will populate with the point of collision
+ * @param normal [optional] if provided this will populate with the normal at point of collision
+ * @note if start of the edge (e.a) is inside the box, the POC will be set to e.a and normal will not be set
+ * @return 1 if the edge intersects the box, 0 otherwise.
+ */
+Uint8 gfc_edge_box_test(
+    Edge3D e,
+    Box b,
     Vector3D *poc,
     Vector3D *normal);
 

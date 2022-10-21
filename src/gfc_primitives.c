@@ -21,6 +21,22 @@ Plane3D gfc_plane3d(float x, float y, float z, float d)
     return p;
 }
 
+Triangle3D gfc_triangle(Vector3D a,Vector3D b,Vector3D c)
+{
+    Triangle3D t = {a,b,c};
+    return t;
+}
+
+
+Uint8 gfc_point_in_box(Vector3D p,Box b)
+{
+    if ((p.x >= b.x) && (p.x <= b.x + b.w)&&
+        (p.y >= b.y) && (p.y <= b.y + b.h)&&
+        (p.z >= b.z) && (p.z <= b.z + b.d))
+        return 1;
+    return 0;
+}
+
 Uint8 gfc_point_in_sphere(Vector3D p,Sphere s)
 {
     if (vector3d_magnitude_compare(
@@ -199,6 +215,160 @@ Uint8 gfc_point_in_triangle(
     return 0;
 }
 
+Uint8 gfc_edge_box_test(
+    Edge3D e,
+    Box b,
+    Vector3D *poc,
+    Vector3D *normal)
+{
+    Vector3D contact;
+    Vector3D vertices[8];
+    
+    Box skip = {0};
+    
+    if (gfc_point_in_box(e.a,b))
+    {
+        //start inside the box
+        if (poc)*poc = e.a;
+        return 1;
+    }
+    if (e.a.x > b.x)skip.x = 1;
+    if (e.a.y > b.y)skip.y = 1;
+    if (e.a.z > b.z)skip.z = 1;
+    if (e.a.x < b.x + b.w)skip.x = 1;
+    if (e.a.y < b.y + b.h)skip.y = 1;
+    if (e.a.z < b.z + b.d)skip.z = 1;
+    
+    // test each size of the box
+    vertices[0] = vector3d(b.x,b.y,b.z);
+    vertices[1] = vector3d(b.x + b.w,b.y,b.z);
+    vertices[2] = vector3d(b.x,b.y + b.h,b.z);
+    vertices[3] = vector3d(b.x + b.w,b.y + b.h,b.z);
+    vertices[4] = vector3d(b.x,b.y,b.z + b.d);
+    vertices[5] = vector3d(b.x + b.w,b.y,b.z + b.d);
+    vertices[6] = vector3d(b.x,b.y + b.h,b.z + b.d);
+    vertices[7] = vector3d(b.x + b.w,b.y + b.h,b.z + b.d);
+        
+    if (!skip.z) //check against the top side
+    {
+        if (gfc_edge_in_plane(
+                e,
+                gfc_triangle_get_plane(
+                    gfc_triangle(vertices[4],vertices[5],vertices[6])),
+                &contact))
+        {
+            //check for inclusion
+            if ((contact.x >= b.x)&&(contact.x <= b.x + b.w)&&
+                (contact.y >= b.y)&&(contact.y >= b.y + b.h))
+            {
+                //we hit!
+                if (poc)*poc = contact;
+                if (normal)*normal = vector3d(0,0,1);
+                return 1;
+            }
+        }
+    }
+
+    if (!skip.d) //check against the bottom side
+    {
+        if (gfc_edge_in_plane(
+                e,
+                gfc_triangle_get_plane(
+                    gfc_triangle(vertices[0],vertices[1],vertices[2])),
+                &contact))
+        {
+            //check for inclusion
+            if ((contact.x >= b.x)&&(contact.x <= b.x + b.w)&&
+                (contact.y >= b.y)&&(contact.y >= b.y + b.h))
+            {
+                //we hit!
+                if (poc)*poc = contact;
+                if (normal)*normal = vector3d(0,0,-1);
+                return 1;
+            }
+        }
+    }
+
+    if (!skip.y) //check against the front side
+    {
+        if (gfc_edge_in_plane(
+                e,
+                gfc_triangle_get_plane(
+                    gfc_triangle(vertices[0],vertices[1],vertices[4])),
+                &contact))
+        {
+            //check for inclusion
+            if ((contact.x >= b.x)&&(contact.x <= b.x + b.w)&&
+                (contact.z >= b.z)&&(contact.z >= b.z + b.d))
+            {
+                //we hit!
+                if (poc)*poc = contact;
+                if (normal)*normal = vector3d(0,-1,0);
+                return 1;
+            }
+        }
+    }
+
+    if (!skip.h) //check against the back side
+    {
+        if (gfc_edge_in_plane(
+                e,
+                gfc_triangle_get_plane(
+                    gfc_triangle(vertices[2],vertices[3],vertices[6])),
+                &contact))
+        {
+            //check for inclusion
+            if ((contact.x >= b.x)&&(contact.x <= b.x + b.w)&&
+                (contact.z >= b.z)&&(contact.z >= b.z + b.d))
+            {
+                //we hit!
+                if (poc)*poc = contact;
+                if (normal)*normal = vector3d(0,1,0);
+                return 1;
+            }
+        }
+    }
+
+    if (!skip.x) //check against the left side
+    {
+        if (gfc_edge_in_plane(
+                e,
+                gfc_triangle_get_plane(
+                    gfc_triangle(vertices[0],vertices[2],vertices[4])),
+                &contact))
+        {
+            //check for inclusion
+            if ((contact.y >= b.y)&&(contact.y <= b.y + b.h)&&
+                (contact.z >= b.z)&&(contact.z >= b.z + b.d))
+            {
+                //we hit!
+                if (poc)*poc = contact;
+                if (normal)*normal = vector3d(-1,0,0);
+                return 1;
+            }
+        }
+    }
+    if (!skip.w) //check against the right side
+    {
+        if (gfc_edge_in_plane(
+                e,
+                gfc_triangle_get_plane(
+                    gfc_triangle(vertices[1],vertices[6],vertices[3])),
+                &contact))
+        {
+            //check for inclusion
+            if ((contact.y >= b.y)&&(contact.y <= b.y + b.h)&&
+                (contact.z >= b.z)&&(contact.z >= b.z + b.d))
+            {
+                //we hit!
+                if (poc)*poc = contact;
+                if (normal)*normal = vector3d(1,0,0);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 
 Uint8 gfc_triangle_edge_test(
   Edge3D e,
@@ -233,6 +403,13 @@ Uint8 gfc_edge3d_to_sphere_intersection(Edge3D e,Sphere s,Vector3D *poc,Vector3D
     float dx, dy, dz, A, B, C, det, t,t1,t2;
     Vector3D intersection1, intersection2;
     Vector3D cp;
+    
+    if (gfc_point_in_sphere(e.a,s))
+    {
+        //edge starts in sphere
+        if (poc)*poc = e.a;
+        return 1;
+    }
     dx = e.b.x - e.a.x;
     dy = e.b.y - e.a.y;
     dz = e.b.z - e.a.z;
