@@ -228,4 +228,102 @@ Uint8 gfc_triangle_edge_test(
   return 0;
 }
 
+Uint8 gfc_edge3d_to_sphere_intersection(Edge3D e,Sphere s,Vector3D *poc,Vector3D *normal)
+{
+    float dx, dy, dz, A, B, C, det, t,t1,t2;
+    Vector3D intersection1, intersection2;
+    Vector3D cp;
+    dx = e.b.x - e.a.x;
+    dy = e.b.y - e.a.y;
+    dz = e.b.z - e.a.z;
+
+    cp.x = s.x;
+    cp.y = s.y;
+    cp.z = s.y;
+    A = dx * dx + dy * dy + dz * dz;
+    B = 2 * (dx * (e.a.x - s.x) + dy * (e.a.y - s.y) + dz * (e.a.z - s.z));
+    C = (e.a.x - s.x) * (e.a.x - s.x) +
+        (e.a.y - s.y) * (e.a.y - s.y) +
+        (e.a.z - s.z) * (e.a.z - s.z) -
+        s.r * s.r;
+
+    det = B * B - 4 * A * C;
+    if ((A <= 0.0000001) || (det < 0))
+    {
+        // No real solutions.
+        return 0;
+    }
+    else if (det == 0)
+    {
+        // One solution.
+        t = -B / (2 * A);
+        intersection1 = vector3d(e.a.x + t * dx, e.a.y + t * dy,e.a.z + t * dz);
+        
+        if ((intersection1.x < MIN(e.a.x,e.b.x))||(intersection1.x > MAX(e.a.x,e.b.x))||
+            (intersection1.y < MIN(e.a.y,e.b.y))||(intersection1.y > MAX(e.a.y,e.b.y))||
+            (intersection1.z < MIN(e.a.z,e.b.z))||(intersection1.z > MAX(e.a.z,e.b.z)))
+        {
+            //point lies outside of line segment
+            return 0;
+        }
+        if (poc)
+        {
+            *poc = intersection1;
+        }
+        if (normal)
+        {
+            vector3d_sub(intersection2,cp,intersection1);
+            vector3d_normalize(&intersection2);
+            *normal = intersection2;
+        }
+        return 1;
+    }
+    else
+    {
+        // Two solutions. picking the one closer to the first point of the edge
+        t1 = (float)((-B + sqrt(det)) / (2 * A));
+        t2 = (float)((-B - sqrt(det)) / (2 * A));
+        intersection1 = vector3d(e.a.x + t1 * dx, e.a.y + t1 * dy, e.a.z + t1 * dz);
+        intersection2 = vector3d(e.a.x + t2 * dx, e.a.y + t2 * dy, e.a.z + t2 * dz);
+        
+        if ((intersection1.x < MIN(e.a.x,e.b.x))||(intersection1.x > MAX(e.a.x,e.b.x))||
+            (intersection1.y < MIN(e.a.y,e.b.y))||(intersection1.y > MAX(e.a.y,e.b.y))||
+            (intersection1.z < MIN(e.a.z,e.b.z))||(intersection1.z > MAX(e.a.z,e.b.z)))
+        {
+            if ((intersection2.x < MIN(e.a.x,e.b.x))||(intersection2.x > MAX(e.a.x,e.b.x))||
+                (intersection2.y < MIN(e.a.y,e.b.y))||(intersection2.y > MAX(e.a.y,e.b.y))||
+                (intersection2.z < MIN(e.a.z,e.b.z))||(intersection2.z > MAX(e.a.z,e.b.z)))
+            {
+                return 0;
+            }
+            t = t2;
+        }
+        else
+        {
+            if ((intersection2.x < MIN(e.a.x,e.b.x))||(intersection2.x > MAX(e.a.x,e.b.x))||
+                (intersection2.y < MIN(e.a.y,e.b.y))||(intersection2.y > MAX(e.a.y,e.b.y))||
+                (intersection2.z < MIN(e.a.z,e.b.z))||(intersection2.z > MAX(e.a.z,e.b.z)))
+            {
+                t = t1;
+            }
+            else
+            {
+                t = MIN(t1,t2);
+            }
+        }
+        intersection1 = vector3d(e.a.x + t * dx, e.a.y + t * dy, e.a.z + t * dz);        
+        if (poc)
+        {
+            *poc = intersection1;
+        }
+        if (normal)
+        {
+            vector3d_sub(intersection2,cp,intersection1);
+            vector3d_normalize(&intersection2);
+            *normal = intersection2;
+        }
+        return 2;
+    }
+}
+
 /*eol@eof*/

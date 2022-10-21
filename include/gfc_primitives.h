@@ -128,4 +128,30 @@ Uint8 gfc_point_in_sphere(Vector3D p,Sphere s);
  */
 Uint8 gfc_sphere_overlap(Sphere A, Sphere B);
 
+/**
+ * @brief check if the edge intersects the triangle
+ * @param e the edge to test with
+ * @param t the triangle to test
+ * @param contact [optional] if provided it will be populated with the point of collision
+ * @return 0 if no intersection, 1 if there is
+ */
+Uint8 gfc_triangle_edge_test(
+  Edge3D e,
+  Triangle3D t,
+  Vector3D *contact);
+
+/**
+ * @brief determine if the 3D edge intersects the sphere and find the point of contact and normal at contact point
+ * @param e the 3d edge to test with
+ * @param s the sphere to test
+ * @param poc [optional] if provided this will populate with the point of collision
+ * @param normal [optional] if provided this will populate with the normal at point of collision
+ * @return 0 if not overlap, 1 if there is
+ */
+Uint8 gfc_edge3d_to_sphere_intersection(
+    Edge3D e,
+    Sphere s,
+    Vector3D *poc,
+    Vector3D *normal);
+
 #endif
