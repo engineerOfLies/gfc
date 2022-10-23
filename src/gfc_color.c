@@ -2,6 +2,18 @@
 #include "gfc_color.h"
 
 
+int gfc_color_cmp(Color a, Color b)
+{
+    a = gfc_color_to_float(a);
+    b = gfc_color_to_float(b);
+
+    if ((a.r != b.r)||
+        (a.g != b.g)||
+        (a.b != b.b)||
+        (a.a != b.a))return 0;
+    return 1;
+}
+
 Color gfc_color(float r,float g,float b,float a)
 {
     Color color;

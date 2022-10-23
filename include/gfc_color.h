@@ -33,6 +33,15 @@ typedef struct
  * @returns a newly set color
  */
 Color gfc_color(float r,float g,float b,float a);
+
+/**
+ * @brief check if two colors are the same color
+ * @param a color to check
+ * @param b color to check
+ * @return 1 if the same color, 0 if not
+ */
+int gfc_color_cmp(Color a, Color b);
+
 /**
  * @brief create and return a color from 8 bit integer RGBA values
  * @param r red value 0 - 255
