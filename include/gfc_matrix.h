@@ -4,6 +4,8 @@
 #include "gfc_vector.h"
 
 typedef float Matrix4[4][4];
+typedef float Matrix3[3][3];
+typedef float Matrix2[2][2];
 
 typedef struct
 {
@@ -72,7 +74,13 @@ void gfc_matrix_view(
     Vector3D up
 );
 
-void gfc_matrix_slog(Matrix4 mat);
+/**
+ * @brief send the information from a matrix to the log out
+ * @param mat the matrix to print
+ */
+void gfc_matrix4_slog(Matrix4 mat);
+void gfc_matrix3_slog(Matrix3 mat);
+void gfc_matrix2_slog(Matrix2 mat);
 
 /**
  * @brief setup a perspective projection matrix

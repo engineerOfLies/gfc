@@ -40,12 +40,25 @@ Vector3D gfc_unproject(Vector3D in,Matrix4 model, Matrix4 proj,Vector4D viewport
     return out;
 }
 
-void gfc_matrix_slog(Matrix4 mat)
+void gfc_matrix4_slog(Matrix4 mat)
 {
     slog("%f,%f,%f,%f",mat[0][0],mat[0][1],mat[0][2],mat[0][3]);
     slog("%f,%f,%f,%f",mat[1][0],mat[1][1],mat[1][2],mat[1][3]);
     slog("%f,%f,%f,%f",mat[2][0],mat[2][1],mat[2][2],mat[2][3]);
     slog("%f,%f,%f,%f",mat[3][0],mat[3][1],mat[3][2],mat[3][3]);
+}
+
+void gfc_matrix3_slog(Matrix3 mat)
+{
+    slog("%f,%f,%f",mat[0][0],mat[0][1],mat[0][2]);
+    slog("%f,%f,%f",mat[1][0],mat[1][1],mat[1][2]);
+    slog("%f,%f,%f",mat[2][0],mat[2][1],mat[2][2]);
+}
+
+void gfc_matrix2_slog(Matrix2 mat)
+{
+    slog("%f,%f",mat[0][0],mat[0][1]);
+    slog("%f,%f",mat[1][0],mat[1][1]);
 }
 
 
