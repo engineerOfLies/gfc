@@ -47,6 +47,15 @@ typedef struct
     }s;
 }Shape;
 
+
+/**
+ * @brief check if two shapes are exactly the same
+ * @param a one shape to check
+ * @param b one shape to check
+ * @return 0 if there are any differences, 1 if exactly the same
+ */
+Uint8 gfc_shape_compare(Shape a, Shape b);
+
 /**
  * @brief parse a shape out of json
  * @param json the json object to parse

@@ -264,6 +264,27 @@ Vector2D gfc_edge_get_normal_for_edge(Edge e1,Edge e2)
     return out;
 }
 
+Uint8 gfc_shape_compare(Shape a, Shape b)
+{
+    if (a.type != b.type)return 0;
+    switch(a.type)
+    {
+        case ST_RECT:
+            if ((a.s.r.x != b.s.r.x)||(a.s.r.y != b.s.r.y)||(a.s.r.w != b.s.r.w)||(a.s.r.h != b.s.r.h))
+                return 0;
+            break;
+        case ST_CIRCLE:
+            if ((a.s.c.x != b.s.c.x)||(a.s.c.y != b.s.c.y)||(a.s.c.r != b.s.c.r))
+                return 0;
+            break;
+        case ST_EDGE:
+            if ((a.s.e.x1 != b.s.e.x1)||(a.s.e.y1 != b.s.e.y1)||(a.s.e.x2 != b.s.e.x2)||(a.s.e.y2 != b.s.e.y2))
+                return 0;
+            break;
+    }
+    return 1;
+}
+
 Vector2D gfc_shape_get_normal_for_edge(Shape s, Edge e)
 {
     Vector2D out = {0};
