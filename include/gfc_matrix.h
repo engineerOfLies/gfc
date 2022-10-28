@@ -138,6 +138,19 @@ void gfc_matrix_multiply_vector4d(
 );
 
 /**
+ * @brief create a transformation matrix from the three basic operation vectors
+ * @param out the output matrix
+ * @param translation the movement produced from the matrix
+ * @param rotation the amount to rotation with this matrix about the x, y, and z axis.
+ * @param scale the amount to scale with this matrix.  remember (1,1,1) is no change.  (0,0,0) is destroyed
+ */
+void gfc_matrix4_from_vectors(
+    Matrix4 out,
+    Vector3D translation,
+    Vector3D rotation,
+    Vector3D scale);
+
+/**
  * @brief multiply a matrix by the scalar value
  * @param out the output matrix
  * @param m1 input matrix to multiply by

@@ -61,6 +61,18 @@ void gfc_matrix2_slog(Matrix2 mat)
     slog("%f,%f",mat[1][0],mat[1][1]);
 }
 
+void gfc_matrix4_from_vectors(
+    Matrix4 out,
+    Vector3D translation,
+    Vector3D rotation,
+    Vector3D scale)
+{
+    gfc_matrix_identity(out);
+    
+    gfc_matrix_scale(out,scale);
+    gfc_matrix_rotate_by_vector(out,out,rotation);
+    gfc_matrix_translate(out,translation);
+}
 
 /*
  * Code has been adapted from glm to C for this project
