@@ -501,36 +501,36 @@ void vector3d_angles (Vector3D value1, Vector3D * angles)
     {
         yaw = 0;
         if (value1.z > 0)
-            pitch = 90;
+            pitch = GFC_HALF_PI;
         else
-            pitch = 270;
+            pitch = GFC_PI + GFC_HALF_PI;
     }
     else
     {
         if (value1.x)
         {
-            yaw = (int) (atan2(value1.y, value1.x) * GFC_RADTODEG);
+            yaw = (atan2(value1.y, value1.x));
         }
         else if (value1.y > 0)
         {
-            yaw = 90;
+            yaw = GFC_HALF_PI;
         }
         else
         {
-            yaw = -90;
+            yaw = -GFC_HALF_PI;
         }
         if (yaw < 0)
         {
-            yaw += 360;
+            yaw += GFC_2PI;
         }
 
         forward = sqrt (value1.x*value1.x + value1.y*value1.y);
-        pitch = (atan2(value1.z, forward) * GFC_RADTODEG);
+        pitch = (atan2(value1.z, forward));
         if (pitch < 0)
-            pitch += 360;
+            pitch += GFC_2PI;
     }
-    angles->x = -1 * pitch * GFC_DEGTORAD;
-    angles->z = yaw * GFC_DEGTORAD;
+    angles->x = -1 * pitch;
+    angles->z = yaw;
     angles->y = 0;
 }
 
