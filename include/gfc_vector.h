@@ -376,6 +376,15 @@ Bool vector4d_distance_between_less_than(Vector4D p1,Vector4D p2,float size);
 void vector3d_angle_vectors(Vector3D angles, Vector3D *forward, Vector3D *right, Vector3D *up);
 
 /**
+ * @brief given a vector, get the angles, in radians for yaw,roll, pitch
+ * @param vector the vector to assess
+ * @param angles the angles in radians (x,y,z) as (yaw,roll,pitch)
+ * @note roll will always be zero
+ * @note adapted from the quake2 source 'vectoangles' function
+ */
+void vector3d_angles (Vector3D vector, Vector3D * angles);
+
+/**
  * @brief rotate a 2D vector by the angle specified (in radians)
  * @param in the input vector
  * @param angle the angle to rotate by

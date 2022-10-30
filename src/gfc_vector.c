@@ -488,6 +488,54 @@ void vector3d_rotate_about_z(Vector3D *vect, float angle)
 }
 
 
+void vector3d_angles (Vector3D value1, Vector3D * angles)
+{
+    float   forward;
+    float   yaw, pitch;
+
+    if (!angles)return;
+    
+    vector3d_normalize(&value1);
+    
+    if (value1.y == 0 && value1.x == 0)
+    {
+        yaw = 0;
+        if (value1.z > 0)
+            pitch = 90;
+        else
+            pitch = 270;
+    }
+    else
+    {
+        if (value1.x)
+        {
+            yaw = (int) (atan2(value1.y, value1.x) * GFC_RADTODEG);
+        }
+        else if (value1.y > 0)
+        {
+            yaw = 90;
+        }
+        else
+        {
+            yaw = -90;
+        }
+        if (yaw < 0)
+        {
+            yaw += 360;
+        }
+
+        forward = sqrt (value1.x*value1.x + value1.y*value1.y);
+        pitch = (atan2(value1.z, forward) * GFC_RADTODEG);
+        if (pitch < 0)
+            pitch += 360;
+    }
+    angles->x = -1 * pitch * GFC_DEGTORAD;
+    angles->z = yaw * GFC_DEGTORAD;
+    angles->y = 0;
+}
+
+
+
 void vector3d_angle_vectors(Vector3D angles, Vector3D *forward, Vector3D *right, Vector3D *up)
 {
   float angle;

@@ -104,6 +104,26 @@ Plane3D gfc_plane3d(float x, float y, float z, float d);
  */
 Triangle3D gfc_triangle(Vector3D a,Vector3D b,Vector3D c);
 
+/**
+ * @brief make a 3d edge from its 2 points
+ * @param ax point a x position
+ * @param ay point a y position
+ * @param az point a z position
+ * @param bx point b x position
+ * @param by point b y position
+ * @param bz point b z position
+ * @return a set edge3d
+ */
+Edge3D gfc_edge3d(float ax,float ay,float az,float bx,float by,float bz);
+
+/**
+ * @brief make an edge from component vectors
+ * @param a point a's position
+ * @param b point b's potition
+ * @return a set edge3d
+ */
+Edge3D gfc_edge3d_from_vectors(Vector3D a,Vector3D b);
+
 //tests
 /**
  * @brief check if a point is within a bounding box

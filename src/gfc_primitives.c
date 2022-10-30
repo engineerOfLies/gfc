@@ -3,6 +3,19 @@
 #include "gfc_shape.h"
 #include "gfc_primitives.h"
 
+
+Edge3D gfc_edge3d_from_vectors(Vector3D a,Vector3D b)
+{
+    Edge3D e = {a,b};
+    return e;
+}
+
+Edge3D gfc_edge3d(float ax,float ay,float az,float bx,float by,float bz)
+{
+    Edge3D e = {{ax,ay,az},{bx,by,bz}};
+    return e;
+}
+
 Box gfc_box(float x, float y, float z, float w, float h, float d)
 {
     Box b = {x, y, z, w, h, d};
