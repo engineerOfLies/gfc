@@ -367,7 +367,7 @@ Bool vector3d_distance_between_less_than(Vector3D p1,Vector3D p2,float size);
 Bool vector4d_distance_between_less_than(Vector4D p1,Vector4D p2,float size);
 
 /**
- * @brief given a rotation, get the component vectors
+ * @brief given a rotation, get the component vectors  (in degrees!)
  * @param angles the input rotation
  * @param forward output optional calculated forward vector
  * @param right output optional calculated right vector

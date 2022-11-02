@@ -541,13 +541,13 @@ void vector3d_angle_vectors(Vector3D angles, Vector3D *forward, Vector3D *right,
   float angle;
   float sr, sp, sy, cr, cp, cy;
   
-  angle = angles.x * (GFC_DEGTORAD);
+  angle = angles.z;
   sy = sin(angle);
   cy = cos(angle);
-  angle = angles.z * (GFC_DEGTORAD);
+  angle = angles.x;
   sp = sin(angle);
   cp = cos(angle);
-  angle = angles.y * (GFC_DEGTORAD);
+  angle = angles.y;
   sr = sin(angle);
   cr = cos(angle);
   
