@@ -114,8 +114,7 @@ List *gfc_list_append(List *list,void *data)
 {
     if (!list)
     {
-        slog("no list provided");
-        return NULL;
+        list = gfc_list_new();
     }
     if (list->count >= list->size)
     {
