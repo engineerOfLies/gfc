@@ -443,9 +443,7 @@ void vector3d_rotate_about_x(Vector3D *vect, float angle)
 {
   Vector3D temp;
   if (!vect)return;
-  
-  angle=angle*GFC_DEGTORAD;
-  
+
   temp.x=vect->x;
   temp.y=(vect->y*cos(angle))-(vect->z*sin(angle));
   temp.z=(vect->y*sin(angle))+(vect->z*cos(angle));
@@ -459,9 +457,7 @@ void vector3d_rotate_about_y(Vector3D *vect, float angle)
 {
   Vector3D temp;
   if (!vect)return;
-  
-  angle=angle*GFC_DEGTORAD;
-  
+    
   temp.y=vect->y;
   temp.x=(vect->x*cos(angle))+(vect->z*sin(angle));
   temp.z=(vect->x*sin(angle)*(-1))+(vect->z*cos(angle));
@@ -475,9 +471,7 @@ void vector3d_rotate_about_z(Vector3D *vect, float angle)
 {
   Vector3D temp;
   if (!vect)return;
-  
-  angle=angle*GFC_DEGTORAD;
-  
+    
   temp.z=vect->z;
   temp.x=(vect->x*cos(angle))-(vect->y*sin(angle));
   temp.y=(vect->x*sin(angle))+(vect->y*cos(angle));
