@@ -114,8 +114,8 @@ Vector3D gfc_unproject(Vector3D in,Matrix4 view, Matrix4 proj,Vector2D viewport)
 
 /**
  * @brief multiply the two input matrices together and save the result into out
- * @note this is not safe if out is one of the inputs
- * @note operation is out = a * b
+ * @note operation is out = a * b, so most of the time a is changed by b
+ * @note result = childOp * parentOp
  * @param out the output matrix
  * @param a one multiplicand matrix
  * @param b another multiplicand matrix
