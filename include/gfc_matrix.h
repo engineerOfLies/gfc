@@ -165,6 +165,19 @@ void gfc_matrix4_from_vectors(
     Vector3D scale);
 
 /**
+ * @brief extract translation,rotation, and scale from a matrix
+ * @param in the matrix to extract from
+ * @param translation if provided, this will be populated with the translation information
+ * @param rotation if provided, this will be populated with the rotation information
+ * @param scale if provided, this will be populated with the scale information
+ */
+void gfc_matrix4_to_vectors(
+    Matrix4 in,
+    Vector3D *translation,
+    Vector3D *rotation,
+    Vector3D *scale);
+
+/**
  * @brief multiply a matrix by the scalar value
  * @param out the output matrix
  * @param m1 input matrix to multiply by

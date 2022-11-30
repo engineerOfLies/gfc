@@ -72,6 +72,42 @@ void gfc_matrix2_slog(Matrix2 mat)
     slog("%f,%f",mat[1][0],mat[1][1]);
 }
 
+void gfc_matrix4_to_vectors(
+    Matrix4 in,
+    Vector3D *translation,
+    Vector3D *rotation,
+    Vector3D *scale)
+{
+    if (scale)
+    {
+        scale->x = in[0][0];
+        scale->y = in[1][1];
+        scale->z = in[2][2];
+    }
+    if (translation)
+    {
+        translation->x = in[3][0];
+        translation->y = in[3][1];
+        translation->z = in[3][2];
+    }
+    if (rotation)
+    {
+        if ((in[0][0] == 1.0f)||(in[0][0] == -1.0f))
+        {
+            rotation->x = -atan2f(in[0][2], in[2][3]);
+            rotation->z = 0;
+            rotation->y = 0;
+
+        }else 
+        {
+
+            rotation->x = -atan2(-in[2][0],in[0][0]);
+            rotation->z = asin(in[1][0]);
+            rotation->y = -atan2(-in[1][2],in[1][1]);
+        }
+    }
+}
+
 void gfc_matrix4_from_vectors(
     Matrix4 out,
     Vector3D translation,
