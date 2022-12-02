@@ -47,12 +47,10 @@ void gfc_audio_init(
     atexit(Mix_Quit);
     atexit(gfc_audio_close);
     gfc_sound_init(maxSounds);
-    slog("audio system initialized");
 }
 
 void gfc_audio_close()
 {
-    slog("audio system closed");    
 }
 
 void gfc_sound_close()
@@ -64,7 +62,6 @@ void gfc_sound_close()
     }
     sound_manager.sound_list = NULL;
     sound_manager.max_sounds = 0;
-    slog("sound system closed");
 }
 
 void gfc_sound_init(Uint32 max)
@@ -77,7 +74,6 @@ void gfc_sound_init(Uint32 max)
     sound_manager.max_sounds = max;
     sound_manager.sound_list = (Sound *)malloc(sizeof(Sound)*max);
     memset (sound_manager.sound_list,0,sizeof(Sound)*max);
-    slog("sound system initialized");
     atexit(gfc_sound_close);
 }
 
