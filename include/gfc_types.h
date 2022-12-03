@@ -10,9 +10,12 @@
 #endif
 #define GFC_EPSILON   1e-6f
 #define GFC_ROOT2  1.414213562
-#define GFC_2PI 6.283185308
-#define GFC_PI 3.141592654
+
 #define GFC_HALF_PI 1.570796327
+#define GFC_PI 3.141592654
+#define GFC_PI_HALFPI 4.712388981
+#define GFC_2PI 6.283185308
+
 /* conversion factor for converting from radians to degrees*/
 #define GFC_RADTODEG  57.295779513082
 

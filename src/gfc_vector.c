@@ -605,6 +605,13 @@ float vector_angle(float x,float y)
     return (atan2(y,x) * GFC_RADTODEG) + 90;
 }
 
+void angle_clamp_radians(float *a)
+{
+  if (!a)return;
+  while (*a >= GFC_2PI)*a -= GFC_2PI;
+  while (*a < 0)*a += GFC_2PI;
+}
+
 void angle_clamp_degrees(float *a)
 {
   if (!a)return;

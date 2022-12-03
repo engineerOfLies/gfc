@@ -125,6 +125,16 @@ float angle_between_degrees(float a, float b);
  */
 float angle_between_radians(float a, float b);
 
+/**
+ * @brief prevent an angle from going beyond the range of +/- 2Pi
+ * @param a the angle to clamp
+ */
+void angle_clamp_radians(float *a);
+
+/**
+ * @brief prevent an angle from going beyond the range of 0 - 360
+ * @param a the angle to clamp
+ */
 void angle_clamp_degrees(float *a);
 
 /**
