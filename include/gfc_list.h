@@ -102,6 +102,7 @@ List *gfc_list_insert(List *list,void *data,Uint32 n);
 
 /**
  * @brief delete the element at the nth position in the array
+ * @note this does not clean up the information that the list is referring to
  * @param list the list to delete out of
  * @param n the element to delete.  This is no-op if the nth element is beyond the scope of the list (event is logged)
  * @return -1 on error, 0 otherwise

@@ -284,7 +284,6 @@ void gfc_list_foreach(List *list,void (*function)(void *data))
     int i;
     if (!list)
     {
-        slog("no list provided");
         return;
     }
     if (!function)
