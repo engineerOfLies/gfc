@@ -222,6 +222,18 @@ Color gfc_color_from_vector4(Vector4D vector)
     return color;
 }
 
+Color gfc_color_from_vector4f(Vector4D vector)
+{
+    Color color;
+    color.ct = CT_RGBAf;
+    color.r = vector.x;
+    color.g = vector.y;
+    color.b = vector.z;
+    color.a = vector.w;
+    return color;
+}
+
+
 Vector4D gfc_color_to_vector4(Color color)
 {
     Vector4D vector;

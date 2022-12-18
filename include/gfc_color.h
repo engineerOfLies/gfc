@@ -112,9 +112,16 @@ SDL_Color gfc_color_to_sdl(Color color);
 /**
  * @brief create a color from a vector where x = r, y = g, z = b, w = a
  * @param vector the vector to convert
- * @return a new color in the format CT_HSL
+ * @return a new color in the format CT_RGBA8
  */
 Color gfc_color_from_vector4(Vector4D vector);
+
+/**
+ * @brief create a color from a vector where x = r, y = g, z = b, w = a
+ * @param vector the vector to convert
+ * @return a new color in the format CT_RGBAf
+ */
+Color gfc_color_from_vector4f(Vector4D vector);
 
 /**
  * @brief convert a color to a vector where x = r, y = g, z = b, w = a
