@@ -80,7 +80,6 @@ void *gfc_list_get_nth(List *list,Uint32 n)
 {
     if (!list)
     {
-        slog("no list provided");
         return NULL;
     }
     if ((n >= list->count)||(n >= list->size))return NULL;
