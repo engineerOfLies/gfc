@@ -22,7 +22,7 @@
 /* conversion factor for converting from degrees to radians*/
 #define GFC_DEGTORAD  0.017453292519943295769236907684886
 
-typedef short unsigned int Bool;
+typedef short int Bool;
 
 #ifndef false
 #define false 0

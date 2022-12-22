@@ -21,6 +21,16 @@ typedef struct
     ColorType ct;   /**<how this structure is used*/
 }Color;
 
+#define GFC_RED gfc_color8(255,0,0,255)
+#define GFC_GREEN gfc_color8(0,255,0,255)
+#define GFC_BLUE gfc_color8(0,0,255,255)
+#define GFC_BLACK gfc_color8(0,0,0,255)
+#define GFC_WHITE gfc_color8(255,255,255,255)
+#define GFC_YELLOW gfc_color8(255,255,0,255)
+#define GFC_CYAN gfc_color8(0,255,255,255)
+#define GFC_MAGENTA gfc_color8(255,0,255,255)
+#define GFC_TRANSPARENT gfc_color8(0,0,0,0)
+
 #define gfc_color_copy(dst,src) (dst.r = src.r,dst.g = src.g,dst.b = src.b,dst.a = src.a,dst.ct = src.ct)
 
 /**
@@ -77,7 +87,8 @@ Color gfc_color_to_float(Color color);
 /**
  * @brief convert a color to 8 bit integer representation
  * @param color the color to convert
- * @return a new color in the format CT_RGBA8
+ * @return a new color         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),gfc_color(1,1,1,1));        
+in the format CT_RGBA8
  */
 Color gfc_color_to_int8(Color color);
 
