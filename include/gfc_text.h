@@ -34,6 +34,15 @@
  */
 
 /**
+ * @brief check if the two strings match AND are the same length  strcmp will match on substrings if the longer word is second.
+ * @param a one of the strings to compare
+ * @param b one of the strings to compare
+ * @returns strcmp results or -2 if the strings are not same length
+ */
+int gfc_strlcmp(const char *a,const char *b);
+
+
+/**
  * @brief believe it or not but standard C does not have stricmp.  This does that
  * @param a one of the strings to compare
  * @param b one of the strings to compare

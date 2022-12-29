@@ -2,6 +2,13 @@
 #include "simple_logger.h"
 #include "gfc_text.h"
 
+int gfc_strlcmp(const char *a,const char *b)
+{
+    if ((!a)||(!b))return -3;
+    if (strlen(a)!=strlen(b))return -2;
+    return strcmp(a,b);
+}
+
 int gfc_stricmp(const char *a,const char *b)
 {
     int i,v = 0;
