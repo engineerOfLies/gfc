@@ -104,9 +104,11 @@ List *gfc_list_expand(List *list)
     {
         memcpy(l->elements,list->elements,sizeof(ListElementData)*list->count);
     }
-    l->count = list->count;
-    gfc_list_delete(list);
-    return l;
+    list->size = l->size;// update the new size
+    free(list->elements);//free the old data
+    list->elements = l->elements;//point to new memory address
+    free(l);//free the temp list
+    return list;//for backward compatibility
 }
 
 List *gfc_list_append(List *list,void *data)

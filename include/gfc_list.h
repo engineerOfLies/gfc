@@ -76,7 +76,7 @@ void gfc_list_set_nth(List *list,Uint32 n,void *data);
 
 /**
  * @brief add an element to the end of the list
- * @note must catch the returned list to replace the list you had
+ * @note as of 2023, the original list is what is returned on success and you do not HAVE to assign it back to this function
  * @param list the list to add to
  * @param data the data to assign to the new element
  * @return NULL on error, your list otherwise
