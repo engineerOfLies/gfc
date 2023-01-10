@@ -25,7 +25,7 @@ typedef struct
 #define GFC_COLOR_GREEN gfc_color8(0,255,0,255)
 #define GFC_COLOR_BLUE gfc_color8(0,0,255,255)
 #define GFC_COLOR_BLACK gfc_color8(0,0,0,255)
-#define GFC_COLOR_DARKGREY gfc_color8(64,64,64,255)
+#define GFC_COLOR_DARKGREY gfc_color8(32,32,32,255)
 #define GFC_COLOR_GREY gfc_color8(128,128,128,255)
 #define GFC_COLOR_LIGHTGREY gfc_color8(192,192,192,255)
 #define GFC_COLOR_WHITE gfc_color8(255,255,255,255)
