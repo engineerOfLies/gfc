@@ -22,17 +22,26 @@ typedef struct
 }Color;
 
 #define GFC_COLOR_RED gfc_color8(255,0,0,255)
+#define GFC_COLOR_LIGHTRED gfc_color(1,.2,.2,1)
 #define GFC_COLOR_GREEN gfc_color8(0,255,0,255)
+#define GFC_COLOR_LIGHTGREEN gfc_color(.2,1,.2,1)
 #define GFC_COLOR_BLUE gfc_color8(0,0,255,255)
+#define GFC_COLOR_LIGHTBLUE gfc_color(.5,.6,1,1)
 #define GFC_COLOR_BLACK gfc_color8(0,0,0,255)
 #define GFC_COLOR_DARKGREY gfc_color8(32,32,32,255)
 #define GFC_COLOR_GREY gfc_color8(128,128,128,255)
 #define GFC_COLOR_LIGHTGREY gfc_color8(192,192,192,255)
 #define GFC_COLOR_WHITE gfc_color8(255,255,255,255)
 #define GFC_COLOR_YELLOW gfc_color8(255,255,0,255)
+#define GFC_COLOR_LIGHTYELLOW gfc_color(0.9,0.9,0.7,1)
 #define GFC_COLOR_CYAN gfc_color8(0,255,255,255)
+#define GFC_COLOR_LIGHTCYAN gfc_color(0.7,0.9,0.9,1)
 #define GFC_COLOR_MAGENTA gfc_color8(255,0,255,255)
 #define GFC_COLOR_TRANSPARENT gfc_color8(0,0,0,0)
+#define GFC_COLOR_BROWN gfc_color(.7,.4,0,1)
+#define GFC_COLOR_ORANGE gfc_color(.9,.6,0,1)
+#define GFC_COLOR_LIGHTORANGE gfc_color(1,.7,0.1,1)
+
 
 #define gfc_color_copy(dst,src) (dst.r = src.r,dst.g = src.g,dst.b = src.b,dst.a = src.a,dst.ct = src.ct)
 
