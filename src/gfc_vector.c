@@ -525,7 +525,7 @@ void vector3d_angles (Vector3D value1, Vector3D * angles)
     }
     angles->x = -1 * pitch;
     angles->z = yaw;
-    angles->y = 0;
+//    angles->y = 0;  //leave this alone
 }
 
 

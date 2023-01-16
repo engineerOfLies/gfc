@@ -435,8 +435,8 @@ void gfc_matrix_rotate_by_vector(
     Vector3D    v
 )
 {
-    gfc_matrix_rotate_x(out,m,  v.x);
     gfc_matrix_rotate_y(out,out,v.y);
+    gfc_matrix_rotate_x(out,m,  v.x);
     gfc_matrix_rotate_z(out,out,v.z);
 }
 

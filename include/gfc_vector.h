@@ -273,6 +273,25 @@ Vector4D vector4d_multiply(Vector4D a, Vector4D b);
 #define vector4d_clear(a)       (a.x=0,a.y=0,a.z=0,a.w=0)
 
 /**
+ * @brief macro to test if a vector is zero
+ * @param a the vector to test
+ * @return true if it is zero, false otherwise
+ */
+#define vector2d_is_zero(a)     ((a.x==0)&&(a.y==0))
+#define vector3d_is_zero(a)     ((a.x==0)&&(a.y==0)&&(a.z==0))
+#define vector4d_is_zero(a)     ((a.x==0)&&(a.y==0)&&(a.z==0)&&(a.w==0))
+
+/**
+ * @brief macro to check if two vectors are exactly the same
+ * @param a one vector to test
+ * @param b one vector to test
+ * @return true if and only if all parameters are the same
+ */
+#define vector2d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y))
+#define vector3d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y)&&(a.z==b.z))
+#define vector4d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y)&&(a.z==b.z)&&(a.w==b.w))
+
+/**
  * @brief Macro to get the negative of a vector
  *
  * @param src MglVect[2D|3D|4D] input
