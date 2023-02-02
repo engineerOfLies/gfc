@@ -13,6 +13,13 @@
 
 typedef struct
 {
+    int channel;        /**<which channel to play it on*/
+    int current;        /**<which sound is currently being played*/
+    List *sequence;     /**<list of Sound pointers to be played in sequence*/
+}SoundSequence;
+
+typedef struct
+{
     Uint32 ref_count;
     TextLine filepath;  /**<the sound file that was loaded*/
     Mix_Chunk *sound;
@@ -96,5 +103,15 @@ void gfc_sound_pack_play(HashMap *pack, const char *name,int loops,float volume,
  * @param pack the sound pack to free
  */
 void gfc_sound_pack_free(HashMap *pack);
+
+/**
+ * @brief queue a sequence of sounds to play on a specific channel
+ * @param sounds a list of pointers to Sound's
+ * @param channel the channel to play the sounds on
+ * @note copies the sound list, so feel free to free the list provided.
+ * @note it will not free or change the refcount for the sounds in the list, so keep them alive while needed
+ */
+void gfc_sound_queue_sequence(List *sounds,int channel);
+
 
 #endif

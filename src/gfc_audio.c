@@ -7,11 +7,14 @@
 
 typedef struct
 {
-    Uint32 max_sounds;
+    Uint32  max_sounds;
     Sound * sound_list;
+    List  * sound_sequences;
 }SoundManager;
 
 static SoundManager sound_manager={0,NULL};
+
+void gfc_sound_sequence_channel_callback(int channel);
 
 void gfc_audio_close();
 void gfc_sound_init(Uint32 max);
@@ -72,8 +75,9 @@ void gfc_sound_init(Uint32 max)
         return;
     }
     sound_manager.max_sounds = max;
-    sound_manager.sound_list = (Sound *)malloc(sizeof(Sound)*max);
-    memset (sound_manager.sound_list,0,sizeof(Sound)*max);
+    sound_manager.sound_list = gfc_allocate_array(sizeof(Sound),max);
+    sound_manager.sound_sequences = gfc_list_new();
+    Mix_ChannelFinished(gfc_sound_sequence_channel_callback);
     atexit(gfc_sound_close);
 }
 
@@ -270,4 +274,58 @@ HashMap *gfc_sound_pack_parse(SJson *sounds)
     return pack;
 }
 
+void gfc_sound_sequence_free(SoundSequence *sequence)
+{
+    if (!sequence)return;
+    if (sequence->sequence)gfc_list_delete(sequence->sequence);
+    free(sequence);
+}
+
+SoundSequence *gfc_sound_sequence_new()
+{
+    SoundSequence *sequence;
+    sequence = gfc_allocate_array(sizeof(SoundSequence),1);
+    if (!sequence)return NULL;
+    sequence->sequence = gfc_list_new();
+    return sequence;
+}
+
+void gfc_sound_queue_sequence(List *sounds,int channel)
+{
+    SoundSequence *sequence;
+    if (!sounds)return;
+    sequence = gfc_sound_sequence_new();
+    if (!sequence)return;
+    sequence->channel = channel;
+    sequence->sequence = gfc_list_copy(sounds);
+    gfc_list_append(sound_manager.sound_sequences,sequence);
+    if (!Mix_Playing(channel))
+    {
+        gfc_sound_sequence_channel_callback(channel);
+    }
+}
+
+void gfc_sound_sequence_channel_callback(int channel)
+{
+    Sound *sound;
+    SoundSequence *sequence;
+    int i,c;
+    c = gfc_list_get_count(sound_manager.sound_sequences);
+    for (i = 0; i < c;i++)
+    {
+        sequence = gfc_list_get_nth(sound_manager.sound_sequences,i);
+        if (!sequence)continue;
+        if (sequence->channel != channel)continue;
+        sound = gfc_list_get_nth(sequence->sequence,sequence->current);
+        if (!sound)continue;
+        sequence->current++;
+        gfc_sound_play(sound,0,sound->volume,channel,-1);
+        if (sequence->current >= gfc_list_get_count(sequence->sequence))//we are finished with this sequence
+        {
+            gfc_list_delete_data(sound_manager.sound_sequences,sequence);
+            gfc_sound_sequence_free(sequence);
+        }
+        return;
+    }
+}
 /*eol@eof*/
