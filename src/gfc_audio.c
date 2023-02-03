@@ -1,8 +1,9 @@
 #include "simple_logger.h"
 #include "simple_json.h"
 
-#include "gfc_audio.h"
+#include "gfc_pak.h"
 #include "gfc_hashmap.h"
+#include "gfc_audio.h"
 
 
 typedef struct
@@ -235,7 +236,7 @@ HashMap *gfc_sound_pack_parse_file(const char *filename)
     SJson *sounds;
     HashMap *pack;
     if (!filename)return NULL;
-    file = sj_load(filename);
+    file = gfc_pak_load_json(filename);
     if (!file)return NULL;
     
     sounds = sj_object_get_value(file,"sounds");

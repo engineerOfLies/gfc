@@ -2,6 +2,7 @@
 
 #include "gfc_types.h"
 #include "gfc_list.h"
+#include "gfc_pak.h"
 
 #include "gfc_config_def.h"
 
@@ -35,7 +36,7 @@ void gfc_config_def_load(const char *filename)
     if (!filename)return;
     
 
-    json = sj_load(filename);
+    json = gfc_pak_load_json(filename);
     if (!json)
     {
         slog("failed to load config def file %s");

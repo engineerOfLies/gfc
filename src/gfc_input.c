@@ -72,7 +72,11 @@ void gfc_input_controller_load_mappings(const char *config)
 {
     SJson *file,*mappings;
     file = gfc_pak_load_json(config);
-    if (!file)return;
+    if (!file)
+    {
+        slog("failed to load input config");
+        return;
+    }
     mappings = sj_object_get_value(file,"controller_map");
     if (!mappings)
     {
@@ -972,7 +976,7 @@ void gfc_input_commands_load(char *configFile)
     SJson *value;
     int count,i;
     if (!configFile)return;
-    json = sj_load(configFile);
+    json = gfc_pak_load_json(configFile);
     if (!json)return;
     commands = sj_object_get_value(json,"commands");
     if (!commands)
