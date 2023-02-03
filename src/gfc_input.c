@@ -1,6 +1,7 @@
 #include <simple_json.h>
 #include "simple_logger.h"
 #include "gfc_list.h"
+#include "gfc_pak.h"
 #include "gfc_input.h"
 
 typedef struct
@@ -70,7 +71,7 @@ GFC_InputController *gfc_controller_new()
 void gfc_input_controller_load_mappings(const char *config)
 {
     SJson *file,*mappings;
-    file = sj_load(config);
+    file = gfc_pak_load_json(config);
     if (!file)return;
     mappings = sj_object_get_value(file,"controller_map");
     if (!mappings)
