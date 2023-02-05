@@ -174,5 +174,4 @@ void *gfc_pak_file_extract(const char *filename,size_t *fileSize)
     //nope, couldn't find it
     return NULL;
 }
-
 /*eol@eof*/

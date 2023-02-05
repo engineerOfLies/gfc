@@ -179,6 +179,7 @@ Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
         return NULL;
     }
     sound->sound = Mix_LoadWAV_RW(rwops, 1);
+    free(mem);
     if (!sound->sound)
     {
         slog("failed to load sound file %s",filename);
@@ -348,6 +349,7 @@ void gfc_sound_sequence_channel_callback(int channel)
 
 Mix_Music *gfc_sound_load_music(const char *filename)
 {
+    Mix_Music *music;
     SDL_RWops* rwops;
     void *mem = NULL;
     size_t fileSize = 0;
@@ -364,6 +366,8 @@ Mix_Music *gfc_sound_load_music(const char *filename)
         free(mem);
         return NULL;
     }
-    return Mix_LoadMUS_RW(rwops, 1);
+    music = Mix_LoadMUS_RW(rwops, 1);
+    free(mem);
+    return music;
 }
 /*eol@eof*/
