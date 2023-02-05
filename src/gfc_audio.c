@@ -345,4 +345,25 @@ void gfc_sound_sequence_channel_callback(int channel)
         return;
     }
 }
+
+Mix_Music *gfc_sound_load_music(const char *filename)
+{
+    SDL_RWops* rwops;
+    void *mem = NULL;
+    size_t fileSize = 0;
+    mem = gfc_pak_file_extract(filename,&fileSize);
+    if (!mem)
+    {
+        slog("failed to load music file %s",filename);
+        return NULL;
+    }
+    rwops = SDL_RWFromMem(mem, fileSize);
+    if (!rwops)
+    {
+        slog("failed to read music file %s",filename);
+        free(mem);
+        return NULL;
+    }
+    return Mix_LoadMUS_RW(rwops, 1);
+}
 /*eol@eof*/

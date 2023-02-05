@@ -45,6 +45,13 @@ void gfc_audio_init(
     Uint8  enableOgg);
 
 /**
+ * @brief load a music file (ogg or mp3 or other supported music file) from disk or pak
+ * @param filename the name of the file (or path to it in the pak file)
+ * @return NULL on error or a pointer to the music file.  Clean it up with Mix_FreeMusic(Mix_Music *music)
+ */
+Mix_Music *gfc_sound_load_music(const char *filename);
+
+/**
  * @brief load a WAV or RIFF from file and return it as a sound pointer
  * @param filename the file to load
  * @param volume how loud the sound should be on a scale from 0 to 1.0
