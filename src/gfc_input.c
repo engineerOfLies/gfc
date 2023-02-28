@@ -41,8 +41,8 @@ void gfc_controller_update(GFC_InputController *controller)
     }
     for (i = 0; i < controller->num_axis;i++)
     {
+        controller->axis[i] = controller->old_axis[i];
         controller->axis[i] = SDL_JoystickGetAxis(controller->controller,i);
-//        if (controller->axis[i])slog("controller axis %i is %i",i,controller->axis[i]);
     }
 }
 
@@ -53,6 +53,7 @@ void gfc_controller_free(GFC_InputController *controller)
     if (controller->old_buttons)free(controller->old_buttons);
     if (controller->axis)free(controller->axis);
     if (controller->axis_maxes)free(controller->axis_maxes);
+    if (controller->axis_threshold)free(controller->axis_threshold);
     if (controller->old_axis)free(controller->old_axis);
     if (controller->controller)
     {
@@ -132,6 +133,8 @@ void gfc_input_init(char *configFile)
             {
                 controller->axis = gfc_allocate_array(sizeof(Sint16),controller->num_axis);
                 controller->axis_maxes = gfc_allocate_array(sizeof(Sint16),controller->num_axis);
+                
+                controller->axis_threshold = gfc_allocate_array(sizeof(Sint16),controller->num_axis);
                 controller->old_axis = gfc_allocate_array(sizeof(Sint16),controller->num_axis);
             }
             controller->controller = joystick;
@@ -142,6 +145,55 @@ void gfc_input_init(char *configFile)
     atexit(gfc_input_close);
     gfc_input_commands_load(configFile);
 }
+
+int gfc_input_controller_get_axis_index(const char *axis)
+{
+    int i,c;
+    int index;
+    const char *name;
+    SJson *item;
+    if (!axis)return -1;
+    c = sj_array_get_count(gfc_input_data.controller_axis_map);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(gfc_input_data.controller_axis_map,i);
+        if (!item)continue;
+        name = sj_get_string_value(sj_object_get_value(item,"axis"));
+        if (!name)continue;
+        if (gfc_strlcmp(name,axis)==0)
+        {
+            index = -1;
+            sj_object_get_value_as_int(item,"index",&index);
+            return index;
+        }
+    }
+    return -1;
+}
+
+int gfc_input_controller_get_axis_max(const char *axis)
+{
+    int i,c;
+    int max;
+    const char *name;
+    SJson *item;
+    if (!axis)return -1;
+    c = sj_array_get_count(gfc_input_data.controller_axis_map);
+    for (i = 0; i < c; i++)
+    {
+        item = sj_array_get_nth(gfc_input_data.controller_axis_map,i);
+        if (!item)continue;
+        name = sj_get_string_value(sj_object_get_value(item,"axis"));
+        if (!name)continue;
+        if (gfc_strlcmp(name,axis)==0)
+        {
+            max = 0;
+            sj_object_get_value_as_int(item,"max",&max);
+            return max;
+        }
+    }
+    return 0;
+}
+
 
 int gfc_input_controller_get_button_index(const char *button)
 {
@@ -166,6 +218,50 @@ int gfc_input_controller_get_button_index(const char *button)
         }
     }
     return -1;
+}
+
+float gfc_input_controller_axis_state_by_index(Uint32 controllerId, Uint32 axis, int max)
+{
+    GFC_InputController *controller;
+    controller = gfc_list_get_nth(gfc_input_data.controllers,controllerId);
+    if (!max)
+    {        
+        return 0;
+    }
+    if (!controller)
+    {
+        slog("no controller found with index %i",controllerId);
+        return 0;
+    }
+    if (axis >= controller->num_axis)
+    {
+        slog("controller %i has no axis indexed %i",controllerId,axis);
+        return 0;
+    }
+    if (((max < 0)&&(controller->axis[axis] > 0))||
+        ((max > 0)&&(controller->axis[axis] < 0)))
+    {
+        return 0;
+    }
+    
+    return (float)controller->axis[axis]/(float)max;
+}
+
+int gfc_input_controller_get_count()
+{
+    return gfc_list_get_count(gfc_input_data.controllers);
+}
+
+float gfc_input_controller_get_axis_state(Uint8 controllerId, const char *axis)
+{
+    int index = gfc_input_controller_get_axis_index(axis);
+    int max = gfc_input_controller_get_axis_max(axis);
+    if (index <= -1)
+    {
+        slog("no controller axis found by name %s",axis);
+        return 0;
+    }
+    return gfc_input_controller_axis_state_by_index(controllerId, index,max);
 }
 
 Uint8 gfc_input_controller_button_state(Uint8 controllerId, const char *button)
@@ -965,6 +1061,16 @@ void gfc_input_parse_command_json(SJson *command)
                 }
             }
         }
+        list = sj_object_get_value(command,"axes");
+        if (list)
+        {
+            count = sj_array_get_count(list);
+            for (i = 0; i < count; i++)
+            {
+                value = sj_array_get_nth(list,i);
+                if (!value)continue;
+            }            
+        }
     }
     gfc_input_data.input_list = gfc_list_append(gfc_input_data.input_list,(void *)in);
 }
@@ -992,6 +1098,7 @@ void gfc_input_commands_load(char *configFile)
         if (!value)continue;
         gfc_input_parse_command_json(value);
     }
+    
     sj_free(json);
 }
 

@@ -31,6 +31,7 @@ typedef struct
     Sint16 *axis_maxes;
     Sint16 *axis;
     Sint16 *old_axis;
+    Sint16 *axis_threshold;
     SDL_Joystick *controller;
 }GFC_InputController;
 
@@ -152,5 +153,17 @@ void gfc_input_set_callbacks(
     void *data
 );
 
+/**
+ * @brief check the state of a named axis of a controller
+ * @param controllerId the id of the controller to poll
+ * @param axis the name of the axis to ask about
+ * @return 0 on error or if the axis is not engaged, a value <= 1.0 otherwise
+ */
+float gfc_input_controller_get_axis_state(Uint8 controllerId, const char *axis);
+
+/**
+ * @brief get the number of controllers that are setup
+ */
+int gfc_input_controller_get_count();
 
 #endif
