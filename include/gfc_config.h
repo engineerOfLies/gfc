@@ -20,6 +20,12 @@ SJson *sj_vector2d_new(Vector2D input);
 SJson *sj_vector3d_new(Vector3D input);
 SJson *sj_vector4d_new(Vector4D input);
 
+/**
+ * @brief get a vector from an object by its key
+ */
+int sj_object_get_vector2d(SJson *json,const char *key,Vector2D *output);
+int sj_object_get_vector3d(SJson *json,const char *key,Vector3D *output);
+int sj_object_get_vector4d(SJson *json,const char *key,Vector4D *output);
 
 /**
  * @brief parse a color from json
@@ -27,5 +33,10 @@ SJson *sj_vector4d_new(Vector4D input);
  * @return pure solid white, unless a color was successfully parsed
  */
 Color sj_value_as_color(SJson *value);
+
+/**
+ * @brief get the object key as a color, defaulting to all zero if not found
+ */
+Color sj_object_get_color(SJson *json,const char *key);
 
 #endif

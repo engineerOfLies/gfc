@@ -37,6 +37,11 @@ SJson *sj_vector4d_new(Vector4D input)
     return json;
 }
 
+Color sj_object_get_color(SJson *json,const char *key)
+{
+    return sj_value_as_color(sj_object_get_value(json,key));
+}
+
 Color sj_value_as_color(SJson *value)
 {
     Color color;
@@ -48,6 +53,20 @@ Color sj_value_as_color(SJson *value)
     return color;
 }
 
+int sj_object_get_vector2d(SJson *json,const char *key,Vector2D *output)
+{
+    return sj_value_as_vector2d(sj_object_get_value(json,key),output);
+}
+
+int sj_object_get_vector3d(SJson *json,const char *key,Vector3D *output)
+{
+    return sj_value_as_vector3d(sj_object_get_value(json,key),output);
+}
+
+int sj_object_get_vector4d(SJson *json,const char *key,Vector4D *output)
+{
+    return sj_value_as_vector4d(sj_object_get_value(json,key),output);
+}
 
 int sj_value_as_vector2d(SJson *json,Vector2D *output)
 {

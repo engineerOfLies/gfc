@@ -76,8 +76,8 @@ Color gfc_color8(Uint8 r,Uint8 g,Uint8 b,Uint8 a);
 /**
  * @brief create and return a color from floating point RGBA values
  * @param h hue value 0 - 360
- * @param s saturation value 0 - 1, 0 is black, 1 is white, 0.5 is pure color
- * @param l lightness value 0 - 1
+ * @param s saturation value 0 - 1
+ * @param l lightness value 0 - 1, 0 is black, 1 is white, 0.5 is pure color
  * @param a alpha value 0 - 1
  * @returns a newly set color
  */
