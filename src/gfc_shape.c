@@ -1373,4 +1373,123 @@ int gfc_shape_from_json(SJson *json,Shape *shape)
     return 0;
 }
 
+Vector2D gfc_shape_get_bezier_point_2d(Vector2D p0, Vector2D p1, Vector2D p2,float t)
+{
+    Vector2D point;
+    Vector2D qp,qp2,qpv; /*approximation line starting point and vector*/
+    Vector2D p0v,p1v,temp; /*vectors from point to next point*/
+    vector2d_sub(p0v,p1,p0);
+    vector2d_sub(p1v,p2,p1);
+    /*calculate Q*/
+    vector2d_scale(temp,p0v,t);
+    vector2d_add(qp,p0,temp);
+    
+    vector2d_scale(temp,p1v,t);
+    vector2d_add(qp2,p1,temp);
+    
+    vector2d_sub(qpv,qp2,qp);
+    
+    vector2d_scale(temp,qpv,t);
+    vector2d_add(point,qp,temp);
+    return point;
+}
+
+Vector3D gfc_shape_get_bezier_point_3d(Vector3D p0, Vector3D p1, Vector3D p2,float t)
+{
+    Vector3D point;
+    Vector3D qp,qp2,qpv; /*approximation line starting point and vector*/
+    Vector3D p0v,p1v,temp; /*vectors from point to next point*/
+    vector3d_sub(p0v,p1,p0);
+    vector3d_sub(p1v,p2,p1);
+    /*calculate Q*/
+    vector3d_scale(temp,p0v,t);
+    vector3d_add(qp,p0,temp);
+    
+    vector3d_scale(temp,p1v,t);
+    vector3d_add(qp2,p1,temp);
+    
+    vector3d_sub(qpv,qp2,qp);
+    
+    vector3d_scale(temp,qpv,t);
+    vector3d_add(point,qp,temp);
+    return point;
+}
+
+List *gfc_shape_get_bezier_point_list_2d(Vector2D p0, Vector2D p1, Vector2D p2,Uint32 count)
+{
+    List *points;
+    Vector2D *point;
+    Vector2D qp,qp2,qpv; /*approximation line starting point and vector*/
+    Vector2D p0v,p1v,temp; /*vectors from point to next point*/
+    Vector2D dp; /*draw point*/
+    float t = 0;  /*time segment*/
+    float tstep;
+    vector2d_sub(p0v,p1,p0);
+    vector2d_sub(p1v,p2,p1);
+    tstep = 1/(float)count;
+    points = gfc_list_new();
+    if (!points)return NULL;
+    for (t = 0; t <= 1;t += tstep)
+    {
+        /*calculate Q*/
+        vector2d_scale(temp,p0v,t);
+        vector2d_add(qp,p0,temp);
+        
+        vector2d_scale(temp,p1v,t);
+        vector2d_add(qp2,p1,temp);
+        
+        vector2d_sub(qpv,qp2,qp);
+        
+        vector2d_scale(temp,qpv,t);
+        vector2d_add(dp,qp,temp);
+        point = gfc_allocate_array(sizeof(Vector2D),1);
+        if (!point)continue;
+        vector2d_copy((*point),dp);
+        points = gfc_list_append(points,point);
+    }
+    return points;
+}
+
+List *gfc_shape_get_bezier_point_list_3d(Vector3D p0, Vector3D p1, Vector3D p2,Uint32 count)
+{
+    List *points;
+    Vector3D *point;
+    Vector3D qp,qp2,qpv; /*approximation line starting point and vector*/
+    Vector3D p0v,p1v,temp; /*vectors from point to next point*/
+    Vector3D dp; /*draw point*/
+    float t = 0;  /*time segment*/
+    float tstep;
+    vector3d_sub(p0v,p1,p0);
+    vector3d_sub(p1v,p2,p1);
+    tstep = 1/(float)count;
+    points = gfc_list_new();
+    if (!points)return NULL;
+    for (t = 0; t <= 1;t += tstep)
+    {
+        /*calculate Q*/
+        vector3d_scale(temp,p0v,t);
+        vector3d_add(qp,p0,temp);
+        
+        vector3d_scale(temp,p1v,t);
+        vector3d_add(qp2,p1,temp);
+        
+        vector3d_sub(qpv,qp2,qp);
+        
+        vector3d_scale(temp,qpv,t);
+        vector3d_add(dp,qp,temp);
+        point = gfc_allocate_array(sizeof(Vector3D),1);
+        if (!point)continue;
+        vector3d_copy((*point),dp);
+        points = gfc_list_append(points,point);
+    }
+    return points;
+}
+
+void gfc_shape_point_list_free(List *list)
+{
+    if (!list)return;
+    gfc_list_foreach(list,(gfc_work_func*)free);
+    gfc_list_delete(list);
+}
+
 /*eol@eof*/
