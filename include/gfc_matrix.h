@@ -3,6 +3,9 @@
 
 #include "gfc_vector.h"
 
+/**
+ * @note all matrices are assumed to be row-major ie:  the first index is row, the second is column
+ */
 typedef float Matrix4[4][4];
 typedef float Matrix3[3][3];
 typedef float Matrix2[2][2];
