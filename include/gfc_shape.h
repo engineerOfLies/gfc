@@ -66,6 +66,14 @@ Uint8 gfc_shape_compare(Shape a, Shape b);
 int gfc_shape_from_json(SJson *json,Shape *shape);
 
 /**
+ * @brief get rect information out of a json value
+ * @param json the json to parse
+ * @param rect [output] save the results here
+ * @return false on failure, true on success
+ */
+int gfc_rect_from_json(SJson *json,Rect *rect);
+
+/**
  * @brief make a GF2D Rect
  * @param x the left position of the rect
  * @param y the top position of the rect

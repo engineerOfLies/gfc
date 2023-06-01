@@ -1337,6 +1337,20 @@ Rect gfc_shape_get_bounds(Shape shape)
     return r;
 }
 
+int gfc_rect_from_json(SJson *json,Rect *rect)
+{
+    Vector4D dimensions = {0};
+    if ((!rect)||(!json))return 0;
+    
+    if (sj_value_as_vector4d(json,&dimensions))
+    {
+        *rect = gfc_rect_from_vector4(dimensions);
+        return 1;
+    }
+
+    return 0;
+}
+
 int gfc_shape_from_json(SJson *json,Shape *shape)
 {
     const char *type;
