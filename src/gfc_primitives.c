@@ -236,151 +236,142 @@ Uint8 gfc_edge_box_test(
 {
     Vector3D contact;
     Vector3D vertices[8];
-    
-    Box skip = {0};
-    
+    float bestDistance = -1;
+    float distance;
+    Vector3D bestContact;
+    Vector3D bestNormal;
+        
     if (gfc_point_in_box(e.a,b))
     {
         //start inside the box
         if (poc)*poc = e.a;
         return 1;
     }
-    if (e.a.x > b.x)skip.x = 1;
-    if (e.a.y > b.y)skip.y = 1;
-    if (e.a.z > b.z)skip.z = 1;
-    if (e.a.x < b.x + b.w)skip.x = 1;
-    if (e.a.y < b.y + b.h)skip.y = 1;
-    if (e.a.z < b.z + b.d)skip.z = 1;
     
-    // test each size of the box
-    vertices[0] = vector3d(b.x,b.y,b.z);
+    // corners of the box
+    vertices[0] = vector3d(b.x,b.y,b.z);            //min corner
     vertices[1] = vector3d(b.x + b.w,b.y,b.z);
     vertices[2] = vector3d(b.x,b.y + b.h,b.z);
     vertices[3] = vector3d(b.x + b.w,b.y + b.h,b.z);
     vertices[4] = vector3d(b.x,b.y,b.z + b.d);
     vertices[5] = vector3d(b.x + b.w,b.y,b.z + b.d);
     vertices[6] = vector3d(b.x,b.y + b.h,b.z + b.d);
-    vertices[7] = vector3d(b.x + b.w,b.y + b.h,b.z + b.d);
+    vertices[7] = vector3d(b.x + b.w,b.y + b.h,b.z + b.d);//max corner
         
-    if (!skip.z) //check against the top side
+    if (gfc_edge_in_plane(
+            e,
+            gfc_triangle_get_plane(
+                gfc_triangle(vertices[4],vertices[5],vertices[6])),//bottom face
+            &contact))
     {
-        if (gfc_edge_in_plane(
-                e,
-                gfc_triangle_get_plane(
-                    gfc_triangle(vertices[4],vertices[5],vertices[6])),
-                &contact))
+        //check for inclusion
+        if (gfc_point_in_rect(vector2d(contact.x,contact.y),gfc_rect(b.x,b.y,b.w,b.h)))
         {
-            //check for inclusion
-            if ((contact.x >= b.x)&&(contact.x <= b.x + b.w)&&
-                (contact.y >= b.y)&&(contact.y >= b.y + b.h))
+            //we hit!
+            vector3d_copy(bestContact,contact);
+            bestDistance = vector3d_magnitude_between(e.a,contact);
+            bestNormal = vector3d(0,0,-1);
+        }
+    }
+    if (gfc_edge_in_plane(
+            e,
+            gfc_triangle_get_plane(
+                gfc_triangle(vertices[0],vertices[1],vertices[2])),//top face
+            &contact))
+    {
+        //check for inclusion
+        if (gfc_point_in_rect(vector2d(contact.x,contact.y),gfc_rect(b.x,b.y,b.w,b.h)))
+        {
+            //we hit!
+            distance = vector3d_magnitude_between(e.a,contact);
+            if ((bestDistance == -1)||(distance < bestDistance))
             {
-                //we hit!
-                if (poc)*poc = contact;
-                if (normal)*normal = vector3d(0,0,1);
-                return 1;
+                vector3d_copy(bestContact,contact);
+                bestNormal = vector3d(0,0,1);
+                bestDistance = distance;
             }
         }
     }
-
-    if (!skip.d) //check against the bottom side
+    if (gfc_edge_in_plane(
+            e,
+            gfc_triangle_get_plane(
+                gfc_triangle(vertices[0],vertices[4],vertices[2])),//left face
+            &contact))
     {
-        if (gfc_edge_in_plane(
-                e,
-                gfc_triangle_get_plane(
-                    gfc_triangle(vertices[0],vertices[1],vertices[2])),
-                &contact))
+        //check for inclusion
+        if (gfc_point_in_rect(vector2d(contact.z,contact.y),gfc_rect(b.z,b.y,b.d,b.h)))
         {
-            //check for inclusion
-            if ((contact.x >= b.x)&&(contact.x <= b.x + b.w)&&
-                (contact.y >= b.y)&&(contact.y >= b.y + b.h))
+            //we hit!
+            distance = vector3d_magnitude_between(e.a,contact);
+            if ((bestDistance == -1)||(distance < bestDistance))
             {
-                //we hit!
-                if (poc)*poc = contact;
-                if (normal)*normal = vector3d(0,0,-1);
-                return 1;
+                vector3d_copy(bestContact,contact);
+                bestNormal = vector3d(-1,0,0);
+                bestDistance = distance;
             }
         }
     }
-
-    if (!skip.y) //check against the front side
+    if (gfc_edge_in_plane(
+            e,
+            gfc_triangle_get_plane(
+                gfc_triangle(vertices[1],vertices[3],vertices[5])),//right face
+            &contact))
     {
-        if (gfc_edge_in_plane(
-                e,
-                gfc_triangle_get_plane(
-                    gfc_triangle(vertices[0],vertices[1],vertices[4])),
-                &contact))
+        //check for inclusion
+        if (gfc_point_in_rect(vector2d(contact.z,contact.y),gfc_rect(b.z,b.y,b.d,b.h)))
         {
-            //check for inclusion
-            if ((contact.x >= b.x)&&(contact.x <= b.x + b.w)&&
-                (contact.z >= b.z)&&(contact.z >= b.z + b.d))
+            //we hit!
+            distance = vector3d_magnitude_between(e.a,contact);
+            if ((bestDistance == -1)||(distance < bestDistance))
             {
-                //we hit!
-                if (poc)*poc = contact;
-                if (normal)*normal = vector3d(0,-1,0);
-                return 1;
+                vector3d_copy(bestContact,contact);
+                bestNormal = vector3d(1,0,0);
+                bestDistance = distance;
             }
         }
     }
-
-    if (!skip.h) //check against the back side
+    if (gfc_edge_in_plane(
+            e,
+            gfc_triangle_get_plane(
+                gfc_triangle(vertices[0],vertices[1],vertices[4])),//back face
+            &contact))
     {
-        if (gfc_edge_in_plane(
-                e,
-                gfc_triangle_get_plane(
-                    gfc_triangle(vertices[2],vertices[3],vertices[6])),
-                &contact))
+        //check for inclusion
+        if (gfc_point_in_rect(vector2d(contact.x,contact.z),gfc_rect(b.x,b.z,b.w,b.d)))
         {
-            //check for inclusion
-            if ((contact.x >= b.x)&&(contact.x <= b.x + b.w)&&
-                (contact.z >= b.z)&&(contact.z >= b.z + b.d))
+            //we hit!
+            distance = vector3d_magnitude_between(e.a,contact);
+            if ((bestDistance == -1)||(distance < bestDistance))
             {
-                //we hit!
-                if (poc)*poc = contact;
-                if (normal)*normal = vector3d(0,1,0);
-                return 1;
+                vector3d_copy(bestContact,contact);
+                bestNormal = vector3d(0,-1,0);
+                bestDistance = distance;
             }
         }
     }
-
-    if (!skip.x) //check against the left side
+    if (gfc_edge_in_plane(
+            e,
+            gfc_triangle_get_plane(
+                gfc_triangle(vertices[2],vertices[3],vertices[6])),//front face
+            &contact))
     {
-        if (gfc_edge_in_plane(
-                e,
-                gfc_triangle_get_plane(
-                    gfc_triangle(vertices[0],vertices[2],vertices[4])),
-                &contact))
+        //check for inclusion
+        if (gfc_point_in_rect(vector2d(contact.x,contact.z),gfc_rect(b.x,b.z,b.w,b.d)))
         {
-            //check for inclusion
-            if ((contact.y >= b.y)&&(contact.y <= b.y + b.h)&&
-                (contact.z >= b.z)&&(contact.z >= b.z + b.d))
+            //we hit!
+            distance = vector3d_magnitude_between(e.a,contact);
+            if ((bestDistance == -1)||(distance < bestDistance))
             {
-                //we hit!
-                if (poc)*poc = contact;
-                if (normal)*normal = vector3d(-1,0,0);
-                return 1;
+                vector3d_copy(bestContact,contact);
+                bestNormal = vector3d(0,1,0);
+                bestDistance = distance;
             }
         }
     }
-    if (!skip.w) //check against the right side
-    {
-        if (gfc_edge_in_plane(
-                e,
-                gfc_triangle_get_plane(
-                    gfc_triangle(vertices[1],vertices[6],vertices[3])),
-                &contact))
-        {
-            //check for inclusion
-            if ((contact.y >= b.y)&&(contact.y <= b.y + b.h)&&
-                (contact.z >= b.z)&&(contact.z >= b.z + b.d))
-            {
-                //we hit!
-                if (poc)*poc = contact;
-                if (normal)*normal = vector3d(1,0,0);
-                return 1;
-            }
-        }
-    }
-    return 0;
+    if (bestDistance == -1)return 0;//never found a hit
+    if (poc)vector3d_copy((*poc),bestContact);
+    if (normal)vector3d_copy((*normal),bestNormal);
+    return 1;
 }
 
 Uint8 gfc_triangle_edge_test(

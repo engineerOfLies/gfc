@@ -75,6 +75,9 @@ typedef struct
  */
 Box gfc_box(float x, float y, float z, float w, float h, float d);
 
+
+#define gfc_box_cpy(dst,src) (dst.x = src.x,dst.y = src.y,dst.z = src.z,dst.w = src.w,dst.h = src.h,dst.d = src.d)
+
 /**
  * @brief make a sphere based on its component
  * @param x the center x value
