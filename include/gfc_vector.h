@@ -67,6 +67,52 @@ Vector3D vector3d(float x, float y, float z);
 Vector4D vector4d(float x, float y, float z, float w);
 
 /**
+ * @brief convert a 3d vector into a 2d vector, dropping the 3rd value
+ * @param v the 3d vector
+ * @return the new 2d vector
+ */
+Vector2D vector3dxy(Vector3D v);
+
+/**
+ * @brief convert a 4d vector into a 2d vector, dropping the 3rd and 4th value
+ * @param v the 4d vector
+ * @return the new 2d vector
+ */
+Vector2D vector4dxy(Vector4D v);
+
+/**
+ * @brief convert a 4d vector into a 3d vector, dropping the 4th value
+ * @param v the 4d vector
+ * @return the new 3d vector
+ */
+Vector3D vector4dxyz(Vector4D v);
+
+/**
+ * @brief convert a 2d vector into a 3d vector
+ * @param v the 2d vector
+ * @param z the new z component
+ * @return the new 3d vector
+ */
+Vector3D vector2dxyz(Vector2D v,float z);
+
+/**
+ * @brief convert a 3d vector into a 4d vector
+ * @param v the 3d vector
+ * @param w the new w component
+ * @return the new 4d vector
+ */
+Vector4D vector3dxyzw(Vector3D v,float w);
+
+/**
+ * @brief convert a 2d vector into a 4d vector
+ * @param v the 2d vector
+ * @param z the new z component
+ * @param w the new w component
+ * @return the new 4d vector
+ */
+Vector4D vector2dxyzw(Vector2D v,float z,float w);
+
+/**
  * @brief sets the outvector to a unit vector pointing at the angle specified
  * @param out output.  Vector will be set to a unit vector rotated by radians
  * @param radians specify the angle of the vector to be set.

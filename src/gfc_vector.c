@@ -3,6 +3,37 @@
 #include <math.h>
 #include "gfc_vector.h"
 
+Vector2D vector3dxy(Vector3D v)
+{
+  return vector2d(v.x,v.y);
+}
+
+Vector2D vector4dxy(Vector4D v)
+{
+  return vector2d(v.x,v.y);
+}
+
+Vector3D vector4dxyz(Vector4D v)
+{
+  return vector3d(v.x,v.y,v.z);
+}
+
+Vector3D vector2dxyz(Vector2D v,float z)
+{
+  return vector3d(v.x,v.y,z);
+}
+
+Vector4D vector3dxyzw(Vector3D v,float w)
+{
+  return vector4d(v.x,v.y,v.z,w);
+}
+
+Vector4D vector2dxyzw(Vector2D v,float z,float w)
+{
+  return vector4d(v.x,v.y,z,w);
+}
+
+
 Vector2D vector2d(float x, float y)
 {
   Vector2D vec;
