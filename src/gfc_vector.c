@@ -55,6 +55,16 @@ Vector4D vector4d(float x, float y, float z, float w)
   return vec;
 }
 
+Vector3D vector3d_added(Vector3D a, Vector3D b)
+{
+  return vector3d(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+Vector3D vector3d_subbed(Vector3D a, Vector3D b)
+{
+  return vector3d(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
 Vector2D vector2d_multiply(Vector2D a, Vector2D b)
 {
     return vector2d(a.x * b.x, a.y * b.y);

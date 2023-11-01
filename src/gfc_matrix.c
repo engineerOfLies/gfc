@@ -592,29 +592,29 @@ void gfc_matrix_view(
     Vector3D up
 )
 {
-    Vector3D f,s,u;
-    vector3d_sub(f,target,position);
+    Vector3D f,r,u;
+    vector3d_sub(f,position,target);
     vector3d_normalize(&f);
     
-    vector3d_cross_product(&s,f,up);
-    vector3d_normalize(&s);
+    vector3d_cross_product(&r,up,f);
+    vector3d_normalize(&r);
     
-    vector3d_cross_product(&u,s,f);
+    vector3d_cross_product(&u,f,r);
+    vector3d_normalize(&u);
  
     gfc_matrix_identity(out);
-    out[0][0] = s.x;
-    out[1][0] = s.y;
-    out[2][0] = s.z;
+    out[0][0] = r.x;
+    out[1][0] = r.y;
+    out[2][0] = r.z;
     out[0][1] = u.x;
     out[1][1] = u.y;
     out[2][1] = u.z;
-    out[0][2] = -f.x;
-    out[1][2] = -f.y;
-    out[2][2] = -f.z;
-    out[3][0] = vector3d_dot_product(s, position)?-vector3d_dot_product(s, position):0;
-    out[3][1] = vector3d_dot_product(u, position)?-vector3d_dot_product(u, position):0;
-    out[3][2] = vector3d_dot_product(f, position)?vector3d_dot_product(f, position):0;
-    
+    out[0][2] = f.x;
+    out[1][2] = f.y;
+    out[2][2] = f.z;
+    out[3][0] = -vector3d_dot_product(r, position);
+    out[3][1] = -vector3d_dot_product(u, position);
+    out[3][2] = -vector3d_dot_product(f, position);
 }
 
 void gfc_matrix_scale(

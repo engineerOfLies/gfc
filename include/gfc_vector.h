@@ -183,6 +183,8 @@ void angle_clamp_radians(float *a);
  */
 void angle_clamp_degrees(float *a);
 
+#define vector3d_to_slog(vec) vec.x,vec.y,vec.z
+
 /**
  * 3D Vector Math
  * These macros handle most of the common operations for vector math.
@@ -203,8 +205,8 @@ void vector3d_cross_product(Vector3D *out, Vector3D v1, Vector3D v2);
 /**
  * @brief Macro to get the dot product from a vector.
  *
- * @param a MglVect3D component of the dot product
- * @param b MglVect3D component of the dot product
+ * @param a Vector3D component of the dot product
+ * @param b Vector3D component of the dot product
  *
  * @return the calculated dot product
  */
@@ -245,12 +247,12 @@ Vector4D vector4d_multiply(Vector4D a, Vector4D b);
 
 /**
  * @brief Macro to subtract two vectors
- * varient ending in p takes a pointer to MglVect3D instead.
+ * varient ending in p takes a pointer to Vector3D instead.
  * Varients ending with 2D only operate on the x an y components of vectors
  *
- * @param dst result MglVect3D output
- * @param a MglVect3D input
- * @param b MglVect3D input
+ * @param dst result Vector3D output
+ * @param a Vector3D input
+ * @param b Vector3D input
  */
 #define vector2d_sub(dst,a,b)     (dst.x=a.x-b.x,dst.y=a.y-b.y)
 #define vector3d_sub(dst,a,b)     (dst.x=a.x-b.x,dst.y=a.y-b.y,dst.z=a.z-b.z)
@@ -258,24 +260,40 @@ Vector4D vector4d_multiply(Vector4D a, Vector4D b);
 
 /**
  * @brief Macro to add two vectors
- * varient ending in p takes a pointer to MglVect3D instead.
+ * varient ending in p takes a pointer to Vector3D instead.
  * Varients ending with 2D only operate on the x an y components of vectors
  *
- * @param dst result MglVect3D output
- * @param a MglVect3D input
- * @param b MglVect3D input
+ * @param dst result Vector3D output
+ * @param a Vector3D input
+ * @param b Vector3D input
  */
 #define vector2d_add(dst,a,b)   (dst.x = a.x+b.x,dst.y = a.y+b.y)
 #define vector3d_add(dst,a,b)   (dst.x = a.x+b.x,dst.y = a.y+b.y,dst.z = a.z+b.z)
 #define vector4d_add(dst,a,b)   (dst.x = a.x+b.x,dst.y = a.y+b.y,dst.z = a.z+b.z,dst.w = a.w+b.w)
 
 /**
+ * @brief function version of the subtract, returns the new vector
+ * @param a Vector3D input
+ * @param b Vector3D input
+ * @return the resulting vector
+ */
+Vector3D vector3d_subbed(Vector3D a, Vector3D b);
+
+/**
+ * @brief function version of the add, returns the new vector
+ * @param a Vector3D input
+ * @param b Vector3D input
+ * @return the resulting vector
+ */
+Vector3D vector3d_added(Vector3D a, Vector3D b);
+
+/**
  * @brief Macro to scale a vector by a scalar value
- * varient ending in p takes a pointer to MglVect3D instead.
+ * varient ending in p takes a pointer to Vector3D instead.
  * Varients ending with 2D only operate on the x an y components of vectors
  *
- * @param dst result MglVect3D output
- * @param src MglVect3D input
+ * @param dst result Vector3D output
+ * @param src Vector3D input
  * @Param factpr the scalar value to scale the vector by.
  */
 #define vector2d_scale(dst,src,factor) (dst.x = src.x *(factor),\
@@ -290,11 +308,11 @@ Vector4D vector4d_multiply(Vector4D a, Vector4D b);
 
 /**
  * @brief Macro to scale a vector by a vector of the same dimensions
- * varient ending in p takes a pointer to MglVect3D instead.
+ * varient ending in p takes a pointer to Vector3D instead.
  * Varients ending with 2D only operate on the x an y components of vectors
  *
- * @param dst result MglVect3D output
- * @param src MglVect3D input
+ * @param dst result Vector3D output
+ * @param src Vector3D input
  * @Param factpr the scalar value to scale the vector by.
  */
 #define vector2d_scale_by(dst,src,factor) (dst.x = src.x *(factor.x),\
@@ -350,7 +368,7 @@ Vector4D vector4d_multiply(Vector4D a, Vector4D b);
 /**
  * @brief Macro to set the components of the vector
  *
- * @param v MglVect3D output
+ * @param v Vector3D output
  * @param a float x component
  * @param b float y component
  * @param c float z component (only in 3D & 4D version)

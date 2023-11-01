@@ -94,9 +94,11 @@ Plane3D gfc_triangle_get_plane(Triangle3D t)
     Vector3D normal;
     normal = gfc_triangle_get_normal(t);
     vector3d_copy(p,normal);// pass by name!!!
-    p.d = -((t.a.x *(t.b.y * t.c.z - t.c.y * t.b.z)) +
-            (t.b.x *(t.c.y * t.a.z - t.a.y * t.c.z)) +
-            (t.c.x *(t.a.y * t.b.z - t.b.y * t.a.z)));
+    
+//     p.d = -((t.a.x *(t.b.y * t.c.z - t.c.y * t.b.z)) +
+//             (t.b.x *(t.c.y * t.a.z - t.a.y * t.c.z)) +
+//             (t.c.x *(t.a.y * t.b.z - t.b.y * t.a.z)));
+    p.d = vector3d_dot_product(t.a,normal);
     return p;
 }
 
@@ -105,29 +107,36 @@ float gfc_edge_in_plane(
     Plane3D p,
     Vector3D *contact)
 {
-    Vector3D dir;
+    Vector3D dir,normal;
     float denom,t = 0;
+    float distance;
+        
+    vector3d_sub(dir,e.b,e.a);//direction from a to b
+    distance = vector3d_magnitude(dir);
+    vector3d_normalize(&dir);
+//     slog("test edge start: %f,%f,%f",vector3d_to_slog(e.a));
+//     slog("test edge dir: %f,%f,%f",vector3d_to_slog(dir));
+//     slog("test edge length: %f",distance);
+//     slog("test plane: %f,%f,%f, D:%f",vector3d_to_slog(p),p.d);
+    if (!distance)return 0;//zero length edge
+    normal = vector3d(p.x,p.y,p.z);
+    //check if parallel
+    denom = vector3d_dot_product(normal,dir);
+    if (denom == 0)return 0;// parallel
     
-    vector3d_sub(dir,e.b,e.a);
-    denom = ((p.x * dir.x) + (p.y * dir.y) + (p.z * dir.z));
-    if(denom == 0)return 0;
-    t = - (((p.x * e.a.x) + (p.y * e.a.y) + (p.z * e.a.z) + p.d) / denom);
-    if((t > 0)&&(t <= 1))
-    {
-        if (contact)
-        {
-        contact->x = e.a.x + (dir.x * t);
-        contact->y = e.a.y + (dir.y * t);
-        contact->z = e.a.z + (dir.z * t);
-        }
-        return t;
-    }
+    // Compute the t value for the directed line ray intersecting the plane
+    
+    t = (p.d - vector3d_dot_product(normal, e.a)) / denom;
+    
+//     slog("t value calculated:%f",t);
+    
     if (contact)
     {
         contact->x = e.a.x + (dir.x * t);
         contact->y = e.a.y + (dir.y * t);
         contact->z = e.a.z + (dir.z * t);
     }
+    t /= distance;
     return t;
 }
 
@@ -143,11 +152,43 @@ Box gfc_triangle_get_bounding_box(Triangle3D t)
     return b;
 }
 
+
+
+Uint8 gfc_point_same_side(Vector3D p1,Vector3D p2,Vector3D a,Vector3D b)
+{
+    float f;
+    Vector3D cp1,cp2;
+    Vector3D side1,side2,ref;
+    vector3d_sub(side1,b,a);
+    vector3d_sub(side2,p2,a);
+    vector3d_sub(ref,p1,a);
+    vector3d_cross_product(&cp1,side1,side2);
+    vector3d_cross_product(&cp2,side1, ref);
+    f = vector3d_dot_product(cp1, cp2);
+    if (f >= 0)return 1;
+    return 0;
+}
+
 Uint8 gfc_point_in_triangle(
+    Vector3D point,
+    Triangle3D t)
+{
+                    //test point, reference point, edge A, edge B
+    if (gfc_point_same_side(point,t.c,t.a,t.b) &&
+        gfc_point_same_side(point,t.a,t.b,t.c) &&
+        gfc_point_same_side(point,t.b,t.c,t.a))
+    {
+        return 1;
+    }
+    return 0;
+}
+
+Uint8 gfc_point_in_triangle_old(
     Vector3D point,
     Triangle3D t,
     Plane3D p)
 {
+    Vector3D absNormal;
     float rayTest = 0;
     Uint8 intersectCount = 0;
     
@@ -156,8 +197,10 @@ Uint8 gfc_point_in_triangle(
                 vector3d_magnitude_squared(vector3d(point.x - t.c.x,point.y - t.c.y,point.z - t.c.z));
     //The above makes sure that the testing ray is going to be long enought to go through all possible edge of the trianlge
     // if it were somehow too short, it might give a false positive, vector3d_magnitude_squared is fast
+                
+    vector3d_set(absNormal,abs(p.x),abs(p.y),abs(p.z));
   
-    if (p.x > (MAX(p.y,p.z)))
+    if (absNormal.x > (MAX(absNormal.y,absNormal.z)))
     {
         /*project triangle to yz plane*/
         if (gfc_edge_intersect(
@@ -179,7 +222,7 @@ Uint8 gfc_point_in_triangle(
             intersectCount++;
         }
     }
-    else if (p.y > (MAX(p.x,p.z)))
+    else if (absNormal.y > (MAX(absNormal.x,absNormal.z)))
     {
         if (gfc_edge_intersect(
             gfc_edge(point.x,point.z,point.x,point.z + rayTest),
@@ -375,31 +418,29 @@ Uint8 gfc_edge_box_test(
 }
 
 Uint8 gfc_triangle_edge_test(
-  Edge3D e,
-  Triangle3D t,
-  Vector3D *contact)
+    Edge3D e,
+    Triangle3D t,
+    Vector3D *contact)
 {
-  float time;
-  Plane3D p;
-  Vector3D intersectPoint;
-  
-  p = gfc_triangle_get_plane(t);
-  time = gfc_edge_in_plane(e,p,&intersectPoint);
-  
-  if ((time <= 0)|| (time > 1))
-  {
-    return 0;
-  }
-  
-  if (gfc_point_in_triangle(intersectPoint,t,p))
-  {
-    if (contact)
+    float time;
+    Plane3D p;
+    Vector3D intersectPoint = {0,0,0};
+
+    p = gfc_triangle_get_plane(t);
+    time = gfc_edge_in_plane(e,p,&intersectPoint);
+    if ((time <= 0)||(time > 1))
     {
-      vector3d_copy((*contact),intersectPoint);
+        return 0;
     }
-    return 1;
-  }
-  return 0;
+    if (gfc_point_in_triangle(intersectPoint,t))
+    {
+        if (contact)
+        {
+            vector3d_copy((*contact),intersectPoint);
+        }
+        return 1;
+    }
+    return 0;
 }
 
 Uint8 gfc_edge3d_to_sphere_intersection(Edge3D e,Sphere s,Vector3D *poc,Vector3D *normal)
