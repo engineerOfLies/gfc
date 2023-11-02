@@ -81,9 +81,14 @@ Uint8 gfc_box_overlap(Box a,Box b)
 Vector3D gfc_triangle_get_normal(Triangle3D t)
 {
     Vector3D normal = {0};
-    normal.x = (t.a.y * (t.b.z - t.c.z)) + (t.b.y * (t.c.z - t.a.z)) + (t.c.y * (t.a.z - t.b.z));
-    normal.y = (t.a.z * (t.b.x - t.c.x)) + (t.b.z * (t.c.x - t.a.x)) + (t.c.z * (t.a.x - t.b.x));
-    normal.z = (t.a.x * (t.b.y - t.c.y)) + (t.b.x * (t.c.y - t.a.y)) + (t.c.x * (t.a.y - t.b.y));
+    Vector3D side1,side2;
+    vector3d_sub(side1,t.b,t.a);
+    vector3d_sub(side2,t.c,t.a);
+
+    vector3d_cross_product(&normal,side1,side2);
+//     normal.x = (t.a.y * (t.b.z - t.c.z)) + (t.b.y * (t.c.z - t.a.z)) + (t.c.y * (t.a.z - t.b.z));
+//     normal.y = (t.a.z * (t.b.x - t.c.x)) + (t.b.z * (t.c.x - t.a.x)) + (t.c.z * (t.a.x - t.b.x));
+//     normal.z = (t.a.x * (t.b.y - t.c.y)) + (t.b.x * (t.c.y - t.a.y)) + (t.c.x * (t.a.y - t.b.y));
     vector3d_normalize(&normal);
     return normal;
 }
