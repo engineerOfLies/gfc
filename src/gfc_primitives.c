@@ -86,9 +86,6 @@ Vector3D gfc_triangle_get_normal(Triangle3D t)
     vector3d_sub(side2,t.c,t.a);
 
     vector3d_cross_product(&normal,side1,side2);
-//     normal.x = (t.a.y * (t.b.z - t.c.z)) + (t.b.y * (t.c.z - t.a.z)) + (t.c.y * (t.a.z - t.b.z));
-//     normal.y = (t.a.z * (t.b.x - t.c.x)) + (t.b.z * (t.c.x - t.a.x)) + (t.c.z * (t.a.x - t.b.x));
-//     normal.z = (t.a.x * (t.b.y - t.c.y)) + (t.b.x * (t.c.y - t.a.y)) + (t.c.x * (t.a.y - t.b.y));
     vector3d_normalize(&normal);
     return normal;
 }
@@ -99,10 +96,6 @@ Plane3D gfc_triangle_get_plane(Triangle3D t)
     Vector3D normal;
     normal = gfc_triangle_get_normal(t);
     vector3d_copy(p,normal);// pass by name!!!
-    
-//     p.d = -((t.a.x *(t.b.y * t.c.z - t.c.y * t.b.z)) +
-//             (t.b.x *(t.c.y * t.a.z - t.a.y * t.c.z)) +
-//             (t.c.x *(t.a.y * t.b.z - t.b.y * t.a.z)));
     p.d = vector3d_dot_product(t.a,normal);
     return p;
 }
