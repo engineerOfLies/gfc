@@ -218,6 +218,55 @@ void vector4d_set_angle_by_radians(Vector4D *out,float radians)
   out->y = sin(radians);
 }
 
+Vector2D vector2d_get_normal(Vector2D v)
+{
+  float M;
+  Vector2D V = {0};
+  M = vector2d_magnitude (v);
+  if (M == 0.0f)
+  {
+    return V;
+  }
+  M = 1/M;
+  V.x *= M;
+  V.y *= M;
+  return V;
+}
+
+Vector3D vector3d_get_normal(Vector3D v)
+{
+  float M;
+  Vector3D V = {0};
+  M = vector3d_magnitude (v);
+  if (M == 0.0f)
+  {
+    return V;
+  }
+  M = 1/M;
+  V.x *= M;
+  V.y *= M;
+  V.z *= M;
+  return V;
+}
+
+Vector4D vector4d_get_normal(Vector4D v)
+{
+  float M;
+  Vector4D V = {0};
+  M = vector4d_magnitude (v);
+  if (M == 0.0f)
+  {
+    return V;
+  }
+  M = 1/M;
+  V.x *= M;
+  V.y *= M;
+  V.z *= M;
+  V.w *= M;
+  return V;
+}
+
+
 void vector2d_normalize (Vector2D *V)
 {
   float M;

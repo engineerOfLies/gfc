@@ -658,3 +658,28 @@ void gfc_matrix_translate(
     gfc_matrix_multiply(temp,out,translate);
     gfc_matrix_copy(out,temp);
 }
+
+void gfc_matrix_from_quaternion(
+    Matrix4     out,
+    Vector4D    q)
+{
+    out[0][0] = 1.0f - 2.0f*q.y*q.y - 2.0f*q.z*q.z;
+    out[0][1] = 2.0f*q.x*q.y + 2.0f*q.z*q.w;
+    out[0][2] = 2.0f*q.x*q.z - 2.0f*q.y*q.w;
+    out[0][3] = 0.0f;
+
+    out[1][0] = 2.0f*q.x*q.y - 2.0f*q.z*q.w;
+    out[1][1] = 1.0f - 2.0f*q.x*q.x - 2.0f*q.z*q.z;
+    out[1][2] = 2.0f*q.z*q.y + 2.0f*q.x*q.w;
+    out[1][3] = 0.0f;
+
+    out[2][0]= 2.0f*q.x*q.z + 2.0f*q.y*q.w;
+    out[2][1]= 2.0f*q.z*q.y - 2.0f*q.x*q.w;
+    out[2][2] = 1.0f - 2.0f*q.x*q.x - 2.0f*q.y*q.y;
+    out[2][3] = 0.0f;
+
+    out[3][0] = 0;
+    out[3][1] = 0;
+    out[3][2] = 0;
+    out[3][3] = 1.f;
+}

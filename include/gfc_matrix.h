@@ -181,6 +181,15 @@ void gfc_matrix4_to_vectors(
     Vector3D *scale);
 
 /**
+ * @brief get a quaternion matrix from quaternion vector
+ * @param out the resulting matrix
+ * @param q the quaternion vector
+ */
+void gfc_matrix_from_quaternion(
+    Matrix4     out,
+    Vector4D    q);
+
+/**
  * @brief multiply a matrix by the scalar value
  * @param out the output matrix
  * @param m1 input matrix to multiply by

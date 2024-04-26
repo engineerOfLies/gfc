@@ -413,9 +413,22 @@ float vector2d_magnitude_between(Vector2D a,Vector2D b);
 float vector3d_magnitude_between(Vector3D a,Vector3D b);
 float vector4d_magnitude_between(Vector4D a,Vector4D b);
 
+/**
+ * @brief normalize a vector
+ * @note changes the vector
+ */
 void vector2d_normalize (Vector2D *V);
 void vector3d_normalize (Vector3D *V);
 void vector4d_normalize (Vector4D *V);
+
+/**
+ * @brief get the normal of a vector
+ * @note original vector is unchanged
+ * @return a new unit vector
+ */
+Vector2D vector2d_get_normal(Vector2D v);
+Vector3D vector3d_get_normal(Vector3D v);
+Vector4D vector4d_get_normal(Vector4D v);
 
 /**
  * @brief returns the magnitude squared, which is faster than getting the magnitude
