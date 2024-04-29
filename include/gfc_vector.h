@@ -25,7 +25,7 @@
 #include "gfc_types.h"
 
 /*
- * The Vector Types
+ * The floating point Vector Types
  * Not to be confused with the vector lists from STL
  */
 typedef struct
@@ -48,6 +48,40 @@ typedef struct
   float z;
   float w;
 }Vector4D;
+
+/**
+ * The integer space vector types:
+ */
+typedef struct
+{
+    int x,y;
+}Vector2I;
+
+typedef struct
+{
+    int x,y,z;
+}Vector3I;
+
+typedef struct
+{
+    int x,y,z,w;
+}Vector4I;
+
+//unsiened 8 bit vectors
+typedef struct
+{
+    Uint8 x,y;
+}Vector2UI8;
+
+typedef struct
+{
+    Uint8 x,y,z;
+}Vector3UI8;
+
+typedef struct
+{
+    Uint8 x,y,z,w;
+}Vector4UI8;
 
 #define vector_in_rect(v, r)  ((v.x >= r.x)&&(v.x < (r.x + r.w))&&(v.y >= r.y)&&(v.y < (r.y + r.h)))
 
