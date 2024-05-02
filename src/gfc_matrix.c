@@ -659,6 +659,30 @@ void gfc_matrix_translate(
     gfc_matrix_copy(out,temp);
 }
 
+void gfc_matrix4_from_vectors_q(
+    Matrix4 out,
+    Vector3D translation,
+    Vector4D quaternion,
+    Vector3D scale
+)
+{
+    Matrix4 rotateM;
+        
+    //M = T * R * S
+    
+    gfc_matrix_identity(out);
+    gfc_matrix_scale(out,scale);
+
+    gfc_matrix_from_quaternion(rotateM,quaternion);
+    gfc_matrix_multiply(
+            out,
+            out,
+            rotateM
+        );
+    
+    gfc_matrix_translate(out,translation);
+}
+
 void gfc_matrix_from_quaternion(
     Matrix4     out,
     Vector4D    q)

@@ -168,6 +168,18 @@ void gfc_matrix4_from_vectors(
     Vector3D scale);
 
 /**
+ * @brief create a matrix from the thee basic operation vectors, where the rotation is defined by a quaternion
+ * @param translation the movement produced from the matrix
+ * @param quaternion the amount to rotation the matrix with a quaternion
+ * @param scale the amount to scale with this matrix.  remember (1,1,1) is no change.  (0,0,0) is destroyed
+ */
+void gfc_matrix4_from_vectors_q(
+    Matrix4 out,
+    Vector3D translation,
+    Vector4D quaternion,
+    Vector3D scale);
+
+/**
  * @brief extract translation,rotation, and scale from a matrix
  * @param in the matrix to extract from
  * @param translation if provided, this will be populated with the translation information
