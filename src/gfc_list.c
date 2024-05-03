@@ -1,5 +1,7 @@
-#include "gfc_list.h"
 #include "simple_logger.h"
+
+#include "gfc_types.h"
+#include "gfc_list.h"
 
 void gfc_list_delete(List *list)
 {
@@ -14,6 +16,19 @@ void gfc_list_delete(List *list)
 List *gfc_list_new()
 {
     return gfc_list_new_size(16);
+}
+
+List *gfc_list_copy(List *old)
+{
+    List *new;
+    if (!old)return 0;
+    if (old->size <= 0)return NULL;
+    new = gfc_list_new_size(old->size);
+    if (!new)return NULL;
+    if (old->count <= 0)return new;
+    memcpy(new->elements,old->elements,sizeof(ListElementData)*old->count);
+    new->count = old->count;
+    return new;
 }
 
 List *gfc_list_new_size(Uint32 count)
@@ -32,22 +47,39 @@ List *gfc_list_new_size(Uint32 count)
     }
     memset(l,0,sizeof(List));
     l->size = count;
-    l->elements = (ListElementData*)malloc(sizeof(ListElementData)*count);
+    l->elements = gfc_allocate_array(sizeof(ListElementData),count);
     if (!l->elements)
     {
         slog("failed to allocate space for list elements");
         free(l);
         return NULL;
     }
-    memset(l->elements,0,sizeof(ListElementData)*count);
     return l;
+}
+
+void gfc_list_set_nth(List *list,Uint32 n,void *data)
+{
+    if (!list)return;
+    if ((n >= list->count)||(n >= list->size))return;
+    list->elements[n].data = data;
+}
+
+void gfc_list_swap_indices(List *list,Uint32 a, Uint32 b)
+{
+    void *temp = NULL;
+    if (!list)return;
+    if (a == b)return;
+    if ((a >= list->count)||(b >= list->count))return;
+    if ((a >= list->size)||(b >= list->size))return;
+    temp = list->elements[a].data;
+    list->elements[a].data = list->elements[b].data;
+    list->elements[b].data = temp;
 }
 
 void *gfc_list_get_nth(List *list,Uint32 n)
 {
     if (!list)
     {
-        slog("no list provided");
         return NULL;
     }
     if ((n >= list->count)||(n >= list->size))return NULL;
@@ -72,17 +104,18 @@ List *gfc_list_expand(List *list)
     {
         memcpy(l->elements,list->elements,sizeof(ListElementData)*list->count);
     }
-    l->count = list->count;
-    gfc_list_delete(list);
-    return l;
+    list->size = l->size;// update the new size
+    free(list->elements);//free the old data
+    list->elements = l->elements;//point to new memory address
+    free(l);//free the temp list
+    return list;//for backward compatibility
 }
 
 List *gfc_list_append(List *list,void *data)
 {
     if (!list)
     {
-        slog("no list provided");
-        return NULL;
+        list = gfc_list_new();
     }
     if (list->count >= list->size)
     {
@@ -186,9 +219,7 @@ int gfc_list_get_item_index(List *list,void *data)
             return i;
         }
     }
-    slog("data not found");
-    return -1;
-    
+    return -1;    
 }
 
 int gfc_list_delete_data(List *list,void *data)
@@ -211,6 +242,13 @@ int gfc_list_delete_data(List *list,void *data)
     }
     slog("data not found");
     return -1;
+}
+
+void gfc_list_clear(List *list)
+{
+    if (!list)return;
+    memset(list->elements,0,list->size);//zero out all the data;
+    list->count = 0;
 }
 
 int gfc_list_delete_nth(List *list,Uint32 n)
@@ -242,7 +280,24 @@ Uint32 gfc_list_get_count(List *list)
     return list->count;
 }
 
-void gfc_list_foreach(List *list,void (*function)(void *data,void *context),void *contextData)
+void gfc_list_foreach(List *list,void (*function)(void *data))
+{
+    int i;
+    if (!list)
+    {
+        return;
+    }
+    if (!function)
+    {
+        slog("no function provided");
+    }
+    for (i = 0;i < list->count;i++)
+    {
+        function(list->elements[i].data);
+    }
+}
+
+void gfc_list_foreach_context(List *list,void (*function)(void *data,void *context),void *contextData)
 {
     int i;
     if (!list)

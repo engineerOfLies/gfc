@@ -3,6 +3,9 @@
 
 #include <SDL.h>
 
+typedef void gfc_work_func(void*);/**<prototype for a work function*/
+typedef void gfc_work_func_context(void*,void*);/**<prototype for a work function*/
+
 typedef struct
 {
     void *data;
@@ -33,10 +36,26 @@ List *gfc_list_new();
 List *gfc_list_new_size(Uint32 count);
 
 /**
+ * @brief make a copy of a list.  
+ * @note: THIS DOES NOT COPY ANY DATA POINTED TO BY THE OLD LIST
+ * @param old the list to copy
+ * @return NULL on error or no old data to copy,  A new list that contains the same 
+ * information as the old list.  (data pointers will be copied)
+ */
+List *gfc_list_copy(List *old);
+
+/**
  * @brief deletes a list that has been previously allocated
  * @param list the list to delete;
  */
 void gfc_list_delete(List *list);
+
+/**
+ * @brief clears out the list, but does NOT free any data that the list may have been pointing to
+ * @param list the list to clear
+ * @note effectively zeroes out the list without freeing any data
+ */
+void gfc_list_clear(List *list);
 
 /**
  * @brief get the data stored at the nth element
@@ -47,8 +66,17 @@ void gfc_list_delete(List *list);
 void *gfc_list_get_nth(List *list,Uint32 n);
 
 /**
+ * @brief set the data stored at the nth element
+ * @param list the list to change
+ * @param n which element to change
+ * @param data the new data to set it to
+ * @note the old data WILL NOT be cleaned up
+ */
+void gfc_list_set_nth(List *list,Uint32 n,void *data);
+
+/**
  * @brief add an element to the end of the list
- * @note must catch the returned list to replace the list you had
+ * @note as of 2023, the original list is what is returned on success and you do not HAVE to assign it back to this function
  * @param list the list to add to
  * @param data the data to assign to the new element
  * @return NULL on error, your list otherwise
@@ -56,15 +84,26 @@ void *gfc_list_get_nth(List *list,Uint32 n);
 List *gfc_list_append(List *list,void *data);
 
 /**
+ * @brief add an element to the beginning of the list
+ * @note must catch the returned list to replace the list you had
+ * @param list the list to add to
+ * @param data the data to assign to the new element
+ * @return NULL on error, your list otherwise
+ */
+List *gfc_list_prepend(List *list,void *data);
+
+/**
  * @brief instert a new element at the position provided
  * @param list the list to insert into
  * @param data the data to assin to the new element
- * @return -1 on error, 0 otherwise
+ * @param n the position to insert at
+ * @return NULL on error, or the provided list otherwise
  */
 List *gfc_list_insert(List *list,void *data,Uint32 n);
 
 /**
  * @brief delete the element at the nth position in the array
+ * @note this does not clean up the information that the list is referring to
  * @param list the list to delete out of
  * @param n the element to delete.  This is no-op if the nth element is beyond the scope of the list (event is logged)
  * @return -1 on error, 0 otherwise
@@ -106,10 +145,25 @@ Uint32 gfc_list_get_count(List *list);
 /**
  * @brief iterate over each element in the array and call the function provided
  * @param list the list to iterate over
+ * @param function a pointer to a function that will be called.  Data will be set to the list data element
+ */
+void gfc_list_foreach(List *list,void (*function)(void *data));
+
+/**
+ * @brief iterate over each element in the array and call the function provided
+ * @param list the list to iterate over
  * @param function a pointer to a function that will be called.  Data will be set to the list data element, context will be the contextData provided
  * @param contextData the data that will also be provided to the function pointer for each element
  */
-void gfc_list_foreach(List *list,void (*function)(void *data,void *context),void *contextData);
+void gfc_list_foreach_context(List *list,void (*function)(void *data,void *context),void *contextData);
+
+/**
+ * @brief swap the locations of two items in the list.
+ * @param list the list to alter
+ * @param a the first item
+ * @param b the second item
+ */
+void gfc_list_swap_indices(List *list,Uint32 a, Uint32 b);
 
 /**
  * @brief add the elements from b into a

@@ -5,6 +5,29 @@
 
 #include "simple_logger.h"
 
+long get_file_Size(FILE *file)
+{
+  long size;
+
+  if(file != NULL){
+    if( fseek(file, 0, SEEK_END) ){
+      fclose(file);
+      return -1;
+    }
+
+    size = ftell(file);
+    rewind(file);
+    return size;
+  }
+
+  return -1;
+}
+
+float gfc_random_seeded(Uint32 seed)
+{
+    srand(seed);
+    return gfc_random();
+}
 
 SDL_Rect gfc_sdl_rect(Sint32 x,Sint32 y,Uint32 w, Uint32 h)
 {

@@ -3,6 +3,37 @@
 #include <math.h>
 #include "gfc_vector.h"
 
+Vector2D vector3dxy(Vector3D v)
+{
+  return vector2d(v.x,v.y);
+}
+
+Vector2D vector4dxy(Vector4D v)
+{
+  return vector2d(v.x,v.y);
+}
+
+Vector3D vector4dxyz(Vector4D v)
+{
+  return vector3d(v.x,v.y,v.z);
+}
+
+Vector3D vector2dxyz(Vector2D v,float z)
+{
+  return vector3d(v.x,v.y,z);
+}
+
+Vector4D vector3dxyzw(Vector3D v,float w)
+{
+  return vector4d(v.x,v.y,v.z,w);
+}
+
+Vector4D vector2dxyzw(Vector2D v,float z,float w)
+{
+  return vector4d(v.x,v.y,z,w);
+}
+
+
 Vector2D vector2d(float x, float y)
 {
   Vector2D vec;
@@ -22,6 +53,31 @@ Vector4D vector4d(float x, float y, float z, float w)
   Vector4D vec;
   vector4d_set(vec,x, y, z, w);
   return vec;
+}
+
+Vector3D vector3d_added(Vector3D a, Vector3D b)
+{
+  return vector3d(a.x + b.x, a.y + b.y, a.z + b.z);
+}
+
+Vector3D vector3d_subbed(Vector3D a, Vector3D b)
+{
+  return vector3d(a.x - b.x, a.y - b.y, a.z - b.z);
+}
+
+Vector2D vector2d_multiply(Vector2D a, Vector2D b)
+{
+    return vector2d(a.x * b.x, a.y * b.y);
+}
+
+Vector3D vector3d_multiply(Vector3D a, Vector3D b)
+{
+    return vector3d(a.x * b.x, a.y * b.y, a.z * b.z);
+}
+
+Vector4D vector4d_multiply(Vector4D a, Vector4D b)
+{
+    return vector4d(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
 }
 
 Bool vector2d_distance_between_less_than(Vector2D p1,Vector2D p2,float size)
@@ -161,6 +217,55 @@ void vector4d_set_angle_by_radians(Vector4D *out,float radians)
   out->x = cos(radians);
   out->y = sin(radians);
 }
+
+Vector2D vector2d_get_normal(Vector2D v)
+{
+  float M;
+  Vector2D V = {0};
+  M = vector2d_magnitude (v);
+  if (M == 0.0f)
+  {
+    return V;
+  }
+  M = 1/M;
+  V.x *= M;
+  V.y *= M;
+  return V;
+}
+
+Vector3D vector3d_get_normal(Vector3D v)
+{
+  float M;
+  Vector3D V = {0};
+  M = vector3d_magnitude (v);
+  if (M == 0.0f)
+  {
+    return V;
+  }
+  M = 1/M;
+  V.x *= M;
+  V.y *= M;
+  V.z *= M;
+  return V;
+}
+
+Vector4D vector4d_get_normal(Vector4D v)
+{
+  float M;
+  Vector4D V = {0};
+  M = vector4d_magnitude (v);
+  if (M == 0.0f)
+  {
+    return V;
+  }
+  M = 1/M;
+  V.x *= M;
+  V.y *= M;
+  V.z *= M;
+  V.w *= M;
+  return V;
+}
+
 
 void vector2d_normalize (Vector2D *V)
 {
@@ -428,9 +533,7 @@ void vector3d_rotate_about_x(Vector3D *vect, float angle)
 {
   Vector3D temp;
   if (!vect)return;
-  
-  angle=angle*GFC_DEGTORAD;
-  
+
   temp.x=vect->x;
   temp.y=(vect->y*cos(angle))-(vect->z*sin(angle));
   temp.z=(vect->y*sin(angle))+(vect->z*cos(angle));
@@ -444,9 +547,7 @@ void vector3d_rotate_about_y(Vector3D *vect, float angle)
 {
   Vector3D temp;
   if (!vect)return;
-  
-  angle=angle*GFC_DEGTORAD;
-  
+    
   temp.y=vect->y;
   temp.x=(vect->x*cos(angle))+(vect->z*sin(angle));
   temp.z=(vect->x*sin(angle)*(-1))+(vect->z*cos(angle));
@@ -460,9 +561,7 @@ void vector3d_rotate_about_z(Vector3D *vect, float angle)
 {
   Vector3D temp;
   if (!vect)return;
-  
-  angle=angle*GFC_DEGTORAD;
-  
+    
   temp.z=vect->z;
   temp.x=(vect->x*cos(angle))-(vect->y*sin(angle));
   temp.y=(vect->x*sin(angle))+(vect->y*cos(angle));
@@ -473,18 +572,66 @@ void vector3d_rotate_about_z(Vector3D *vect, float angle)
 }
 
 
+void vector3d_angles (Vector3D value1, Vector3D * angles)
+{
+    float   forward;
+    float   yaw, pitch;
+
+    if (!angles)return;
+    
+    vector3d_normalize(&value1);
+    
+    if (value1.y == 0 && value1.x == 0)
+    {
+        yaw = 0;
+        if (value1.z > 0)
+            pitch = GFC_HALF_PI;
+        else
+            pitch = GFC_PI + GFC_HALF_PI;
+    }
+    else
+    {
+        if (value1.x)
+        {
+            yaw = (atan2(value1.y, value1.x));
+        }
+        else if (value1.y > 0)
+        {
+            yaw = GFC_HALF_PI;
+        }
+        else
+        {
+            yaw = -GFC_HALF_PI;
+        }
+        if (yaw < 0)
+        {
+            yaw += GFC_2PI;
+        }
+
+        forward = sqrt (value1.x*value1.x + value1.y*value1.y);
+        pitch = (atan2(value1.z, forward));
+        if (pitch < 0)
+            pitch += GFC_2PI;
+    }
+    angles->x = -1 * pitch;
+    angles->z = yaw;
+//    angles->y = 0;  //leave this alone
+}
+
+
+
 void vector3d_angle_vectors(Vector3D angles, Vector3D *forward, Vector3D *right, Vector3D *up)
 {
   float angle;
   float sr, sp, sy, cr, cp, cy;
   
-  angle = angles.x * (GFC_DEGTORAD);
+  angle = angles.z;
   sy = sin(angle);
   cy = cos(angle);
-  angle = angles.y * (GFC_DEGTORAD);
+  angle = angles.x;
   sp = sin(angle);
   cp = cos(angle);
-  angle = angles.z * (GFC_DEGTORAD);
+  angle = angles.y;
   sr = sin(angle);
   cr = cos(angle);
   
@@ -513,6 +660,28 @@ float vector2d_angle(Vector2D v)
   return vector_angle(v.x,v.y);
 }
 
+int vector2d_scale_flip_rotation(Vector2D scale)
+{
+    float factor = scale.x *scale.y;
+    if (factor < 0)return -1;
+    return 1;
+}
+
+Vector2D vector2d_from_angle(float angle)
+{
+    return vector2d_rotate(vector2d(0,1), angle);
+}
+
+Vector2D vector2d_rotate_around_center(Vector2D point,float angle, Vector2D center)
+{
+    Vector2D delta;
+    
+    vector2d_sub(point,point,center);    
+    delta = vector2d_rotate(point, angle);
+    vector2d_add(delta,delta,center);
+    return delta;
+}
+
 Vector2D vector2d_rotate(Vector2D in, float angle)
 {
     Vector2D out;
@@ -523,13 +692,14 @@ Vector2D vector2d_rotate(Vector2D in, float angle)
 
 float vector_angle(float x,float y)
 {
-  float angle = atan2(y, x) + M_PI;
-  float fraction = angle * 0.5 / M_PI;
-  if (fraction >= 1.0)
-  {
-    fraction -= 1.0;
-  }
-  return (fraction * 360)-180;
+    return (atan2(y,x) * GFC_RADTODEG) + 90;
+}
+
+void angle_clamp_radians(float *a)
+{
+  if (!a)return;
+  while (*a >= GFC_2PI)*a -= GFC_2PI;
+  while (*a < 0)*a += GFC_2PI;
 }
 
 void angle_clamp_degrees(float *a)
@@ -539,13 +709,26 @@ void angle_clamp_degrees(float *a)
   while (*a < 0)*a += 360;
 }
 
+float angle_between_radians(float a, float b)
+{
+  float angle;
+  angle = b - a;
+  if (angle > GFC_2PI)angle -= GFC_2PI;
+  if (angle < -GFC_2PI)angle += GFC_2PI;
+  if (angle > GFC_PI)return angle - GFC_2PI;
+  if (angle < -GFC_PI)return angle + GFC_2PI;
+  
+  return angle;
+}
+
 float angle_between_degrees(float a, float b)
 {
   float angle;
-  angle = fabs(a - b);
-  while (angle >= 360)angle -= 360;
-  while (angle < 0)angle += 360;
-  if (angle > 180)angle -= 180;
+  angle = b - a;
+  if (angle > 360) angle -= 360;
+  if (angle < 360) angle += 360;
+  if (angle > 180)return angle - 360;
+  if (angle < -180)return angle + 360;
   return angle;
 }
 

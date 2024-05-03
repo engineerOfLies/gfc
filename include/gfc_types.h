@@ -10,16 +10,19 @@
 #endif
 #define GFC_EPSILON   1e-6f
 #define GFC_ROOT2  1.414213562
-#define GFC_2PI 6.283185308
-#define GFC_PI 3.141592654
+
 #define GFC_HALF_PI 1.570796327
+#define GFC_PI 3.141592654
+#define GFC_PI_HALFPI 4.712388981
+#define GFC_2PI 6.283185308
+
 /* conversion factor for converting from radians to degrees*/
 #define GFC_RADTODEG  57.295779513082
 
 /* conversion factor for converting from degrees to radians*/
 #define GFC_DEGTORAD  0.017453292519943295769236907684886
 
-typedef short unsigned int Bool;
+typedef short int Bool;
 
 #ifndef false
 #define false 0
@@ -34,6 +37,12 @@ typedef short unsigned int Bool;
  * @return a random float between 0 and 1.0
  */
 #define gfc_random()  ((rand ()%1000)/(float)1000.0)
+
+/**
+ * @brief generate a random float (0 -1) based on the provided seed
+ * @param seed the seed for the random number
+ */
+float gfc_random_seeded(Uint32 seed);
 
 /**
  * @brief random macro taken from Id Software's Quake 2 Source.
@@ -64,6 +73,13 @@ SDL_Rect gfc_sdl_rect(Sint32 x,Sint32 y,Uint32 w, Uint32 h);
  * @returns NULL on error (check logs), an array allocated and initialized to zero otherwise
  */
 void *gfc_allocate_array(size_t typeSize,size_t count);
+
+/**
+ * @brief get the size of a file in byte (chars)
+ * @param file the file to take a look at
+ * @return the size of the file in bytes
+ */
+long get_file_Size(FILE *file);
 
 #if defined(WIN32)
 #ifndef snprintf

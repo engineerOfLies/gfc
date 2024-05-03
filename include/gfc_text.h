@@ -34,11 +34,46 @@
  */
 
 /**
+ * @brief check if the two strings match AND are the same length  strcmp will match on substrings if the longer word is second.
+ * @param a one of the strings to compare
+ * @param b one of the strings to compare
+ * @returns strcmp results or -2 if the strings are not same length
+ */
+int gfc_strlcmp(const char *a,const char *b);
+
+
+/**
+ * @brief believe it or not but standard C does not have stricmp.  This does that
+ * @param a one of the strings to compare
+ * @param b one of the strings to compare
+ * @returns strcmp results
+ */
+int gfc_stricmp(const char *a,const char *b);
+
+/**
+ * @brief case insensitive number string compare
+ * @param a one of the strings to compare
+ * @param b one of the strings to compare
+ * @param n how many characters to compare
+ * @returns strcmp results
+ */
+int gfc_strincmp(const char *a,const char *b,int n);
+
+/**
+ * @brief check if the str ends with the suffix
+ * @param str the string to query
+ * @param suffix the search criteria
+ * @returns 1 if the string ends with the suffix or 0 if not
+ */
+int gfc_str_suffix(const char *str, const char *suffix);
+
+/**
  * @brief 16 character buffer used for short tags
  */
 typedef char TextWord[16];
 #define GFCWORDLEN   16
 #define gfc_word_cmp(a,b) (strncmp(a,b,GFCWORDLEN))
+#define gfc_word_icmp(a,b) (strincmp(a,b,GFCWORDLEN))
 #define gfc_word_cpy(dst,src) (strncpy(dst,src,GFCWORDLEN))
 #define gfc_word_clear(a)  (memset(a,0,sizeof(char)*GFCWORDLEN))
 #define gfc_word_sprintf(a,...) snprintf(a,GFCWORDLEN,__VA_ARGS__)
@@ -48,18 +83,21 @@ typedef char TextWord[16];
 typedef char TextLine[128];
 #define GFCLINELEN   128
 #define gfc_line_cmp(a,b) (strncmp(a,b,GFCLINELEN))
+#define gfc_line_icmp(a,b) (strincmp(a,b,GFCLINELEN))
 #define gfc_line_cpy(dst,src) (strncpy(dst,src,GFCLINELEN))
 #define gfc_line_clear(a)  (memset(a,0,sizeof(char)*GFCLINELEN))
 #define gfc_line_sprintf(a,...) snprintf(a,GFCLINELEN,__VA_ARGS__)
 /**
- * @brief 512 character buffer used for text blocks
+ * @brief 1024 character buffer used for text blocks
  */
-typedef char TextBlock[512];
-#define GFCTEXTLEN   512
+typedef char TextBlock[1024];
+#define GFCTEXTLEN   1024
 #define gfc_block_cmp(a,b) (strncmp(a,b,GFCTEXTLEN))
+#define gfc_block_icmp(a,b) (strincmp(a,b,GFCTEXTLEN))
 #define gfc_block_cpy(dst,src) (strncpy(dst,src,GFCTEXTLEN))
 #define gfc_block_clear(a)  (memset(a,0,sizeof(char)*GFCTEXTLEN))
-#define gfc_block_sprintf(a,...) snprintf(a,GFCTEXTLEN,__VA_ARGS__)
+#define gfc_block_sprintf(a,...) snprintf(a,GFCTEXTLEN - 1,__VA_ARGS__)
+
 
 
 #endif

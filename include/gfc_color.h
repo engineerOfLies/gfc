@@ -21,6 +21,28 @@ typedef struct
     ColorType ct;   /**<how this structure is used*/
 }Color;
 
+#define GFC_COLOR_RED gfc_color8(255,0,0,255)
+#define GFC_COLOR_LIGHTRED gfc_color(1,.2,.2,1)
+#define GFC_COLOR_GREEN gfc_color8(0,255,0,255)
+#define GFC_COLOR_LIGHTGREEN gfc_color(.2,1,.2,1)
+#define GFC_COLOR_BLUE gfc_color8(0,0,255,255)
+#define GFC_COLOR_LIGHTBLUE gfc_color(.5,.6,1,1)
+#define GFC_COLOR_BLACK gfc_color8(0,0,0,255)
+#define GFC_COLOR_DARKGREY gfc_color8(32,32,32,255)
+#define GFC_COLOR_GREY gfc_color8(128,128,128,255)
+#define GFC_COLOR_LIGHTGREY gfc_color8(192,192,192,255)
+#define GFC_COLOR_WHITE gfc_color8(255,255,255,255)
+#define GFC_COLOR_YELLOW gfc_color8(255,255,0,255)
+#define GFC_COLOR_LIGHTYELLOW gfc_color(0.9,0.9,0.7,1)
+#define GFC_COLOR_CYAN gfc_color8(0,255,255,255)
+#define GFC_COLOR_LIGHTCYAN gfc_color(0.7,0.9,0.9,1)
+#define GFC_COLOR_MAGENTA gfc_color8(255,0,255,255)
+#define GFC_COLOR_TRANSPARENT gfc_color8(0,0,0,0)
+#define GFC_COLOR_BROWN gfc_color(.7,.4,0,1)
+#define GFC_COLOR_ORANGE gfc_color(.9,.6,0,1)
+#define GFC_COLOR_LIGHTORANGE gfc_color(1,.7,0.1,1)
+
+
 #define gfc_color_copy(dst,src) (dst.r = src.r,dst.g = src.g,dst.b = src.b,dst.a = src.a,dst.ct = src.ct)
 
 /**
@@ -33,6 +55,15 @@ typedef struct
  * @returns a newly set color
  */
 Color gfc_color(float r,float g,float b,float a);
+
+/**
+ * @brief check if two colors are the same color
+ * @param a color to check
+ * @param b color to check
+ * @return 1 if the same color, 0 if not
+ */
+int gfc_color_cmp(Color a, Color b);
+
 /**
  * @brief create and return a color from 8 bit integer RGBA values
  * @param r red value 0 - 255
@@ -44,9 +75,9 @@ Color gfc_color(float r,float g,float b,float a);
 Color gfc_color8(Uint8 r,Uint8 g,Uint8 b,Uint8 a);
 /**
  * @brief create and return a color from floating point RGBA values
- * @param h hue value 0 - 1
+ * @param h hue value 0 - 360
  * @param s saturation value 0 - 1
- * @param l lightness value 0 - 1
+ * @param l lightness value 0 - 1, 0 is black, 1 is white, 0.5 is pure color
  * @param a alpha value 0 - 1
  * @returns a newly set color
  */
@@ -68,7 +99,8 @@ Color gfc_color_to_float(Color color);
 /**
  * @brief convert a color to 8 bit integer representation
  * @param color the color to convert
- * @return a new color in the format CT_RGBA8
+ * @return a new color         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),gfc_color(1,1,1,1));        
+in the format CT_RGBA8
  */
 Color gfc_color_to_int8(Color color);
 
@@ -103,16 +135,32 @@ SDL_Color gfc_color_to_sdl(Color color);
 /**
  * @brief create a color from a vector where x = r, y = g, z = b, w = a
  * @param vector the vector to convert
- * @return a new color in the format CT_HSL
+ * @return a new color in the format CT_RGBA8
  */
 Color gfc_color_from_vector4(Vector4D vector);
+
+/**
+ * @brief create a color from a vector where x = r, y = g, z = b, w = a
+ * @param vector the vector to convert
+ * @return a new color in the format CT_RGBAf
+ */
+Color gfc_color_from_vector4f(Vector4D vector);
 
 /**
  * @brief convert a color to a vector where x = r, y = g, z = b, w = a
  * @param color the color to convert
  * @return a vector set to the color provided
+ * @note: will be in values from 0-255
  */
 Vector4D gfc_color_to_vector4(Color color);
+
+/**
+ * @brief convert a color to a vector where x = r, y = g, z = b, w = a
+ * @param color the color to convert
+ * @return a vector set to the color provided
+ * @note: will be in values from 0-1.0f
+ */
+Vector4D gfc_color_to_vector4f(Color color);
 
 /**
  * @brief Get the Hue value of a color.  It may convert internally as needed.
@@ -161,5 +209,6 @@ void gfc_color_multiply(Color *dst,Color a,Color b);
  * @return the new color within specified range
  */
 Color gfc_color_clamp(Color color);
+
 
  #endif
