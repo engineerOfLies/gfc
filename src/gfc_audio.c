@@ -9,11 +9,11 @@
 typedef struct
 {
     Uint32  max_sounds;
-    Sound * sound_list;
-    List  * sound_sequences;
-}SoundManager;
+    GFC_Sound * sound_list;
+    GFC_List  * sound_sequences;
+}GFC_SoundManager;
 
-static SoundManager sound_manager={0,NULL};
+static GFC_SoundManager sound_manager={0,NULL};
 
 void gfc_sound_sequence_channel_callback(int channel);
 
@@ -21,7 +21,7 @@ void gfc_audio_close();
 void gfc_sound_init(Uint32 max);
 
 void gfc_audio_init(
-    Uint32 maxSounds,
+    Uint32 maxGFC_Sounds,
     Uint32 channels,
     Uint32 channelGroups,
     Uint32 maxMusic,
@@ -50,7 +50,7 @@ void gfc_audio_init(
     }
     atexit(Mix_Quit);
     atexit(gfc_audio_close);
-    gfc_sound_init(maxSounds);
+    gfc_sound_init(maxGFC_Sounds);
 }
 
 void gfc_audio_close()
@@ -76,23 +76,23 @@ void gfc_sound_init(Uint32 max)
         return;
     }
     sound_manager.max_sounds = max;
-    sound_manager.sound_list = gfc_allocate_array(sizeof(Sound),max);
+    sound_manager.sound_list = gfc_allocate_array(sizeof(GFC_Sound),max);
     sound_manager.sound_sequences = gfc_list_new();
     Mix_ChannelFinished(gfc_sound_sequence_channel_callback);
     atexit(gfc_sound_close);
 }
 
-void gfc_sound_delete(Sound *sound)
+void gfc_sound_delete(GFC_Sound *sound)
 {
     if (!sound)return;
     if (sound->sound != NULL)
     {
         Mix_FreeChunk(sound->sound);
     }    
-    memset(sound,0,sizeof(Sound));//clean up all other data
+    memset(sound,0,sizeof(GFC_Sound));//clean up all other data
 }
 
-void gfc_sound_free(Sound *sound)
+void gfc_sound_free(GFC_Sound *sound)
 {
     if (!sound) return;
     sound->ref_count--;
@@ -107,7 +107,7 @@ void gfc_sound_clear_all()
     }
 }
 
-Sound *gfc_sound_new()
+GFC_Sound *gfc_sound_new()
 {
     int i;
     /*search for an unused sound address*/
@@ -133,7 +133,7 @@ Sound *gfc_sound_new()
     return NULL;
 }
 
-Sound *gfc_sound_get_by_filename(const char * filename)
+GFC_Sound *gfc_sound_get_by_filename(const char * filename)
 {
     int i;
     for (i = 0;i < sound_manager.max_sounds;i++)
@@ -146,9 +146,9 @@ Sound *gfc_sound_get_by_filename(const char * filename)
     return NULL;// not found
 }
 
-Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
+GFC_Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
 {
-    Sound *sound;
+    GFC_Sound *sound;
     SDL_RWops* rwops;
     void *mem = NULL;
     size_t fileSize = 0;
@@ -192,7 +192,7 @@ Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
     return sound;
 }
 
-void gfc_sound_play(Sound *sound,int loops,float volume,int channel,int group)
+void gfc_sound_play(GFC_Sound *sound,int loops,float volume,int channel,int group)
 {
     int chan;
     float netVolume = 1;
@@ -215,9 +215,9 @@ void gfc_sound_play(Sound *sound,int loops,float volume,int channel,int group)
 
 }
 
-void gfc_sound_pack_play(HashMap *pack, const char *name,int loops,float volume,int channel,int group)
+void gfc_sound_pack_play(GFC_HashMap *pack, const char *name,int loops,float volume,int channel,int group)
 {
-    Sound *sound;
+    GFC_Sound *sound;
     if ((!pack)||(!name))return;
     sound = gfc_hashmap_get(pack,name);
     if (!sound)return;
@@ -225,9 +225,9 @@ void gfc_sound_pack_play(HashMap *pack, const char *name,int loops,float volume,
 }
 
 
-void gfc_sound_pack_load_sound(HashMap *pack, const char *name,const char *file)
+void gfc_sound_pack_load_sound(GFC_HashMap *pack, const char *name,const char *file)
 {
-    Sound *sound;
+    GFC_Sound *sound;
     if ((!pack)||(!name)||(!file))return;
     sound = gfc_hashmap_get(pack,name);
     if (sound)
@@ -240,18 +240,18 @@ void gfc_sound_pack_load_sound(HashMap *pack, const char *name,const char *file)
     gfc_hashmap_insert(pack,name,sound);
 }
 
-void gfc_sound_pack_free(HashMap *pack)
+void gfc_sound_pack_free(GFC_HashMap *pack)
 {
     if (!pack)return;
     gfc_hashmap_foreach(pack, (gfc_work_func*)gfc_sound_free);
     gfc_hashmap_free(pack);
 }
 
-HashMap *gfc_sound_pack_parse_file(const char *filename)
+GFC_HashMap *gfc_sound_pack_parse_file(const char *filename)
 {
     SJson *file;
     SJson *sounds;
-    HashMap *pack;
+    GFC_HashMap *pack;
     if (!filename)return NULL;
     file = gfc_pak_load_json(filename);
     if (!file)return NULL;
@@ -268,13 +268,13 @@ HashMap *gfc_sound_pack_parse_file(const char *filename)
     return pack;
 }
 
-HashMap *gfc_sound_pack_parse(SJson *sounds)
+GFC_HashMap *gfc_sound_pack_parse(SJson *sounds)
 {
     int i,c;
     const char *name;
     const char *text;
     SJson *sound;
-    HashMap *pack = NULL;
+    GFC_HashMap *pack = NULL;
     if (!sounds)return NULL;
     
     c = sj_array_get_count(sounds);
@@ -292,25 +292,25 @@ HashMap *gfc_sound_pack_parse(SJson *sounds)
     return pack;
 }
 
-void gfc_sound_sequence_free(SoundSequence *sequence)
+void gfc_sound_sequence_free(GFC_SoundSequence *sequence)
 {
     if (!sequence)return;
     if (sequence->sequence)gfc_list_delete(sequence->sequence);
     free(sequence);
 }
 
-SoundSequence *gfc_sound_sequence_new()
+GFC_SoundSequence *gfc_sound_sequence_new()
 {
-    SoundSequence *sequence;
-    sequence = gfc_allocate_array(sizeof(SoundSequence),1);
+    GFC_SoundSequence *sequence;
+    sequence = gfc_allocate_array(sizeof(GFC_SoundSequence),1);
     if (!sequence)return NULL;
     sequence->sequence = gfc_list_new();
     return sequence;
 }
 
-void gfc_sound_queue_sequence(List *sounds,int channel)
+void gfc_sound_queue_sequence(GFC_List *sounds,int channel)
 {
-    SoundSequence *sequence;
+    GFC_SoundSequence *sequence;
     if (!sounds)return;
     sequence = gfc_sound_sequence_new();
     if (!sequence)return;
@@ -325,8 +325,8 @@ void gfc_sound_queue_sequence(List *sounds,int channel)
 
 void gfc_sound_sequence_channel_callback(int channel)
 {
-    Sound *sound;
-    SoundSequence *sequence;
+    GFC_Sound *sound;
+    GFC_SoundSequence *sequence;
     int i,c;
     c = gfc_list_get_count(sound_manager.sound_sequences);
     for (i = 0; i < c;i++)

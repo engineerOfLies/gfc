@@ -1,5 +1,5 @@
-#ifndef __GF2D_SHAPE_H__
-#define __GF2D_SHAPE_H__
+#ifndef __GFC_SHAPE_H__
+#define __GFC_SHAPE_H__
 
 #include <SDL.h>
 
@@ -17,37 +17,56 @@
 typedef struct
 {
     double x1,y1,x2,y2;
-}Edge;
+}GFC_Edge2D;
 
 typedef struct
 {
     double       x,y,r;
-}Circle;
+}GFC_Circle;
 
 typedef struct
 {
     double x,y,w,h;
-}Rect;
+}GFC_Rect;
 
 typedef enum
 {
     ST_RECT,
     ST_CIRCLE,
     ST_EDGE
-}ShapeTypes;
+}GFC_ShapeTypes;
 
 
 typedef struct
 {
-    ShapeTypes type;
+    GFC_ShapeTypes type;
     union
     {
-        Circle c;
-        Rect r;
-        Edge e;
+        GFC_Circle c;
+        GFC_Rect r;
+        GFC_Edge2D e;
     }s;
-}Shape;
+}GFC_Shape;
 
+/**
+ * @brief macro to set an sdl rect.  should work with any data structure with elements x,y,w,h
+ * @param r the rect to set
+ * @param a x param
+ * @param b y param
+ * @param c w param
+ * @param d h param
+ */
+#define gfc_rect_set(r,a,b,c,d) (r.x=(a), r.y=(b), r.w=(c), r.h=(d))
+
+/**
+ * @brief convenience function to return a made SDL_Rect based on provided parameters.
+ * @note this may be made redundant by recent SDL Updates
+ * @param x left
+ * @param y right
+ * @param w width
+ * @param h height
+ */
+SDL_Rect gfc_sdl_rect(Sint32 x,Sint32 y,Uint32 w, Uint32 h);
 
 /**
  * @brief check if two shapes are exactly the same
@@ -55,7 +74,7 @@ typedef struct
  * @param b one shape to check
  * @return 0 if there are any differences, 1 if exactly the same
  */
-Uint8 gfc_shape_compare(Shape a, Shape b);
+Uint8 gfc_shape_compare(GFC_Shape a, GFC_Shape b);
 
 /**
  * @brief parse a shape out of json
@@ -63,7 +82,7 @@ Uint8 gfc_shape_compare(Shape a, Shape b);
  * @param shape pointer to the shape to store the information into
  * @return 0 on error or 1 on success
  */
-int gfc_shape_from_json(SJson *json,Shape *shape);
+int gfc_shape_from_json(SJson *json,GFC_Shape *shape);
 
 /**
  * @brief get rect information out of a json value
@@ -71,24 +90,24 @@ int gfc_shape_from_json(SJson *json,Shape *shape);
  * @param rect [output] save the results here
  * @return false on failure, true on success
  */
-int gfc_rect_from_json(SJson *json,Rect *rect);
+int gfc_rect_from_json(SJson *json,GFC_Rect *rect);
 
 /**
- * @brief make a GF2D Rect
+ * @brief make a GFC GFC_Rect
  * @param x the left position of the rect
  * @param y the top position of the rect
  * @param w the width of the rect
  * @param h the height of the rect
- * @return a GF2D rect
+ * @return a GFC rect
  */
-Rect gfc_rect(float x, float y, float w, float h);
+GFC_Rect gfc_rect(float x, float y, float w, float h);
 
 /**
- * @brief make a GF2D Rect
- * @param v the vector holding rect info
- * @return a GF2D rect
+ * @brief make a GFC GFC_Rect
+ * @param v the gfc_vector holding rect info
+ * @return a GFC rect
  */
-Rect gfc_rect_from_vector4(Vector4D v);
+GFC_Rect gfc_rect_from_vector4(GFC_Vector4D v);
 
 /**
  * @brief make a shape based on a rect
@@ -97,26 +116,26 @@ Rect gfc_rect_from_vector4(Vector4D v);
  * @param w the width
  * @param h the height
  */
-Shape gfc_shape_rect(float x, float y, float w, float h);
+GFC_Shape gfc_shape_rect(float x, float y, float w, float h);
 
 /**
- * @brief convert a rect to a vector4d
+ * @brief convert a rect to a gfc_vector4d
  * @param r the rect to convert
- * @returns a vector4f
+ * @returns a gfc_vector4f
  */
-Vector4D gfc_rect_to_vector4d(Rect r);
+GFC_Vector4D gfc_rect_to_vector4d(GFC_Rect r);
 
 /**
- * @brief make a shape based on a gf2d rect
+ * @brief make a shape based on a gfc rect
  * @param r the rect to base it on
  */
-Shape gfc_shape_from_rect(Rect r);
+GFC_Shape gfc_shape_from_rect(GFC_Rect r);
 
 /**
  * @brief make a shape based on a SDL rect
  * @param r the rect to base it on
  */
-Shape gfc_shape_from_sdl_rect(SDL_Rect r);
+GFC_Shape gfc_shape_from_sdl_rect(SDL_Rect r);
 
 /**
  * @brief make a shape based on a circle
@@ -124,21 +143,21 @@ Shape gfc_shape_from_sdl_rect(SDL_Rect r);
  * @param y the center y
  * @param r the radius
  */
-Shape gfc_shape_circle(float x, float y, float r);
+GFC_Shape gfc_shape_circle(float x, float y, float r);
 
 /**
- * @brief make a shape based on a gf2d Circle
+ * @brief make a shape based on a gfc GFC_Circle
  * @param c the circle to make the shape with
  * @return the shape
  */
-Shape gfc_shape_from_circle(Circle c);
+GFC_Shape gfc_shape_from_circle(GFC_Circle c);
 
 /**
  * @brief get a circle from the shape
  * @param s the shape to get the cirlce from
  * @return the circle
  */
-Circle gfc_shape_to_circle(Shape s);
+GFC_Circle gfc_shape_to_circle(GFC_Shape s);
 
 /**
  * @brief make an edge shape basesd on the points provided
@@ -148,17 +167,17 @@ Circle gfc_shape_to_circle(Shape s);
  * @param y2 the Y component of ending point
  * @return the shape
  */
-Shape gfc_shape_edge(float x1,float y1,float x2,float y2);
+GFC_Shape gfc_shape_edge(float x1,float y1,float x2,float y2);
 
 /**
- * @brief make a shape based on a gf2d Edge
+ * @brief make a shape based on a gfc GFC_Edge2D
  * @param e the edge to make the shape with
  * @return the shape
  */
-Shape gfc_shape_from_edge(Edge e);
+GFC_Shape gfc_shape_from_edge(GFC_Edge2D e);
 
 /**
- * @brief set all parameters of a GF2D rect at once
+ * @brief set all parameters of a GFC rect at once
  * @param r the rectangle to set
  * @param a the x component
  * @param b the y component
@@ -182,7 +201,7 @@ Shape gfc_shape_from_edge(Edge e);
  * @param r the rectangle to check
  * @return true if the point is inside the rectangle, false otherwise
  */
-Uint8 gfc_point_in_rect(Vector2D p,Rect r);
+Uint8 gfc_point_in_rect(GFC_Vector2D p,GFC_Rect r);
 
 /**
  * @brief check if two rectangles are overlapping
@@ -190,7 +209,7 @@ Uint8 gfc_point_in_rect(Vector2D p,Rect r);
  * @param b rect B
  * @return true if there is any overlap, false otherwise
  */
-Uint8 gfc_rect_overlap(Rect a,Rect b);
+Uint8 gfc_rect_overlap(GFC_Rect a,GFC_Rect b);
 
 /**
  * @brief check if two rectangles are overlapping
@@ -200,33 +219,33 @@ Uint8 gfc_rect_overlap(Rect a,Rect b);
  * @param normal if provided, this will be populated with the normal for the point of impact
  * @return true if there is any overlap, false otherwise
  */
-Uint8 gfc_rect_overlap_poc(Rect a,Rect b,Vector2D *poc, Vector2D *normal);
+Uint8 gfc_rect_overlap_poc(GFC_Rect a,GFC_Rect b,GFC_Vector2D *poc, GFC_Vector2D *normal);
 
 
 /**
- * @brief make a GF2D Circle
+ * @brief make a GFC GFC_Circle
  * @param x the position of the circle center
  * @param y the position of the circle center
  * @param r the radius of the circle
  */
-Circle gfc_circle(float x, float y, float r);
+GFC_Circle gfc_circle(float x, float y, float r);
 
 /**
  * @brief get the bounding circle for the given rectangle
  * @param r the rectangle
  * @return the circle who's radius intersects the corners of the rectangle
  */
-Circle gfc_rect_get_bounding_circle(Rect r);
+GFC_Circle gfc_rect_get_bounding_circle(GFC_Rect r);
 
 /**
  * @brief get the bounding circle for the given edge
  * @param e the edge
  * @return the circle who's radius intersects the endpoints of the edge
  */
-Circle gfc_edge_get_bounding_circle(Edge e);
+GFC_Circle gfc_edge_get_bounding_circle(GFC_Edge2D e);
 
 /**
- * @brief set all the parameters of a GF2D circle at once
+ * @brief set all the parameters of a GFC circle at once
  * @param
  */
 #define gfc_circle_set(circle,a,b,c) (circle.x = a,circle.y = b, circle.r = c)
@@ -237,7 +256,7 @@ Circle gfc_edge_get_bounding_circle(Edge e);
  * @param c the circle to check
  * @return true if the point is in the circle, false otherwise
  */
-Uint8 gfc_point_in_cicle(Vector2D p,Circle c);
+Uint8 gfc_point_in_cicle(GFC_Vector2D p,GFC_Circle c);
 
 /**
  * @brief check if two circles are overlapping
@@ -245,7 +264,7 @@ Uint8 gfc_point_in_cicle(Vector2D p,Circle c);
  * @param b circle B
  * @param returns true is there is overlap, false otherwise
  */
-Uint8 gfc_circle_overlap(Circle a, Circle b);
+Uint8 gfc_circle_overlap(GFC_Circle a, GFC_Circle b);
 
 /**
  * @brief check if two circles are overlapping and get the point of contact
@@ -255,38 +274,38 @@ Uint8 gfc_circle_overlap(Circle a, Circle b);
  * @param normal if provided, this will be populated with the normal for the point of impact
  * @param returns true is there is overlap, false otherwise
  */
-Uint8 gfc_circle_overlap_poc(Circle a, Circle b,Vector2D *poc,Vector2D *normal);
+Uint8 gfc_circle_overlap_poc(GFC_Circle a, GFC_Circle b,GFC_Vector2D *poc,GFC_Vector2D *normal);
 
 /**
  * @brief check if two circle intersect and get the points of intersection
  * @note this is more math heavy than the other circle overlap functions
  * @param A first circle to check
  * @param B second circle to check
- * @param pocA (optional) if you want the first point of collision, provide a pointer to a vector here
- * @param pocB (optional) if you want the second point of collision, provide a pointer to a vector here
+ * @param pocA (optional) if you want the first point of collision, provide a pointer to a gfc_vector here
+ * @param pocB (optional) if you want the second point of collision, provide a pointer to a gfc_vector here
  * @return -1 if the circles are the same, 0 if there are no common points of intersection, 
  *          1 if there is a single point of intersection or 2 if there are both.
  * @note in the event this returns 1 both pocA and pocB will be the same point
  */
-int gfc_circle_intersect_circle(Circle A, Circle B, Vector2D *pocA, Vector2D *pocB);
+int gfc_circle_intersect_circle(GFC_Circle A, GFC_Circle B, GFC_Vector2D *pocA, GFC_Vector2D *pocB);
 
 /**
  * @brief check if a circle and rect overlap
- * @param a the Circle
- * @param b the Rect
+ * @param a the GFC_Circle
+ * @param b the GFC_Rect
  * @return true if there is any overlap, false otherwise
  */
-Uint8 gfc_circle_rect_overlap(Circle a, Rect b);
+Uint8 gfc_circle_rect_overlap(GFC_Circle a, GFC_Rect b);
 
 /**
  * @brief check if a circle and rect overlap
- * @param a the Circle
- * @param b the Rect
+ * @param a the GFC_Circle
+ * @param b the GFC_Rect
  * @param poc if set the point of contact is written here
  * @param normal if provided, this will be populated with the normal for the point of impact
  * @return true if there is any overlap, false otherwise
  */
-Uint8 gfc_circle_rect_overlap_poc(Circle a, Rect b,Vector2D *poc,Vector2D * normal);
+Uint8 gfc_circle_rect_overlap_poc(GFC_Circle a, GFC_Rect b,GFC_Vector2D *poc,GFC_Vector2D * normal);
 
 /**
  * @brief check if a point is inside a shape
@@ -295,14 +314,14 @@ Uint8 gfc_circle_rect_overlap_poc(Circle a, Rect b,Vector2D *poc,Vector2D * norm
  * @param s the shape to test
  * @return 0 if not, 1 if it is
  */
-Uint8 gfc_point_in_shape(Vector2D p,Shape s);
+Uint8 gfc_point_in_shape(GFC_Vector2D p,GFC_Shape s);
 
 /**@brief check if a shape is overlapping another shape
  * @param a one shape
  * @param b the other shape
  * @return true is there is overlap, false otherwise
  */
-Uint8 gfc_shape_overlap(Shape a, Shape b);
+Uint8 gfc_shape_overlap(GFC_Shape a, GFC_Shape b);
 
 /**@brief check if a shape is overlapping another shape
  * @param a one shape
@@ -311,35 +330,35 @@ Uint8 gfc_shape_overlap(Shape a, Shape b);
  * @param poc if set the point of contact is written here
  * @param normal if provided, this will be populated with the normal for the point of impact
  */
-Uint8 /**/gfc_shape_overlap_poc(Shape a, Shape b, Vector2D *poc, Vector2D *normal);
+Uint8 /**/gfc_shape_overlap_poc(GFC_Shape a, GFC_Shape b, GFC_Vector2D *poc, GFC_Vector2D *normal);
 
 /**
- * @brief convert a GF2D rect to an SDL rect
- * @param r the GF2D rect to convert
+ * @brief convert a GFC rect to an SDL rect
+ * @param r the GFC rect to convert
  * @return an SDL rect
  */
-SDL_Rect gfc_rect_to_sdl_rect(Rect r);
+SDL_Rect gfc_rect_to_sdl_rect(GFC_Rect r);
 
 /**
- * @brief convert an SDL Rect to a GF2D rect
- * @param r the SDL Rect to convert
- * @return a GF2D rect
+ * @brief convert an SDL GFC_Rect to a GFC rect
+ * @param r the SDL GFC_Rect to convert
+ * @return a GFC rect
  */
-Rect gfc_rect_from_sdl_rect(SDL_Rect r);
+GFC_Rect gfc_rect_from_sdl_rect(SDL_Rect r);
 
 /**
- * @brief change the position of the shape based on the movement vector
+ * @brief change the position of the shape based on the movement gfc_vector
  * @param shape a pointer to the shape to move
  * @param move the amount to move the shape
  */
-void gfc_shape_move(Shape *shape,Vector2D move);
+void gfc_shape_move(GFC_Shape *shape,GFC_Vector2D move);
 
 /**
  * @brief copy one shape into another
  * @param dst a pointer to the shape you want to copy into
  * @param src the shape you want to copy FROM
  */
-void gfc_shape_copy(Shape *dst,Shape src);
+void gfc_shape_copy(GFC_Shape *dst,GFC_Shape src);
 
 /**
  * @brief make an edge
@@ -349,22 +368,22 @@ void gfc_shape_copy(Shape *dst,Shape src);
  * @param y2 the Y component of ending point
  * @return a set edge
  */
-Edge gfc_edge(float x1, float y1, float x2, float y2);
+GFC_Edge2D gfc_edge(float x1, float y1, float x2, float y2);
 
 /**
  * @brief return the length of the edge
  * @param e the edge in question
  * @return the length
  */
-float gfc_edge_length(Edge e);
+float gfc_edge_length(GFC_Edge2D e);
 
 /**
- * @brief make an edge from two vectors
- * @param a the starting point vector
- * @param b the ending point vector
+ * @brief make an edge from two gfc_vectors
+ * @param a the starting point gfc_vector
+ * @param b the ending point gfc_vector
  * @return a set edge
  */
-Edge gfc_edge_from_vectors(Vector2D a,Vector2D b);
+GFC_Edge2D gfc_edge_from_vectors(GFC_Vector2D a,GFC_Vector2D b);
 
 /**
  * @brief set an edge
@@ -388,14 +407,14 @@ Edge gfc_edge_from_vectors(Vector2D a,Vector2D b);
  * @param a edge A
  * @param b edge B
  * @param contact (optional) if provided this will be populated with the intersection point if there was an intersection
- * @param normal (optional) if provided this will be populated with a vector perpendicular to b
+ * @param normal (optional) if provided this will be populated with a gfc_vector perpendicular to b
  * @return true on intersection, false otherwise
  */
 Uint8 gfc_edge_intersect_poc(
-    Edge a,
-    Edge b,
-    Vector2D *contact,
-    Vector2D *normal);
+    GFC_Edge2D a,
+    GFC_Edge2D b,
+    GFC_Vector2D *contact,
+    GFC_Vector2D *normal);
 
 /**
  * @brief determine if and where two edges intersect
@@ -403,7 +422,7 @@ Uint8 gfc_edge_intersect_poc(
  * @param b edge B
  * @return true on intersection, false otherwise
  */
-Uint8 gfc_edge_intersect(Edge a,Edge b);
+Uint8 gfc_edge_intersect(GFC_Edge2D a,GFC_Edge2D b);
 
 /**
  * @brief check if an edge intersects a rectangle
@@ -411,17 +430,17 @@ Uint8 gfc_edge_intersect(Edge a,Edge b);
  * @param r the rect to rest
  * @return true if there is an intersection, false otherwise
  */
-Uint8 gfc_edge_rect_intersection(Edge e, Rect r);
+Uint8 gfc_edge_rect_intersection(GFC_Edge2D e, GFC_Rect r);
 
 /**
  * @brief check if an edge intersects a rectangle and get the point of contact and normal
  * @param e the edge to test
  * @param r the rect to rest
  * @param contact (optional) if provided this will be populated with the intersection point if there was an intersection
- * @param normal (optional) if provided this will be populated with a vector perpendicular to b
+ * @param normal (optional) if provided this will be populated with a gfc_vector perpendicular to b
  * @return true if there is an intersection, false otherwise
  */
-Uint8 gfc_edge_rect_intersection_poc(Edge e, Rect r,Vector2D *poc,Vector2D *normal);
+Uint8 gfc_edge_rect_intersection_poc(GFC_Edge2D e, GFC_Rect r,GFC_Vector2D *poc,GFC_Vector2D *normal);
 
 /**
  * @brief check if an edge intersects a circle
@@ -429,7 +448,7 @@ Uint8 gfc_edge_rect_intersection_poc(Edge e, Rect r,Vector2D *poc,Vector2D *norm
  * @param c the circle to check
  * @return true if there is an intersection, false otherwise
  */
-Uint8 gfc_edge_circle_intersection(Edge e,Circle c);
+Uint8 gfc_edge_circle_intersection(GFC_Edge2D e,GFC_Circle c);
 
 /**
  * @brief check if an edge intersects a circle and get point of contact
@@ -439,7 +458,7 @@ Uint8 gfc_edge_circle_intersection(Edge e,Circle c);
  * @param normal if provided, this will be populated with the normal for the point of impact
  * @return true if there is an intersection, false otherwise
  */
-Uint8 gfc_edge_circle_intersection_poc(Edge e,Circle c,Vector2D *poc,Vector2D *normal);
+Uint8 gfc_edge_circle_intersection_poc(GFC_Edge2D e,GFC_Circle c,GFC_Vector2D *poc,GFC_Vector2D *normal);
 
 /**
  * @brief check if the edge intersects the shape
@@ -447,7 +466,7 @@ Uint8 gfc_edge_circle_intersection_poc(Edge e,Circle c,Vector2D *poc,Vector2D *n
  * @param s the shape to test
  * @param true if the shape and edge intersect, false otherwise
  */
-Uint8 gfc_edge_intersect_shape(Edge e,Shape s);
+Uint8 gfc_edge_intersect_shape(GFC_Edge2D e,GFC_Shape s);
 
 /**
  * @brief check if the edge intersects the shape
@@ -457,52 +476,52 @@ Uint8 gfc_edge_intersect_shape(Edge e,Shape s);
  * @param normal if provided, this will be populated with the normal for the point of impact
  * @param true if the shape and edge intersect, false otherwise
  */
-Uint8 gfc_edge_intersect_shape_poc(Edge e,Shape s,Vector2D *poc,Vector2D *normal);
+Uint8 gfc_edge_intersect_shape_poc(GFC_Edge2D e,GFC_Shape s,GFC_Vector2D *poc,GFC_Vector2D *normal);
 
 /**
  * @brief echo out the shape information to log (and stdout)
  * @param shape the shape information to echo
  */
-void gfc_shape_slog(Shape shape);
+void gfc_shape_slog(GFC_Shape shape);
 
-void gfc_edge_slog(Edge e);
-void gfc_circle_slog(Circle c);
+void gfc_edge_slog(GFC_Edge2D e);
+void gfc_circle_slog(GFC_Circle c);
 
 /**
  * @brief echo out the rect information to log (and stdout)
  * @param r the rect information to echo
  */
-void gfc_rect_slog(Rect r);
+void gfc_rect_slog(GFC_Rect r);
 
 /**
  * @brief get the minum rectangle that bounds the shape
  * @param shape the shape to get the bounds of
  * @return the bounding rectangle
  */
-Rect gfc_shape_get_bounds(Shape shape);
+GFC_Rect gfc_shape_get_bounds(GFC_Shape shape);
 
 /**
  * @brief get the normal of the shape relative to a reference shape
  * @param s the shape to get the normal from
  * @param s2 the normal should be pointing towards this shape
- * @return an empty vector if the refPoint is in the shape, a unit vector otherwise
+ * @return an empty gfc_vector if the refPoint is in the shape, a unit gfc_vector otherwise
  */
-Vector2D gfc_shape_get_normal_for_shape(Shape s, Shape s2);
+GFC_Vector2D gfc_shape_get_normal_for_shape(GFC_Shape s, GFC_Shape s2);
 
 /**
  * @brief get the normal of the shape relative to a reference for a given circle
  * @param s the shape to get the normal from
  * @param c the normal should be pointing towards this shape
- * @return an empty vector if the refPoint is in the shape, a unit vector otherwise
+ * @return an empty gfc_vector if the refPoint is in the shape, a unit gfc_vector otherwise
  */
-Vector2D gfc_shape_get_normal_for_cirlce(Shape s, Circle c);
+GFC_Vector2D gfc_shape_get_normal_for_cirlce(GFC_Shape s, GFC_Circle c);
 
 /**
  * @brief get the center point of a rect
  * @param r the rectangle to use
  * @return the center point of the rect
  */
-Vector2D gfc_rect_get_center_point(Rect r);
+GFC_Vector2D gfc_rect_get_center_point(GFC_Rect r);
 
 /**
  * @brief get the interpolated point along a bezier curve described by the points provided in 2d space
@@ -512,7 +531,7 @@ Vector2D gfc_rect_get_center_point(Rect r);
  * @param t the time step along the curve to determine where the point is.  should be between zero and 1
  * @return the position on the curve corresponding to the time step provided
  */
-Vector2D gfc_shape_get_bezier_point_2d(Vector2D p0, Vector2D p1, Vector2D p2,float t);
+GFC_Vector2D gfc_shape_get_bezier_point_2d(GFC_Vector2D p0, GFC_Vector2D p1, GFC_Vector2D p2,float t);
 
 /**
  * @brief get the interpolated point along a bezier curve described by the points provided in 3d space
@@ -522,7 +541,7 @@ Vector2D gfc_shape_get_bezier_point_2d(Vector2D p0, Vector2D p1, Vector2D p2,flo
  * @param t the time step along the curve to determine where the point is.  should be between zero and 1
  * @return the position on the curve corresponding to the time step provided
  */
-Vector3D gfc_shape_get_bezier_point_3d(Vector3D p0, Vector3D p1, Vector3D p2,float t);
+GFC_Vector3D gfc_shape_get_bezier_point_3d(GFC_Vector3D p0, GFC_Vector3D p1, GFC_Vector3D p2,float t);
 
 /**
  * @brief get a list of points that describe a bezier curve bound by the 3 points provided in 2D
@@ -532,7 +551,7 @@ Vector3D gfc_shape_get_bezier_point_3d(Vector3D p0, Vector3D p1, Vector3D p2,flo
  * @param count how many points should be in the list
  * @return NULL on error or a list of points for a bezier curve.
  */
-List *gfc_shape_get_bezier_point_list_2d(Vector2D p0, Vector2D p1, Vector2D p2,Uint32 count);
+GFC_List *gfc_shape_get_bezier_point_list_2d(GFC_Vector2D p0, GFC_Vector2D p1, GFC_Vector2D p2,Uint32 count);
 
 /**
  * @brief get a list of points that describe a bezier curve bound by the 3 points provided in 3D
@@ -542,13 +561,13 @@ List *gfc_shape_get_bezier_point_list_2d(Vector2D p0, Vector2D p1, Vector2D p2,U
  * @param count how many points should be in the list
  * @return NULL on error or a list of points for a bezier curve.
  */
-List *gfc_shape_get_bezier_point_list_3d(Vector3D p0, Vector3D p1, Vector3D p2,Uint32 count);
+GFC_List *gfc_shape_get_bezier_point_list_3d(GFC_Vector3D p0, GFC_Vector3D p1, GFC_Vector3D p2,Uint32 count);
 
 /**
  * @brief free a point list, works for both 2d and 3d
  * @param list the list of points (as created from above) to delete
  * @note the list itself is also deleted
  */
-void gfc_shape_point_list_free(List *list);
+void gfc_shape_point_list_free(GFC_List *list);
 
 #endif

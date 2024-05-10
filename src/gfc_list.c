@@ -3,7 +3,7 @@
 #include "gfc_types.h"
 #include "gfc_list.h"
 
-void gfc_list_delete(List *list)
+void gfc_list_delete(GFC_List *list)
 {
     if (!list)return;
     if (list->elements)
@@ -13,41 +13,41 @@ void gfc_list_delete(List *list)
     free(list);
 }
 
-List *gfc_list_new()
+GFC_List *gfc_list_new()
 {
     return gfc_list_new_size(16);
 }
 
-List *gfc_list_copy(List *old)
+GFC_List *gfc_list_copy(GFC_List *old)
 {
-    List *new;
+    GFC_List *new;
     if (!old)return 0;
     if (old->size <= 0)return NULL;
     new = gfc_list_new_size(old->size);
     if (!new)return NULL;
     if (old->count <= 0)return new;
-    memcpy(new->elements,old->elements,sizeof(ListElementData)*old->count);
+    memcpy(new->elements,old->elements,sizeof(GFC_ListElementData)*old->count);
     new->count = old->count;
     return new;
 }
 
-List *gfc_list_new_size(Uint32 count)
+GFC_List *gfc_list_new_size(Uint32 count)
 {
-    List *l;
+    GFC_List *l;
     if (!count)
     {
         slog("cannot make a list of size zero");
         return NULL;
     }
-    l = (List *)malloc(sizeof(List));
+    l = (GFC_List *)malloc(sizeof(GFC_List));
     if (!l)
     {
         slog("failed to allocate space for the list");
         return NULL;
     }
-    memset(l,0,sizeof(List));
+    memset(l,0,sizeof(GFC_List));
     l->size = count;
-    l->elements = gfc_allocate_array(sizeof(ListElementData),count);
+    l->elements = gfc_allocate_array(sizeof(GFC_ListElementData),count);
     if (!l->elements)
     {
         slog("failed to allocate space for list elements");
@@ -57,14 +57,14 @@ List *gfc_list_new_size(Uint32 count)
     return l;
 }
 
-void gfc_list_set_nth(List *list,Uint32 n,void *data)
+void gfc_list_set_nth(GFC_List *list,Uint32 n,void *data)
 {
     if (!list)return;
     if ((n >= list->count)||(n >= list->size))return;
     list->elements[n].data = data;
 }
 
-void gfc_list_swap_indices(List *list,Uint32 a, Uint32 b)
+void gfc_list_swap_indices(GFC_List *list,Uint32 a, Uint32 b)
 {
     void *temp = NULL;
     if (!list)return;
@@ -76,7 +76,7 @@ void gfc_list_swap_indices(List *list,Uint32 a, Uint32 b)
     list->elements[b].data = temp;
 }
 
-void *gfc_list_get_nth(List *list,Uint32 n)
+void *gfc_list_get_nth(GFC_List *list,Uint32 n)
 {
     if (!list)
     {
@@ -86,9 +86,9 @@ void *gfc_list_get_nth(List *list,Uint32 n)
     return list->elements[n].data;
 }
 
-List *gfc_list_expand(List *list)
+GFC_List *gfc_list_expand(GFC_List *list)
 {
-    List *l;
+    GFC_List *l;
     if (!list)
     {
         slog("no list provided");
@@ -102,7 +102,7 @@ List *gfc_list_expand(List *list)
     }
     if (list->count > 0)
     {
-        memcpy(l->elements,list->elements,sizeof(ListElementData)*list->count);
+        memcpy(l->elements,list->elements,sizeof(GFC_ListElementData)*list->count);
     }
     list->size = l->size;// update the new size
     free(list->elements);//free the old data
@@ -111,7 +111,7 @@ List *gfc_list_expand(List *list)
     return list;//for backward compatibility
 }
 
-List *gfc_list_append(List *list,void *data)
+GFC_List *gfc_list_append(GFC_List *list,void *data)
 {
     if (!list)
     {
@@ -131,7 +131,7 @@ List *gfc_list_append(List *list,void *data)
     return list;
 }
 
-List *gfc_list_concat(List *a,List *b)
+GFC_List *gfc_list_concat(GFC_List *a,GFC_List *b)
 {
     int i,count;
     void *data;
@@ -150,7 +150,7 @@ List *gfc_list_concat(List *a,List *b)
     return a;
 }
 
-List *gfc_list_concat_free(List *a,List *b)
+GFC_List *gfc_list_concat_free(GFC_List *a,GFC_List *b)
 {
     a = gfc_list_concat(a,b);
     if (a == NULL)return NULL;
@@ -158,12 +158,12 @@ List *gfc_list_concat_free(List *a,List *b)
     return a;
 }
 
-List *gfc_list_prepend(List *list,void *data)
+GFC_List *gfc_list_prepend(GFC_List *list,void *data)
 {
     return gfc_list_insert(list,data,0);
 }
 
-List *gfc_list_insert(List *list,void *data,Uint32 n)
+GFC_List *gfc_list_insert(GFC_List *list,void *data,Uint32 n)
 {
     if (!list)
     {
@@ -180,19 +180,19 @@ List *gfc_list_insert(List *list,void *data,Uint32 n)
         list = gfc_list_expand(list);
         if (!list)return NULL;
     }
-    memmove(&list->elements[n+1],&list->elements[n],sizeof(ListElementData)*(list->count - n));//copy all elements after n
+    memmove(&list->elements[n+1],&list->elements[n],sizeof(GFC_ListElementData)*(list->count - n));//copy all elements after n
     list->elements[n].data = data;
     list->count++;
     return list;
 }
 
 
-int gfc_list_delete_first(List *list)
+int gfc_list_delete_first(GFC_List *list)
 {
     return gfc_list_delete_nth(list,0);
 }
 
-int gfc_list_delete_last(List *list)
+int gfc_list_delete_last(GFC_List *list)
 {
     if (!list)
     {
@@ -202,7 +202,7 @@ int gfc_list_delete_last(List *list)
     return gfc_list_delete_nth(list,list->count-1);
 }
 
-int gfc_list_get_item_index(List *list,void *data)
+int gfc_list_get_item_index(GFC_List *list,void *data)
 {
     int i;
     if (!list)
@@ -222,7 +222,7 @@ int gfc_list_get_item_index(List *list,void *data)
     return -1;    
 }
 
-int gfc_list_delete_data(List *list,void *data)
+int gfc_list_delete_data(GFC_List *list,void *data)
 {
     int i;
     if (!list)
@@ -244,14 +244,14 @@ int gfc_list_delete_data(List *list,void *data)
     return -1;
 }
 
-void gfc_list_clear(List *list)
+void gfc_list_clear(GFC_List *list)
 {
     if (!list)return;
     memset(list->elements,0,list->size);//zero out all the data;
     list->count = 0;
 }
 
-int gfc_list_delete_nth(List *list,Uint32 n)
+int gfc_list_delete_nth(GFC_List *list,Uint32 n)
 {
     if (!list)
     {
@@ -269,18 +269,18 @@ int gfc_list_delete_nth(List *list,Uint32 n)
         list->elements[n].data = NULL;
         return 0;
     }
-    memmove(&list->elements[n],&list->elements[n+1],sizeof(ListElementData)*(list->count - n));//copy all elements after n
+    memmove(&list->elements[n],&list->elements[n+1],sizeof(GFC_ListElementData)*(list->count - n));//copy all elements after n
     list->count--;
     return 0;
 }
 
-Uint32 gfc_list_get_count(List *list)
+Uint32 gfc_list_get_count(GFC_List *list)
 {
     if (!list)return 0;
     return list->count;
 }
 
-void gfc_list_foreach(List *list,void (*function)(void *data))
+void gfc_list_foreach(GFC_List *list,void (*function)(void *data))
 {
     int i;
     if (!list)
@@ -297,7 +297,7 @@ void gfc_list_foreach(List *list,void (*function)(void *data))
     }
 }
 
-void gfc_list_foreach_context(List *list,void (*function)(void *data,void *context),void *contextData)
+void gfc_list_foreach_context(GFC_List *list,void (*function)(void *data,void *context),void *contextData)
 {
     int i;
     if (!list)

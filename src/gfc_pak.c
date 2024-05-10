@@ -7,13 +7,13 @@
 
 typedef struct
 {
-    TextLine filename;
+    GFC_TextLine filename;
     mz_zip_archive zipFile;
 }GFC_PakFile;
 
 typedef struct
 {
-    List *pak_files;
+    GFC_List *pak_files;
 }GFC_PakManager;
 
 static GFC_PakManager pak_manager = {0};

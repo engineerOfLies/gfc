@@ -1,7 +1,7 @@
 #include "simple_logger.h"
 #include "gfc_config.h"
 
-SJson *sj_vector2d_new(Vector2D input)
+SJson *sj_vector2d_new(GFC_Vector2D input)
 {
     SJson *json;
     
@@ -12,7 +12,7 @@ SJson *sj_vector2d_new(Vector2D input)
     return json;
 }
 
-SJson *sj_vector3d_new(Vector3D input)
+SJson *sj_vector3d_new(GFC_Vector3D input)
 {
     SJson *json;
     
@@ -24,7 +24,7 @@ SJson *sj_vector3d_new(Vector3D input)
     return json;
 }
 
-SJson *sj_vector4d_new(Vector4D input)
+SJson *sj_vector4d_new(GFC_Vector4D input)
 {
     SJson *json;
     
@@ -37,15 +37,15 @@ SJson *sj_vector4d_new(Vector4D input)
     return json;
 }
 
-Color sj_object_get_color(SJson *json,const char *key)
+GFC_Color sj_object_get_color(SJson *json,const char *key)
 {
     return sj_value_as_color(sj_object_get_value(json,key));
 }
 
-Color sj_value_as_color(SJson *value)
+GFC_Color sj_value_as_color(SJson *value)
 {
-    Color color;
-    Vector4D colorv = {255,255,255,255};
+    GFC_Color color;
+    GFC_Vector4D colorv = {255,255,255,255};
     color = gfc_color8(255,255,255,255);
     if (!value)return color;
     sj_value_as_vector4d(value,&colorv);
@@ -53,22 +53,22 @@ Color sj_value_as_color(SJson *value)
     return color;
 }
 
-int sj_object_get_vector2d(SJson *json,const char *key,Vector2D *output)
+int sj_object_get_vector2d(SJson *json,const char *key,GFC_Vector2D *output)
 {
     return sj_value_as_vector2d(sj_object_get_value(json,key),output);
 }
 
-int sj_object_get_vector3d(SJson *json,const char *key,Vector3D *output)
+int sj_object_get_vector3d(SJson *json,const char *key,GFC_Vector3D *output)
 {
     return sj_value_as_vector3d(sj_object_get_value(json,key),output);
 }
 
-int sj_object_get_vector4d(SJson *json,const char *key,Vector4D *output)
+int sj_object_get_vector4d(SJson *json,const char *key,GFC_Vector4D *output)
 {
     return sj_value_as_vector4d(sj_object_get_value(json,key),output);
 }
 
-int sj_value_as_vector2d(SJson *json,Vector2D *output)
+int sj_value_as_vector2d(SJson *json,GFC_Vector2D *output)
 {
     const char *text = NULL;
     float numbers[4];
@@ -109,7 +109,7 @@ int sj_value_as_vector2d(SJson *json,Vector2D *output)
     return 0;
 }
 
-int sj_value_as_vector3d(SJson *json,Vector3D *output)
+int sj_value_as_vector3d(SJson *json,GFC_Vector3D *output)
 {
     const char *text = NULL;
     float numbers[4];
@@ -152,7 +152,7 @@ int sj_value_as_vector3d(SJson *json,Vector3D *output)
     return 0;
 }
 
-int sj_value_as_vector4d(SJson *json,Vector4D *output)
+int sj_value_as_vector4d(SJson *json,GFC_Vector4D *output)
 {
     const char *text = NULL;
     float numbers[4];
@@ -167,7 +167,7 @@ int sj_value_as_vector4d(SJson *json,Vector4D *output)
         count = sj_array_get_count(json);
         if (count < 4)
         {
-            slog("not enough elements in the array (%i) for a Vector4D",count);
+            slog("not enough elements in the array (%i) for a GFC_Vector4D",count);
             return 0;
         }
         if (count > 4)count = 4;

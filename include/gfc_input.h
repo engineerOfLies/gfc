@@ -12,7 +12,7 @@ typedef enum
     EMK_Alt,
     EMK_Ctrl,
     EMK_Super
-}InputModKey;
+}GFC_InputModKey;
 
 typedef enum
 {
@@ -20,7 +20,7 @@ typedef enum
     IET_Press   = 1,
     IET_Hold    = 2,
     IET_Release = 3
-}InputEventType;
+}GFC_InputEventType;
 
 typedef struct
 {
@@ -40,14 +40,14 @@ typedef struct
  */
 typedef struct
 {
-    TextLine command;
-    List *keyCodes;                     /**<list of keys that must be pressed together to count as a single input*/
+    GFC_TextLine command;
+    GFC_List *keyCodes;                     /**<list of keys that must be pressed together to count as a single input*/
     Uint8 controller;                   /**<Index of the controller to use to update this input*/
-    List *buttons;                      /**<list of buttons that must be pressed together to count as a single input*/
-    List *axes;                         /**<list of axes that must be pressed together to count as a single input*/
+    GFC_List *buttons;                      /**<list of buttons that must be pressed together to count as a single input*/
+    GFC_List *axes;                         /**<list of axes that must be pressed together to count as a single input*/
     int downCount;
     Uint32 pressTime;                   /**<clock ticks when button was pressed*/
-    InputEventType state;               /**<updated each frame*/
+    GFC_InputEventType state;               /**<updated each frame*/
     void (*onPress)(void *data);        /**<callback for press event*/
     void (*onHold)(void *data);         /**<callback for hold event*/
     void (*onRelease)(void *data);      /**<callback for release event*/
@@ -87,7 +87,7 @@ Uint8 gfc_input_command_held(const char *command);
 Uint8 gfc_input_command_released(const char *command);
 Uint8 gfc_input_command_down(const char *command);
 
-InputEventType gfc_input_command_get_state(const char *command);
+GFC_InputEventType gfc_input_command_get_state(const char *command);
 
 /**
  * @brief report if the key provided has been pressed this frame

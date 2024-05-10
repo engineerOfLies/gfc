@@ -2,7 +2,7 @@
 #include "gfc_color.h"
 
 
-int gfc_color_cmp(Color a, Color b)
+int gfc_color_cmp(GFC_Color a, GFC_Color b)
 {
     a = gfc_color_to_float(a);
     b = gfc_color_to_float(b);
@@ -14,9 +14,9 @@ int gfc_color_cmp(Color a, Color b)
     return 1;
 }
 
-Color gfc_color(float r,float g,float b,float a)
+GFC_Color gfc_color(float r,float g,float b,float a)
 {
-    Color color;
+    GFC_Color color;
     color.r = MIN(MAX(r,-1),1);
     color.g = MIN(MAX(g,-1),1);
     color.b = MIN(MAX(b,-1),1);
@@ -25,9 +25,9 @@ Color gfc_color(float r,float g,float b,float a)
     return color;
 }
 
-Color gfc_color8(Uint8 r,Uint8 g,Uint8 b,Uint8 a)
+GFC_Color gfc_color8(Uint8 r,Uint8 g,Uint8 b,Uint8 a)
 {
-    Color color;
+    GFC_Color color;
     color.r = (float)r;
     color.g = (float)g;
     color.b = (float)b;
@@ -36,9 +36,9 @@ Color gfc_color8(Uint8 r,Uint8 g,Uint8 b,Uint8 a)
     return color;
 }
 
-Color gfc_color_hsl(float h,float s,float l,float a)
+GFC_Color gfc_color_hsl(float h,float s,float l,float a)
 {
-    Color color;
+    GFC_Color color;
     color.r = h;
     while (color.r < 0)color.r+=360;
     while (color.r >= 360)color.r-=360;
@@ -49,17 +49,17 @@ Color gfc_color_hsl(float h,float s,float l,float a)
     return color;
 }
 
-Color gfc_color_hex(Uint32 hex)
+GFC_Color gfc_color_hex(Uint32 hex)
 {
-    Color color;
+    GFC_Color color;
     color.r = (float)hex;
     color.ct = CT_HEX;
     return color;
 }
 
-Color gfc_color_to_float(Color color)
+GFC_Color gfc_color_to_float(GFC_Color color)
 {
-    Color nc;
+    GFC_Color nc;
     float C,X,m;
     float factor = 1.0/255.0;
     switch(color.ct)
@@ -126,9 +126,9 @@ Color gfc_color_to_float(Color color)
     return nc;
 }
 
-Color gfc_color_to_int8(Color color)
+GFC_Color gfc_color_to_int8(GFC_Color color)
 {
-    Color nc;
+    GFC_Color nc;
     switch (color.ct)
     {
         case CT_HEX:
@@ -152,9 +152,9 @@ Color gfc_color_to_int8(Color color)
     return nc;
 }
 
-Color gfc_color_to_hsla(Color color)
+GFC_Color gfc_color_to_hsla(GFC_Color color)
 {
-    Color nc;
+    GFC_Color nc;
     float D,Cmin,Cmax,H,S,L;
     if (color.ct == CT_HSL)
     {
@@ -193,11 +193,11 @@ Color gfc_color_to_hsla(Color color)
     return nc;
 }
 
-Uint32 gfc_color_to_hex(Color color)
+Uint32 gfc_color_to_hex(GFC_Color color)
 {
     Uint32 hex;
     Uint32 r,g,b,a;
-    Color nc;
+    GFC_Color nc;
     if (color.ct == CT_HEX)
     {
         return color.r;
@@ -211,61 +211,61 @@ Uint32 gfc_color_to_hex(Color color)
     return hex;
 }
 
-Color gfc_color_from_vector4(Vector4D vector)
+GFC_Color gfc_color_from_vector4(GFC_Vector4D gfc_vector)
 {
-    Color color;
+    GFC_Color color;
     color.ct = CT_RGBA8;
-    color.r = vector.x;
-    color.g = vector.y;
-    color.b = vector.z;
-    color.a = vector.w;
+    color.r = gfc_vector.x;
+    color.g = gfc_vector.y;
+    color.b = gfc_vector.z;
+    color.a = gfc_vector.w;
     return color;
 }
 
-Color gfc_color_from_vector4f(Vector4D vector)
+GFC_Color gfc_color_from_vector4f(GFC_Vector4D gfc_vector)
 {
-    Color color;
+    GFC_Color color;
     color.ct = CT_RGBAf;
-    color.r = vector.x;
-    color.g = vector.y;
-    color.b = vector.z;
-    color.a = vector.w;
+    color.r = gfc_vector.x;
+    color.g = gfc_vector.y;
+    color.b = gfc_vector.z;
+    color.a = gfc_vector.w;
     return color;
 }
 
 
-Vector4D gfc_color_to_vector4(Color color)
+GFC_Vector4D gfc_color_to_vector4(GFC_Color color)
 {
-    Vector4D vector;
+    GFC_Vector4D gfc_vector;
     color = gfc_color_to_int8(color);
-    vector.x = color.r;
-    vector.y = color.g;
-    vector.z = color.b;
-    vector.w = color.a;
-    return vector;
+    gfc_vector.x = color.r;
+    gfc_vector.y = color.g;
+    gfc_vector.z = color.b;
+    gfc_vector.w = color.a;
+    return gfc_vector;
 }
 
-Vector4D gfc_color_to_vector4f(Color color)
+GFC_Vector4D gfc_color_to_vector4f(GFC_Color color)
 {
-    Vector4D vector;
+    GFC_Vector4D gfc_vector;
     color = gfc_color_to_float(color);
-    vector.x = color.r;
-    vector.y = color.g;
-    vector.z = color.b;
-    vector.w = color.a;
-    return vector;
+    gfc_vector.x = color.r;
+    gfc_vector.y = color.g;
+    gfc_vector.z = color.b;
+    gfc_vector.w = color.a;
+    return gfc_vector;
 }
 
 
-float gfc_color_get_hue(Color color)
+float gfc_color_get_hue(GFC_Color color)
 {
     color = gfc_color_to_hsla(color);
     return color.r;
 }
 
-Color gfc_color_from_sdl(SDL_Color color)
+GFC_Color gfc_color_from_sdl(SDL_Color color)
 {
-    Color nc;
+    GFC_Color nc;
     float factor = 1.0/255.0;
     nc.ct = CT_RGBAf;
     nc.r = color.r *factor;
@@ -275,7 +275,7 @@ Color gfc_color_from_sdl(SDL_Color color)
     return nc;
 }
 
-SDL_Color gfc_color_to_sdl(Color color)
+SDL_Color gfc_color_to_sdl(GFC_Color color)
 {
     SDL_Color nc;
     color = gfc_color_to_int8(color);
@@ -286,9 +286,9 @@ SDL_Color gfc_color_to_sdl(Color color)
     return nc;
 }
 
-void gfc_color_set_hue(float hue,Color *color)
+void gfc_color_set_hue(float hue,GFC_Color *color)
 {
-    Color temp;
+    GFC_Color temp;
     if (color->ct == CT_HSL)
     {
         color->r = hue;
@@ -312,7 +312,7 @@ void gfc_color_set_hue(float hue,Color *color)
     }
 }
 
-void gfc_color_blend(Color *dst,Color a,Color b)
+void gfc_color_blend(GFC_Color *dst,GFC_Color a,GFC_Color b)
 {
     float hex;
     if (!dst)return;
@@ -356,7 +356,7 @@ void gfc_color_blend(Color *dst,Color a,Color b)
     }    
 }
 
-void gfc_color_add(Color *dst,Color a,Color b)
+void gfc_color_add(GFC_Color *dst,GFC_Color a,GFC_Color b)
 {
     float hex;
     if (!dst)return;
@@ -400,9 +400,9 @@ void gfc_color_add(Color *dst,Color a,Color b)
     }    
 }
 
-void gfc_color_multiply(Color *dst,Color a,Color b)
+void gfc_color_multiply(GFC_Color *dst,GFC_Color a,GFC_Color b)
 {
-    ColorType ct;
+    GFC_ColorType ct;
     if (!dst)return;
     ct = a.ct;
     a = gfc_color_to_float(a);
@@ -428,7 +428,7 @@ void gfc_color_multiply(Color *dst,Color a,Color b)
     }
 }
 
-Color gfc_color_clamp(Color color)
+GFC_Color gfc_color_clamp(GFC_Color color)
 {
     switch(color.ct)
     {

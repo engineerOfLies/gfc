@@ -4,28 +4,28 @@
 #include <stdio.h>
 #include <string.h> 
 
-Callback *gfc_callback_new(void (*callback)(void *data),void *data)
+GFC_Callback *gfc_callback_new(void (*callback)(void *data),void *data)
 {
-    Callback *c;
-    c = (Callback *)malloc(sizeof(Callback));
+    GFC_Callback *c;
+    c = (GFC_Callback *)malloc(sizeof(GFC_Callback));
     if (!c)
     {
         slog("failed to allocate callback");
         return NULL;
     }
-    memset(c,0,sizeof(Callback));
+    memset(c,0,sizeof(GFC_Callback));
     c->callback = callback;
     c->data = data;
     return c;
 }
 
-void gfc_callback_free(Callback *callback)
+void gfc_callback_free(GFC_Callback *callback)
 {
     if (!callback)return;
     free(callback);
 }
 
-void gfc_callback_call(Callback *callback)
+void gfc_callback_call(GFC_Callback *callback)
 {
     if (!callback)return;
     if (callback->callback)

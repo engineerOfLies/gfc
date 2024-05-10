@@ -70,7 +70,7 @@ int gfc_str_suffix(const char *str, const char *suffix);
 /**
  * @brief 16 character buffer used for short tags
  */
-typedef char TextWord[16];
+typedef char GFC_TextWord[16];
 #define GFCWORDLEN   16
 #define gfc_word_cmp(a,b) (strncmp(a,b,GFCWORDLEN))
 #define gfc_word_icmp(a,b) (strincmp(a,b,GFCWORDLEN))
@@ -80,7 +80,7 @@ typedef char TextWord[16];
 /**
  * @brief 128 character buffer used for statements
  */
-typedef char TextLine[128];
+typedef char GFC_TextLine[128];
 #define GFCLINELEN   128
 #define gfc_line_cmp(a,b) (strncmp(a,b,GFCLINELEN))
 #define gfc_line_icmp(a,b) (strincmp(a,b,GFCLINELEN))
@@ -90,7 +90,7 @@ typedef char TextLine[128];
 /**
  * @brief 1024 character buffer used for text blocks
  */
-typedef char TextBlock[1024];
+typedef char GFC_TextBlock[1024];
 #define GFCTEXTLEN   1024
 #define gfc_block_cmp(a,b) (strncmp(a,b,GFCTEXTLEN))
 #define gfc_block_icmp(a,b) (strincmp(a,b,GFCTEXTLEN))

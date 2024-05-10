@@ -14,30 +14,34 @@
 
 typedef struct
 {
-    Vector3D a,b;
-}Edge3D;
+    GFC_Vector3D a,b;
+}GFC_Edge3D;
 
 typedef struct
 {
-    Vector3D a,b,c;
-}Triangle3D;
+    GFC_Vector3D a,b,c;
+}GFC_Triangle3D;
 
 typedef struct
 {
     float x,y,z;   //vector normal of the plane
     float d;       //distance from origin
-}Plane3D;
+}GFC_Plane3D;
 
 typedef struct
 {
     float x,y,z,r; // position in space, and radius
-}Sphere;
+}GFC_Sphere;
 
+/**
+ * @brief an axis sligned bounding box use for quick collision detection
+ * can also be used for tracking any cubic shape that will later be able to be rotated
+ */
 typedef struct
 {
     float x,y,z;   //position of corner
     float w,h,d;   // width, height, and depth offsets
-}Box;
+}GFC_Box;
 
 typedef enum
 {
@@ -47,21 +51,21 @@ typedef enum
     VT_PLANE,
     VT_TRIANLGE,
     VT_BOX
-}PrimitiveTypes;
+}GFC_PrimitiveTypes;
 
 typedef struct
 {
-    PrimitiveTypes type;
+    GFC_PrimitiveTypes type;
     union
     {
-        Vector3D p;//point
-        Sphere s;
-        Edge3D e;
-        Plane3D pl;
-        Triangle3D t;
-        Box b;
+        GFC_Vector3D p;//point
+        GFC_Sphere s;
+        GFC_Edge3D e;
+        GFC_Plane3D pl;
+        GFC_Triangle3D t;
+        GFC_Box b;
     }s;
-}Primitive;
+}GFC_Primitive;
 
 /**
  * @brief make an axis aligned box based on its component
@@ -73,7 +77,7 @@ typedef struct
  * @param d the size along z
  * @return a set box
  */
-Box gfc_box(float x, float y, float z, float w, float h, float d);
+GFC_Box gfc_box(float x, float y, float z, float w, float h, float d);
 
 
 #define gfc_box_cpy(dst,src) (dst.x = src.x,dst.y = src.y,dst.z = src.z,dst.w = src.w,dst.h = src.h,dst.d = src.d)
@@ -86,7 +90,7 @@ Box gfc_box(float x, float y, float z, float w, float h, float d);
  * @param r the radius
  * @return a set sphere
  */
-Sphere gfc_sphere(float x, float y, float z, float r);
+GFC_Sphere gfc_sphere(float x, float y, float z, float r);
 
 /**
  * @brief make a plane based on its component
@@ -96,7 +100,7 @@ Sphere gfc_sphere(float x, float y, float z, float r);
  * @param d the distance from origin
  * @return a set sphere
  */
-Plane3D gfc_plane3d(float x, float y, float z, float d);
+GFC_Plane3D gfc_plane3d(float x, float y, float z, float d);
 
 /**
  * @brief make a triangle based on 3 points
@@ -105,7 +109,7 @@ Plane3D gfc_plane3d(float x, float y, float z, float d);
  * @param c a point
  * @return a set triangle
  */
-Triangle3D gfc_triangle(Vector3D a,Vector3D b,Vector3D c);
+GFC_Triangle3D gfc_triangle(GFC_Vector3D a,GFC_Vector3D b,GFC_Vector3D c);
 
 /**
  * @brief make a 3d edge from its 2 points
@@ -117,15 +121,15 @@ Triangle3D gfc_triangle(Vector3D a,Vector3D b,Vector3D c);
  * @param bz point b z position
  * @return a set edge3d
  */
-Edge3D gfc_edge3d(float ax,float ay,float az,float bx,float by,float bz);
+GFC_Edge3D gfc_edge3d(float ax,float ay,float az,float bx,float by,float bz);
 
 /**
- * @brief make an edge from component vectors
+ * @brief make an edge from component gfc_vectors
  * @param a point a's position
  * @param b point b's potition
  * @return a set edge3d
  */
-Edge3D gfc_edge3d_from_vectors(Vector3D a,Vector3D b);
+GFC_Edge3D gfc_edge3d_from_vectors(GFC_Vector3D a,GFC_Vector3D b);
 
 //tests
 /**
@@ -134,7 +138,7 @@ Edge3D gfc_edge3d_from_vectors(Vector3D a,Vector3D b);
  * @param b the bounding box to check
  * @return 1 if the point is inside, 0 if not
  */
-Uint8 gfc_point_in_box(Vector3D p,Box b);
+Uint8 gfc_point_in_box(GFC_Vector3D p,GFC_Box b);
 
 /**
  * @brief check if two boxes overlap
@@ -142,7 +146,7 @@ Uint8 gfc_point_in_box(Vector3D p,Box b);
  * @param b the other box
  * @return 1 if there is any overlap, 0 if not
  */
-Uint8 gfc_box_overlap(Box a,Box b);
+Uint8 gfc_box_overlap(GFC_Box a,GFC_Box b);
 
 /**
  * @brief check if a point is within a sphere
@@ -150,7 +154,7 @@ Uint8 gfc_box_overlap(Box a,Box b);
  * @param s the sphere the check
  * @return 1 if it is inside, 0 if not
  */
-Uint8 gfc_point_in_sphere(Vector3D p,Sphere s);
+Uint8 gfc_point_in_sphere(GFC_Vector3D p,GFC_Sphere s);
 
 /**
  * @brief check if two spheres overlap
@@ -158,21 +162,21 @@ Uint8 gfc_point_in_sphere(Vector3D p,Sphere s);
  * @param B the other sphere
  * @return 1 if there is any overlap, 0 if not
  */
-Uint8 gfc_sphere_overlap(Sphere A, Sphere B);
+Uint8 gfc_sphere_overlap(GFC_Sphere A, GFC_Sphere B);
 
 /**
  * @brief given a triangle, get its plane
  * @param t the triangle in question
  * @return the plane determined by the triangle
  */
-Plane3D gfc_triangle_get_plane(Triangle3D t);
+GFC_Plane3D gfc_triangle_get_plane(GFC_Triangle3D t);
 
 /**
  * @brief get the normal of the triangle
  * @param t the triangle
- * @return the normal vector
+ * @return the normal gfc_vector
  */
-Vector3D gfc_triangle_get_normal(Triangle3D t);
+GFC_Vector3D gfc_triangle_get_normal(GFC_Triangle3D t);
 
 /**
  * @brief check if the edge intersects the triangle
@@ -182,9 +186,9 @@ Vector3D gfc_triangle_get_normal(Triangle3D t);
  * @return 0 if no intersection, 1 if there is
  */
 Uint8 gfc_triangle_edge_test(
-  Edge3D e,
-  Triangle3D t,
-  Vector3D *contact);
+  GFC_Edge3D e,
+  GFC_Triangle3D t,
+  GFC_Vector3D *contact);
 
 /**
  * @brief determine if the 3D edge intersects the sphere and find the point of contact and normal at contact point
@@ -196,10 +200,10 @@ Uint8 gfc_triangle_edge_test(
  * @return 0 if not overlap, 1 if there is
  */
 Uint8 gfc_edge3d_to_sphere_intersection(
-    Edge3D e,
-    Sphere s,
-    Vector3D *poc,
-    Vector3D *normal);
+    GFC_Edge3D e,
+    GFC_Sphere s,
+    GFC_Vector3D *poc,
+    GFC_Vector3D *normal);
 
 /**
  * @brief determine if the 3D edge intersects the box and find the point of contact and normal at contact point
@@ -211,9 +215,9 @@ Uint8 gfc_edge3d_to_sphere_intersection(
  * @return 1 if the edge intersects the box, 0 otherwise.
  */
 Uint8 gfc_edge_box_test(
-    Edge3D e,
-    Box b,
-    Vector3D *poc,
-    Vector3D *normal);
+    GFC_Edge3D e,
+    GFC_Box b,
+    GFC_Vector3D *poc,
+    GFC_Vector3D *normal);
 
 #endif

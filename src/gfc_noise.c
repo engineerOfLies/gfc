@@ -5,12 +5,12 @@ float interpolate(float a0, float a1, float w)
     return (a1 - a0) * w + a0;
 }
 
-/* Create pseudorandom direction vector
+/* Create pseudorandom direction gfc_vector
  */
-Vector2D randomGradient(int ix, int iy) {
+GFC_Vector2D randomGradient(int ix, int iy) {
     // No precomputed gradients mean this works for any number of grid coordinates
     float random;
-    Vector2D v;
+    GFC_Vector2D v;
     const unsigned w = 8 * sizeof(unsigned);
     const unsigned s = w / 2; // rotation width
     unsigned a = ix, b = iy;
@@ -24,13 +24,13 @@ Vector2D randomGradient(int ix, int iy) {
     return v;
 }
 
-// Computes the dot product of the distance and gradient vectors.
+// Computes the dot product of the distance and gradient gfc_vectors.
 float dotGridGradient(int ix, int iy, float x, float y)
 {
     // Get gradient from integer coordinates
-    Vector2D gradient = randomGradient(ix, iy);
+    GFC_Vector2D gradient = randomGradient(ix, iy);
 
-    // Compute the distance vector
+    // Compute the distance gfc_vector
     float dx = x - (float)ix;
     float dy = y - (float)iy;
 
@@ -39,7 +39,7 @@ float dotGridGradient(int ix, int iy, float x, float y)
 }
 
 // Compute Perlin noise at coordinates x, y
-float gfc_perlin(Vector2D in)
+float gfc_perlin(GFC_Vector2D in)
 {
     // Determine grid cell coordinates
     int x0 = (int)floor(in.x);

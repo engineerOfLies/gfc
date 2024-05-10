@@ -28,30 +28,30 @@
 
 typedef struct
 {
-    TextLine key;
+    GFC_TextLine key;
     Uint32 hashValue;
     void *data;
-}HashElement;
+}GFC_HashElement;
 
 typedef struct
 {
-    List* map;      /**<the hash values*/
+    GFC_List* map;      /**<the hash values*/
     Uint32 size;    /**<how many values are available in the hash*/
     Uint32 seed;    /**<the seed to calculate the hashed*/
-}HashMap;
+}GFC_HashMap;
 
 /**
  * @brief allocate and initialize an empty hashmap
  * @returns NULL on error or an empty hashmap otherwise
  * @note must be freed with gfc_hashmap_free();
  */
-HashMap *gfc_hashmap_new();
+GFC_HashMap *gfc_hashmap_new();
 
 /**
  * @brief free a previously allocated hashmap
  * @param map the hashmap to free
  */
-void gfc_hashmap_free(HashMap *map);
+void gfc_hashmap_free(GFC_HashMap *map);
 
 /**
  * @brief add data to the hashmap
@@ -59,21 +59,21 @@ void gfc_hashmap_free(HashMap *map);
  * @param key the key to retreive the data with
  * @param data the data to keep track of
  */
-void gfc_hashmap_insert(HashMap *map,const char *key,void *data);
+void gfc_hashmap_insert(GFC_HashMap *map,const char *key,void *data);
 
 /**
  * @brief search the hashmap for the given key
  * @param map the map to searsh
  * @param key the value to key to search by
  */
-void *gfc_hashmap_get(HashMap *map,const char *key);
+void *gfc_hashmap_get(GFC_HashMap *map,const char *key);
 
 /**
  * @brief delete a value out of the hashmap
  * @param map the map to delete a value from
  * @param key the key to the value to be deleted
  */
-void gfc_hashmap_delete_by_key(HashMap *map,const char *key);
+void gfc_hashmap_delete_by_key(GFC_HashMap *map,const char *key);
 
 /**
  * @brief get a list of all of the values in the hashmap
@@ -82,19 +82,19 @@ void gfc_hashmap_delete_by_key(HashMap *map,const char *key);
  * @note: the list itself will need to be freed by gfc_list_delete
  * @note use this to clean up a hashmap before deleting it
  */
-List *gfc_hashmap_get_all_values(HashMap *map);
+GFC_List *gfc_hashmap_get_all_values(GFC_HashMap *map);
 
 /**
  * @brief run a function on all values in a hashmap
  * @param map the hashmap to work on
  * @param func the function to be run on each item, it will be given each item from the hashmap
  */
-void gfc_hashmap_foreach(HashMap *map, gfc_work_func func);
+void gfc_hashmap_foreach(GFC_HashMap *map, gfc_work_func func);
 
 /**
  * @brief simple log the hash keys of the provided hashmap
  * @param map the map to print.  If NULL, this is a no op
  */
-void gfc_hashmap_slog(HashMap *map);
+void gfc_hashmap_slog(GFC_HashMap *map);
 
 #endif

@@ -8,7 +8,7 @@
 
 typedef struct
 {
-    List *defs;
+    GFC_List *defs;
 }ConfigManager;
 
 static ConfigManager config_manager = {0};

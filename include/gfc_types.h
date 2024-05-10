@@ -62,10 +62,6 @@ float gfc_random_seeded(Uint32 seed);
 #define MAX(a,b)          (a>=b?a:b)
 #endif
 
-#define gfc_rect_set(r,a,b,c,d) (r.x=(a), r.y=(b), r.w=(c), r.h=(d))
-
-SDL_Rect gfc_sdl_rect(Sint32 x,Sint32 y,Uint32 w, Uint32 h);
-
 /**
  * @brief helper function to allocate and initialize arrays.  The array returned needs to be free'd
  * @param typeSize the size of the type for the array

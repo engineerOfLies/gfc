@@ -4,10 +4,10 @@
 #include "gfc_vector.h"
 
 /**
- * @brief generate a perline noise value at the vector position
- * @param in the input vector
+ * @brief generate a perline noise value at the gfc_vector position
+ * @param in the input gfc_vector
  * @return a gradient value
  */
-float gfc_perlin(Vector2D in);
+float gfc_perlin(GFC_Vector2D in);
 
 #endif

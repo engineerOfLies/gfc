@@ -5,10 +5,10 @@ typedef struct
 {
     void *data;
     void (*callback)(void *data);
-}Callback;
+}GFC_Callback;
 
-Callback *gfc_callback_new(void (*callback)(void *data),void *data);
-void gfc_callback_free(Callback *callback);
-void gfc_callback_call(Callback *callback);
+GFC_Callback *gfc_callback_new(void (*callback)(void *data),void *data);
+void gfc_callback_free(GFC_Callback *callback);
+void gfc_callback_call(GFC_Callback *callback);
 
 #endif

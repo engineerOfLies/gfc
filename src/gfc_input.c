@@ -6,7 +6,7 @@
 
 typedef struct
 {
-    List *input_list;
+    GFC_List *input_list;
     const Uint8 * input_keys;
     Uint8 * input_old_keys;
     int input_key_count;
@@ -14,7 +14,7 @@ typedef struct
     int mouse_wheel_y;
     int mouse_wheel_x_old;
     int mouse_wheel_y_old;
-    List *controllers;
+    GFC_List *controllers;
     SJson *controller_button_map;
     SJson *controller_axis_map;
 }GFC_InputData;
@@ -648,7 +648,7 @@ Uint8 gfc_input_command_down(const char *command)
     return 0;
 }
 
-InputEventType gfc_input_command_get_state(const char *command)
+GFC_InputEventType gfc_input_command_get_state(const char *command)
 {
     Input *in;
     in = gfc_input_get_by_name(command);
@@ -656,11 +656,11 @@ InputEventType gfc_input_command_get_state(const char *command)
     return in->state;
 }
 
-List *gfc_input_get_by_scancode(SDL_Scancode keysym)
+GFC_List *gfc_input_get_by_scancode(SDL_Scancode keysym)
 {
     int i,c,kc,ki;
     Input *in;
-    List *keylist = NULL;
+    GFC_List *keylist = NULL;
     keylist = gfc_list_new();
     
     c = gfc_list_get_count(gfc_input_data.input_list);
@@ -757,7 +757,7 @@ void gfc_input_update()
 
 }
 
-InputModKey gfc_input_key_mod_check(const char * buffer)
+GFC_InputModKey gfc_input_key_mod_check(const char * buffer)
 {
     if (!buffer)return EMK_None;
     if (strcmp(buffer,"SHIFT")==0)return EMK_Shift;

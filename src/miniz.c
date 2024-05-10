@@ -4698,7 +4698,7 @@ void *mz_zip_reader_extract_file_to_heap(mz_zip_archive *pZip, const char *pFile
     return mz_zip_reader_extract_to_heap(pZip, file_index, pSize, flags);
 }
 
-mz_bool mz_zip_reader_extract_to_callback(mz_zip_archive *pZip, mz_uint file_index, mz_file_write_func pCallback, void *pOpaque, mz_uint flags)
+mz_bool mz_zip_reader_extract_to_callback(mz_zip_archive *pZip, mz_uint file_index, mz_file_write_func pGFC_Callback, void *pOpaque, mz_uint flags)
 {
     int status = TINFL_STATUS_DONE;
 #ifndef MINIZ_DISABLE_ZIP_READER_CRC32_CHECKS
@@ -4711,7 +4711,7 @@ mz_bool mz_zip_reader_extract_to_callback(mz_zip_archive *pZip, mz_uint file_ind
     mz_uint32 local_header_u32[(MZ_ZIP_LOCAL_DIR_HEADER_SIZE + sizeof(mz_uint32) - 1) / sizeof(mz_uint32)];
     mz_uint8 *pLocal_header = (mz_uint8 *)local_header_u32;
 
-    if ((!pZip) || (!pZip->m_pState) || (!pCallback) || (!pZip->m_pRead))
+    if ((!pZip) || (!pZip->m_pState) || (!pGFC_Callback) || (!pZip->m_pRead))
         return mz_zip_set_error(pZip, MZ_ZIP_INVALID_PARAMETER);
 
     if (!mz_zip_reader_file_stat(pZip, file_index, &file_stat))
@@ -4766,7 +4766,7 @@ mz_bool mz_zip_reader_extract_to_callback(mz_zip_archive *pZip, mz_uint file_ind
             if (((sizeof(size_t) == sizeof(mz_uint32))) && (file_stat.m_comp_size > MZ_UINT32_MAX))
                 return mz_zip_set_error(pZip, MZ_ZIP_INTERNAL_ERROR);
 
-            if (pCallback(pOpaque, out_buf_ofs, pRead_buf, (size_t)file_stat.m_comp_size) != file_stat.m_comp_size)
+            if (pGFC_Callback(pOpaque, out_buf_ofs, pRead_buf, (size_t)file_stat.m_comp_size) != file_stat.m_comp_size)
             {
                 mz_zip_set_error(pZip, MZ_ZIP_WRITE_CALLBACK_FAILED);
                 status = TINFL_STATUS_FAILED;
@@ -4801,7 +4801,7 @@ mz_bool mz_zip_reader_extract_to_callback(mz_zip_archive *pZip, mz_uint file_ind
                 }
 #endif
 
-                if (pCallback(pOpaque, out_buf_ofs, pRead_buf, (size_t)read_buf_avail) != read_buf_avail)
+                if (pGFC_Callback(pOpaque, out_buf_ofs, pRead_buf, (size_t)read_buf_avail) != read_buf_avail)
                 {
                     mz_zip_set_error(pZip, MZ_ZIP_WRITE_CALLBACK_FAILED);
                     status = TINFL_STATUS_FAILED;
@@ -4851,7 +4851,7 @@ mz_bool mz_zip_reader_extract_to_callback(mz_zip_archive *pZip, mz_uint file_ind
 
                 if (out_buf_size)
                 {
-                    if (pCallback(pOpaque, out_buf_ofs, pWrite_buf_cur, out_buf_size) != out_buf_size)
+                    if (pGFC_Callback(pOpaque, out_buf_ofs, pWrite_buf_cur, out_buf_size) != out_buf_size)
                     {
                         mz_zip_set_error(pZip, MZ_ZIP_WRITE_CALLBACK_FAILED);
                         status = TINFL_STATUS_FAILED;
@@ -4898,13 +4898,13 @@ mz_bool mz_zip_reader_extract_to_callback(mz_zip_archive *pZip, mz_uint file_ind
     return status == TINFL_STATUS_DONE;
 }
 
-mz_bool mz_zip_reader_extract_file_to_callback(mz_zip_archive *pZip, const char *pFilename, mz_file_write_func pCallback, void *pOpaque, mz_uint flags)
+mz_bool mz_zip_reader_extract_file_to_callback(mz_zip_archive *pZip, const char *pFilename, mz_file_write_func pGFC_Callback, void *pOpaque, mz_uint flags)
 {
     mz_uint32 file_index;
     if (!mz_zip_reader_locate_file_v2(pZip, pFilename, NULL, flags, &file_index))
         return MZ_FALSE;
 
-    return mz_zip_reader_extract_to_callback(pZip, file_index, pCallback, pOpaque, flags);
+    return mz_zip_reader_extract_to_callback(pZip, file_index, pGFC_Callback, pOpaque, flags);
 }
 
 mz_zip_reader_extract_iter_state* mz_zip_reader_extract_iter_new(mz_zip_archive *pZip, mz_uint file_index, mz_uint flags)

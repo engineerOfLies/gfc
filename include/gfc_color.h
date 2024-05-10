@@ -10,7 +10,7 @@ typedef enum
     CT_RGBA8,   /**<RGBA in 8 bit int 0-255*/
     CT_HSL,     /**<Hue,Saturation and Lightness*/
     CT_HEX      /**<Hex code 0xFFFFFF*/
-}ColorType;
+}GFC_ColorType;
 
 typedef struct
 {
@@ -18,8 +18,8 @@ typedef struct
     float g;    /**<green value or Saturation*/
     float b;    /**<blue value or Lightness*/
     float a;    /**<alpha, or transparency from 0 (clear) to opaque 1*/
-    ColorType ct;   /**<how this structure is used*/
-}Color;
+    GFC_ColorType ct;   /**<how this structure is used*/
+}GFC_Color;
 
 #define GFC_COLOR_RED gfc_color8(255,0,0,255)
 #define GFC_COLOR_LIGHTRED gfc_color(1,.2,.2,1)
@@ -54,7 +54,7 @@ typedef struct
  * @param a alpha value 0 - 1
  * @returns a newly set color
  */
-Color gfc_color(float r,float g,float b,float a);
+GFC_Color gfc_color(float r,float g,float b,float a);
 
 /**
  * @brief check if two colors are the same color
@@ -62,7 +62,7 @@ Color gfc_color(float r,float g,float b,float a);
  * @param b color to check
  * @return 1 if the same color, 0 if not
  */
-int gfc_color_cmp(Color a, Color b);
+int gfc_color_cmp(GFC_Color a, GFC_Color b);
 
 /**
  * @brief create and return a color from 8 bit integer RGBA values
@@ -72,7 +72,7 @@ int gfc_color_cmp(Color a, Color b);
  * @param a alpha value 0 - 255
  * @returns a newly set color
  */
-Color gfc_color8(Uint8 r,Uint8 g,Uint8 b,Uint8 a);
+GFC_Color gfc_color8(Uint8 r,Uint8 g,Uint8 b,Uint8 a);
 /**
  * @brief create and return a color from floating point RGBA values
  * @param h hue value 0 - 360
@@ -81,20 +81,20 @@ Color gfc_color8(Uint8 r,Uint8 g,Uint8 b,Uint8 a);
  * @param a alpha value 0 - 1
  * @returns a newly set color
  */
-Color gfc_color_hsl(float h,float s,float l,float a);
+GFC_Color gfc_color_hsl(float h,float s,float l,float a);
 /**
  * @brief create and return a color from floating point RGBA values
  * @param hex the hex value of the color
  * @returns a newly set color
  */
-Color gfc_color_hex(Uint32 hex);
+GFC_Color gfc_color_hex(Uint32 hex);
 
 /**
  * @brief convert a color to floating point representation
  * @param color the color to convert
  * @return a new color in the format CT_RGBAf
  */
-Color gfc_color_to_float(Color color);
+GFC_Color gfc_color_to_float(GFC_Color color);
 
 /**
  * @brief convert a color to 8 bit integer representation
@@ -102,72 +102,72 @@ Color gfc_color_to_float(Color color);
  * @return a new color         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),gfc_color(1,1,1,1));        
 in the format CT_RGBA8
  */
-Color gfc_color_to_int8(Color color);
+GFC_Color gfc_color_to_int8(GFC_Color color);
 
 /**
  * @brief convert a color to Hue Saturation Lightness (and Alpha) representation
  * @param color the color to convert
  * @return a new color in the format CT_HSL
  */
-Color gfc_color_to_hsla(Color color);
+GFC_Color gfc_color_to_hsla(GFC_Color color);
 
 /**
  * @brief convert a color to Hex representation
  * @param color the color to convert
  * @return a new color in the format CT_HEX
  */
-Uint32 gfc_color_to_hex(Color color);
+Uint32 gfc_color_to_hex(GFC_Color color);
 
 /**
  * @brief convert a SDL color to gfc floating point representation
  * @param color the color to convert
  * @return a new color in the format CT_RGBAf
  */
-Color gfc_color_from_sdl(SDL_Color color);
+GFC_Color gfc_color_from_sdl(SDL_Color color);
 
 /**
  * @brief convert a gfc color to SDL color format
  * @param color the color to convert
- * @return a new SDL_Color
+ * @return a new SDL_GFC_Color
  */
-SDL_Color gfc_color_to_sdl(Color color);
+SDL_Color gfc_color_to_sdl(GFC_Color color);
 
 /**
- * @brief create a color from a vector where x = r, y = g, z = b, w = a
- * @param vector the vector to convert
+ * @brief create a color from a gfc_vector where x = r, y = g, z = b, w = a
+ * @param gfc_vector the gfc_vector to convert
  * @return a new color in the format CT_RGBA8
  */
-Color gfc_color_from_vector4(Vector4D vector);
+GFC_Color gfc_color_from_vector4(GFC_Vector4D gfc_vector);
 
 /**
- * @brief create a color from a vector where x = r, y = g, z = b, w = a
- * @param vector the vector to convert
+ * @brief create a color from a gfc_vector where x = r, y = g, z = b, w = a
+ * @param gfc_vector the gfc_vector to convert
  * @return a new color in the format CT_RGBAf
  */
-Color gfc_color_from_vector4f(Vector4D vector);
+GFC_Color gfc_color_from_vector4f(GFC_Vector4D gfc_vector);
 
 /**
- * @brief convert a color to a vector where x = r, y = g, z = b, w = a
+ * @brief convert a color to a gfc_vector where x = r, y = g, z = b, w = a
  * @param color the color to convert
- * @return a vector set to the color provided
+ * @return a gfc_vector set to the color provided
  * @note: will be in values from 0-255
  */
-Vector4D gfc_color_to_vector4(Color color);
+GFC_Vector4D gfc_color_to_vector4(GFC_Color color);
 
 /**
- * @brief convert a color to a vector where x = r, y = g, z = b, w = a
+ * @brief convert a color to a gfc_vector where x = r, y = g, z = b, w = a
  * @param color the color to convert
- * @return a vector set to the color provided
+ * @return a gfc_vector set to the color provided
  * @note: will be in values from 0-1.0f
  */
-Vector4D gfc_color_to_vector4f(Color color);
+GFC_Vector4D gfc_color_to_vector4f(GFC_Color color);
 
 /**
  * @brief Get the Hue value of a color.  It may convert internally as needed.
  * @param color the color to check
  * @return the value of the Hue of the color (0-360)
  */
-float gfc_color_get_hue(Color color);
+float gfc_color_get_hue(GFC_Color color);
 
 /**
  * @brief Sets the hue of the color provided.  Leaves format unchanged.  Saturation and Value are also unchanged
@@ -176,7 +176,7 @@ float gfc_color_get_hue(Color color);
  * @param color the color to change
  * @return a new color in the format CT_HSL
  */
-void gfc_color_set_hue(float hue,Color *color);
+void gfc_color_set_hue(float hue,GFC_Color *color);
 
 /**
  * @brief adds colors a and b and saves the result in dst
@@ -184,7 +184,7 @@ void gfc_color_set_hue(float hue,Color *color);
  * @param a the format for a is used as the resulting format.  Conversion happen before adding
  * @param b the color to add to a
  */
-void gfc_color_add(Color *dst,Color a,Color b);
+void gfc_color_add(GFC_Color *dst,GFC_Color a,GFC_Color b);
 
 /**
  * @brief blend two colors together
@@ -192,7 +192,7 @@ void gfc_color_add(Color *dst,Color a,Color b);
  * @param a the format for a is used as the resulting format.  Conversion happen before blending
  * @param b the color to add to a
  */
-void gfc_color_blend(Color *dst,Color a,Color b);
+void gfc_color_blend(GFC_Color *dst,GFC_Color a,GFC_Color b);
 
 /**
  * @brief multiplies colors a and b and saves the result in dst
@@ -200,15 +200,15 @@ void gfc_color_blend(Color *dst,Color a,Color b);
  * @param a the format for a is used as the resulting format.  Conversion happen before multiplying
  * @param b the color to add to a
  */
-void gfc_color_multiply(Color *dst,Color a,Color b);
+void gfc_color_multiply(GFC_Color *dst,GFC_Color a,GFC_Color b);
 
 /**
  * @brief make sure the values in the color are within acceptable ranges
- * Note this will break any colors used as a vector that contain negative values
+ * Note this will break any colors used as a gfc_vector that contain negative values
  * @param color the color to clamp
  * @return the new color within specified range
  */
-Color gfc_color_clamp(Color color);
+GFC_Color gfc_color_clamp(GFC_Color color);
 
 
  #endif

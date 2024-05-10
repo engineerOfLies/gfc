@@ -8,11 +8,11 @@
 /*
  * Code has been adapted from glm to C for this project
  */
-Vector3D gfc_unproject(Vector3D in,Matrix4 view, Matrix4 proj,Vector2D viewport)
+GFC_Vector3D gfc_unproject(GFC_Vector3D in,GFC_Matrix4 view, GFC_Matrix4 proj,GFC_Vector2D viewport)
 {
-    Vector3D out = {0,0,0};
-    Matrix4 InvProj = {0},InvView = {0};
-    Vector4D tmp,obj,eye;
+    GFC_Vector3D out = {0,0,0};
+    GFC_Matrix4 InvProj = {0},InvView = {0};
+    GFC_Vector4D tmp,obj,eye;
     
     if ((!viewport.x)||(!viewport.y))
     {
@@ -51,7 +51,7 @@ Vector3D gfc_unproject(Vector3D in,Matrix4 view, Matrix4 proj,Vector2D viewport)
     return out;
 }
 
-void gfc_matrix4_slog(Matrix4 mat)
+void gfc_matrix4_slog(GFC_Matrix4 mat)
 {
     slog("%f,%f,%f,%f",mat[0][0],mat[0][1],mat[0][2],mat[0][3]);
     slog("%f,%f,%f,%f",mat[1][0],mat[1][1],mat[1][2],mat[1][3]);
@@ -59,24 +59,24 @@ void gfc_matrix4_slog(Matrix4 mat)
     slog("%f,%f,%f,%f",mat[3][0],mat[3][1],mat[3][2],mat[3][3]);
 }
 
-void gfc_matrix3_slog(Matrix3 mat)
+void gfc_matrix3_slog(GFC_Matrix3 mat)
 {
     slog("%f,%f,%f",mat[0][0],mat[0][1],mat[0][2]);
     slog("%f,%f,%f",mat[1][0],mat[1][1],mat[1][2]);
     slog("%f,%f,%f",mat[2][0],mat[2][1],mat[2][2]);
 }
 
-void gfc_matrix2_slog(Matrix2 mat)
+void gfc_matrix2_slog(GFC_Matrix2 mat)
 {
     slog("%f,%f",mat[0][0],mat[0][1]);
     slog("%f,%f",mat[1][0],mat[1][1]);
 }
 
 void gfc_matrix4_to_vectors(
-    Matrix4 in,
-    Vector3D *translation,
-    Vector3D *rotation,
-    Vector3D *scale)
+    GFC_Matrix4 in,
+    GFC_Vector3D *translation,
+    GFC_Vector3D *rotation,
+    GFC_Vector3D *scale)
 {
     if (scale)
     {
@@ -109,10 +109,10 @@ void gfc_matrix4_to_vectors(
 }
 
 void gfc_matrix4_from_vectors(
-    Matrix4 out,
-    Vector3D translation,
-    Vector3D rotation,
-    Vector3D scale)
+    GFC_Matrix4 out,
+    GFC_Vector3D translation,
+    GFC_Vector3D rotation,
+    GFC_Vector3D scale)
 {
     gfc_matrix_identity(out);
     
@@ -121,7 +121,7 @@ void gfc_matrix4_from_vectors(
     gfc_matrix_translate(out,translation);
 }
 
-void gfc_matrix4_to_matrix16(float m16[16],Matrix4 m4)
+void gfc_matrix4_to_matrix16(float m16[16],GFC_Matrix4 m4)
 {
     m16[0]  = m4[0][0];
     m16[1]  = m4[0][1];
@@ -141,7 +141,7 @@ void gfc_matrix4_to_matrix16(float m16[16],Matrix4 m4)
     m16[15] = m4[3][3];
 }
 
-void gfc_matrix16_to_matrix4(Matrix4 m4,float m16[16])
+void gfc_matrix16_to_matrix4(GFC_Matrix4 m4,float m16[16])
 {
     m4[0][0] = m16[0]  ;
     m4[0][1] = m16[1]  ;
@@ -291,7 +291,7 @@ Uint8 gfc_matrix16_invert(float m[16], float invOut[16])
     return true;
 }
 
-Uint8 gfc_matrix4_invert(Matrix4 mOut, Matrix4 mIn)
+Uint8 gfc_matrix4_invert(GFC_Matrix4 mOut, GFC_Matrix4 mIn)
 {
     float m[16];
     gfc_matrix4_to_matrix16(m,mIn);
@@ -303,19 +303,19 @@ Uint8 gfc_matrix4_invert(Matrix4 mOut, Matrix4 mIn)
 
 
 void gfc_matrix_copy(
-    Matrix4 d,
-    Matrix4 s
+    GFC_Matrix4 d,
+    GFC_Matrix4 s
   )
 {
     if ((!d)||(!s))return;
     if (d == s)return;
-    memcpy(d,s,sizeof(Matrix4));
+    memcpy(d,s,sizeof(GFC_Matrix4));
 }
 
 
-void gfc_matrix_multiply_scalar(Matrix4 out,Matrix4 m1,float s)
+void gfc_matrix_multiply_scalar(GFC_Matrix4 out,GFC_Matrix4 m1,float s)
 {
-    Matrix4 temp;
+    GFC_Matrix4 temp;
   temp[0][0] = s*m1[0][0];
   temp[0][1] = s*m1[0][1];
   temp[0][2] = s*m1[0][2];
@@ -340,12 +340,12 @@ void gfc_matrix_multiply_scalar(Matrix4 out,Matrix4 m1,float s)
 
 
 void gfc_matrix_multiply(
-    Matrix4 out,
-    Matrix4 m2,
-    Matrix4 m1
+    GFC_Matrix4 out,
+    GFC_Matrix4 m2,
+    GFC_Matrix4 m1
   )
 {
-  Matrix4 out1;
+  GFC_Matrix4 out1;
   out1[0][0] = m2[0][0]*m1[0][0] + m2[0][1]*m1[1][0] + m2[0][2]*m1[2][0] + m2[0][3]*m1[3][0];
   out1[0][1] = m2[0][0]*m1[0][1] + m2[0][1]*m1[1][1] + m2[0][2]*m1[2][1] + m2[0][3]*m1[3][1];
   out1[0][2] = m2[0][0]*m1[0][2] + m2[0][1]*m1[1][2] + m2[0][2]*m1[2][2] + m2[0][3]*m1[3][2];
@@ -369,9 +369,9 @@ void gfc_matrix_multiply(
 }
 
 void gfc_matrix_v_multiply_M(
-  Vector4D * out,
-  Matrix4    mat,
-  Vector4D   vec
+  GFC_Vector4D * out,
+  GFC_Matrix4    mat,
+  GFC_Vector4D   vec
 )
 {
   float x,y,z,w;
@@ -392,9 +392,9 @@ void gfc_matrix_v_multiply_M(
 }
 
 void gfc_matrix_M_multiply_v(
-  Vector4D * out,
-  Matrix4    mat,
-  Vector4D   vec
+  GFC_Vector4D * out,
+  GFC_Matrix4    mat,
+  GFC_Vector4D   vec
 )
 {
   float x,y,z,w;
@@ -414,12 +414,12 @@ void gfc_matrix_M_multiply_v(
   out->w = ow;
 }
 
-void gfc_matrix_zero(Matrix4 zero)
+void gfc_matrix_zero(GFC_Matrix4 zero)
 {
-    memset(zero,0,sizeof(Matrix4));
+    memset(zero,0,sizeof(GFC_Matrix4));
 }
 
-void gfc_matrix_identity(Matrix4 one)
+void gfc_matrix_identity(GFC_Matrix4 one)
 {
     gfc_matrix_zero(one);
     one[0][0] = 1;
@@ -430,9 +430,9 @@ void gfc_matrix_identity(Matrix4 one)
 
 
 void gfc_matrix_rotate_by_vector(
-    Matrix4     out,
-    Matrix4     m,
-    Vector3D    v
+    GFC_Matrix4     out,
+    GFC_Matrix4     m,
+    GFC_Vector3D    v
 )
 {
     gfc_matrix_rotate_y(out,out,v.y);
@@ -441,12 +441,12 @@ void gfc_matrix_rotate_by_vector(
 }
 
 void gfc_matrix_rotate_x(
-    Matrix4     out,
-    Matrix4     m,
+    GFC_Matrix4     out,
+    GFC_Matrix4     m,
     float       theta
 )
 {
-    Matrix4     Result;
+    GFC_Matrix4     Result;
     
     gfc_matrix_identity(Result);
     Result[0][0] = cos(-theta);
@@ -457,12 +457,12 @@ void gfc_matrix_rotate_x(
 }
 
 void gfc_matrix_rotate_y(
-    Matrix4     out,
-    Matrix4     m,
+    GFC_Matrix4     out,
+    GFC_Matrix4     m,
     float       theta
 )
 {
-    Matrix4     Result;
+    GFC_Matrix4     Result;
     
     gfc_matrix_identity(Result);
     Result[1][1] = cos(-theta);
@@ -474,12 +474,12 @@ void gfc_matrix_rotate_y(
 }
 
 void gfc_matrix_rotate_z(
-    Matrix4     out,
-    Matrix4     m,
+    GFC_Matrix4     out,
+    GFC_Matrix4     m,
     float       theta
 )
 {
-    Matrix4     Result;
+    GFC_Matrix4     Result;
     
     gfc_matrix_identity(Result);
     Result[0][0] = cos(-theta);
@@ -491,22 +491,22 @@ void gfc_matrix_rotate_z(
 
 
 void gfc_matrix_rotate(
-    Matrix4     out,
-    Matrix4     m,
+    GFC_Matrix4     out,
+    GFC_Matrix4     m,
     float       degree,
-    Vector3D    axis
+    GFC_Vector3D    axis
 )
 {
-    Matrix4 Rotate;
-    Matrix4 Result;
-    Vector3D temp;
+    GFC_Matrix4 Rotate;
+    GFC_Matrix4 Result;
+    GFC_Vector3D temp;
     float a = degree;
     float c = cos(a);
     float s = sin(a);
 
-    vector3d_normalize(&axis);
+    gfc_vector3d_normalize(&axis);
     
-    vector3d_scale(temp,axis,(1 - c));
+    gfc_vector3d_scale(temp,axis,(1 - c));
 
     Rotate[0][0] = c + temp.x * axis.x;
     Rotate[0][1] = temp.x * axis.y + s * axis.z;
@@ -545,7 +545,7 @@ void gfc_matrix_rotate(
 }
 
 void gfc_matrix_perspective(
-    Matrix4     out,
+    GFC_Matrix4     out,
     float      fov,
     float      aspect,
     float      near,
@@ -586,21 +586,21 @@ void gfc_matrix_perspective(
 }
 
 void gfc_matrix_view(
-    Matrix4  out,
-    Vector3D position,
-    Vector3D target,
-    Vector3D up
+    GFC_Matrix4  out,
+    GFC_Vector3D position,
+    GFC_Vector3D target,
+    GFC_Vector3D up
 )
 {
-    Vector3D f,r,u;
-    vector3d_sub(f,position,target);
-    vector3d_normalize(&f);
+    GFC_Vector3D f,r,u;
+    gfc_vector3d_sub(f,position,target);
+    gfc_vector3d_normalize(&f);
     
-    vector3d_cross_product(&r,up,f);
-    vector3d_normalize(&r);
+    gfc_vector3d_cross_product(&r,up,f);
+    gfc_vector3d_normalize(&r);
     
-    vector3d_cross_product(&u,f,r);
-    vector3d_normalize(&u);
+    gfc_vector3d_cross_product(&u,f,r);
+    gfc_vector3d_normalize(&u);
  
     gfc_matrix_identity(out);
     out[0][0] = r.x;
@@ -612,17 +612,17 @@ void gfc_matrix_view(
     out[0][2] = f.x;
     out[1][2] = f.y;
     out[2][2] = f.z;
-    out[3][0] = -vector3d_dot_product(r, position);
-    out[3][1] = -vector3d_dot_product(u, position);
-    out[3][2] = -vector3d_dot_product(f, position);
+    out[3][0] = -gfc_vector3d_dot_product(r, position);
+    out[3][1] = -gfc_vector3d_dot_product(u, position);
+    out[3][2] = -gfc_vector3d_dot_product(f, position);
 }
 
 void gfc_matrix_scale(
-    Matrix4 out,
-    Vector3D scale
+    GFC_Matrix4 out,
+    GFC_Vector3D scale
 )
 {
-    Matrix4 m;
+    GFC_Matrix4 m;
     gfc_matrix_zero(m);
     m[0][0] = scale.x;
     m[1][1] = scale.y;
@@ -637,8 +637,8 @@ void gfc_matrix_scale(
 }
 
 void gfc_matrix_make_translation(
-    Matrix4 out,
-    Vector3D move
+    GFC_Matrix4 out,
+    GFC_Vector3D move
 )
 {
     if (!out)return;
@@ -649,24 +649,24 @@ void gfc_matrix_make_translation(
 }
 
 void gfc_matrix_translate(
-    Matrix4 out,
-    Vector3D move
+    GFC_Matrix4 out,
+    GFC_Vector3D move
 )
 {
-    Matrix4 translate,temp;
+    GFC_Matrix4 translate,temp;
     gfc_matrix_make_translation(translate,move);
     gfc_matrix_multiply(temp,out,translate);
     gfc_matrix_copy(out,temp);
 }
 
 void gfc_matrix4_from_vectors_q(
-    Matrix4 out,
-    Vector3D translation,
-    Vector4D quaternion,
-    Vector3D scale
+    GFC_Matrix4 out,
+    GFC_Vector3D translation,
+    GFC_Vector4D quaternion,
+    GFC_Vector3D scale
 )
 {
-    Matrix4 rotateM;
+    GFC_Matrix4 rotateM;
         
     //M = T * R * S
     
@@ -684,8 +684,8 @@ void gfc_matrix4_from_vectors_q(
 }
 
 void gfc_matrix_from_quaternion(
-    Matrix4     out,
-    Vector4D    q)
+    GFC_Matrix4     out,
+    GFC_Vector4D    q)
 {
     out[0][0] = 1.0f - 2.0f*q.y*q.y - 2.0f*q.z*q.z;
     out[0][1] = 2.0f*q.x*q.y + 2.0f*q.z*q.w;
