@@ -193,7 +193,7 @@ int gfc_vector2d_scale_flip_rotation(GFC_Vector2D scale);
  * @Param b one of the angles in question
  * @return the angle, in degrees, between the two angles
  */
-float angle_between_degrees(float a, float b);
+float gfc_angle_between_degrees(float a, float b);
 
 /**
  * @brief returns the angle between the two angles.
@@ -203,19 +203,19 @@ float angle_between_degrees(float a, float b);
  * @Param b one of the angles in question
  * @return the angle, in degrees, between the two angles
  */
-float angle_between_radians(float a, float b);
+float gfc_angle_between_radians(float a, float b);
 
 /**
  * @brief prevent an angle from going beyond the range of +/- 2Pi
  * @param a the angle to clamp
  */
-void angle_clamp_radians(float *a);
+void gfc_angle_clamp_radians(float *a);
 
 /**
  * @brief prevent an angle from going beyond the range of 0 - 360
  * @param a the angle to clamp
  */
-void angle_clamp_degrees(float *a);
+void gfc_angle_clamp_degrees(float *a);
 
 #define gfc_vector3d_to_slog(vec) vec.x,vec.y,vec.z
 

@@ -169,14 +169,14 @@ Uint8 gfc_sphere_overlap(GFC_Sphere A, GFC_Sphere B);
  * @param t the triangle in question
  * @return the plane determined by the triangle
  */
-GFC_Plane3D gfc_triangle_get_plane(GFC_Triangle3D t);
+GFC_Plane3D gfc_trigfc_angle_get_plane(GFC_Triangle3D t);
 
 /**
  * @brief get the normal of the triangle
  * @param t the triangle
  * @return the normal gfc_vector
  */
-GFC_Vector3D gfc_triangle_get_normal(GFC_Triangle3D t);
+GFC_Vector3D gfc_trigfc_angle_get_normal(GFC_Triangle3D t);
 
 /**
  * @brief check if the edge intersects the triangle
@@ -185,7 +185,7 @@ GFC_Vector3D gfc_triangle_get_normal(GFC_Triangle3D t);
  * @param contact [optional] if provided it will be populated with the point of collision
  * @return 0 if no intersection, 1 if there is
  */
-Uint8 gfc_triangle_edge_test(
+Uint8 gfc_trigfc_angle_edge_test(
   GFC_Edge3D e,
   GFC_Triangle3D t,
   GFC_Vector3D *contact);

@@ -78,7 +78,7 @@ Uint8 gfc_box_overlap(GFC_Box a,GFC_Box b)
 }
 
 
-GFC_Vector3D gfc_triangle_get_normal(GFC_Triangle3D t)
+GFC_Vector3D gfc_trigfc_angle_get_normal(GFC_Triangle3D t)
 {
     GFC_Vector3D normal = {0};
     GFC_Vector3D side1,side2;
@@ -90,11 +90,11 @@ GFC_Vector3D gfc_triangle_get_normal(GFC_Triangle3D t)
     return normal;
 }
 
-GFC_Plane3D gfc_triangle_get_plane(GFC_Triangle3D t)
+GFC_Plane3D gfc_trigfc_angle_get_plane(GFC_Triangle3D t)
 {
     GFC_Plane3D p;
     GFC_Vector3D normal;
-    normal = gfc_triangle_get_normal(t);
+    normal = gfc_trigfc_angle_get_normal(t);
     gfc_vector3d_copy(p,normal);// pass by name!!!
     p.d = gfc_vector3d_dot_product(t.a,normal);
     return p;
@@ -138,7 +138,7 @@ float gfc_edge_in_plane(
     return t;
 }
 
-GFC_Box gfc_triangle_get_bounding_box(GFC_Triangle3D t)
+GFC_Box gfc_trigfc_angle_get_bounding_box(GFC_Triangle3D t)
 {
     GFC_Box b;
     b.x = MIN(MIN(t.a.x,t.b.x),t.c.x);
@@ -181,7 +181,7 @@ Uint8 gfc_point_in_triangle(
     return 0;
 }
 
-Uint8 gfc_point_in_triangle_old(
+Uint8 gfc_point_in_trigfc_angle_old(
     GFC_Vector3D point,
     GFC_Triangle3D t,
     GFC_Plane3D p)
@@ -301,7 +301,7 @@ Uint8 gfc_edge_box_test(
         
     if (gfc_edge_in_plane(
             e,
-            gfc_triangle_get_plane(
+            gfc_trigfc_angle_get_plane(
                 gfc_triangle(vertices[4],vertices[5],vertices[6])),//bottom face
             &contact))
     {
@@ -316,7 +316,7 @@ Uint8 gfc_edge_box_test(
     }
     if (gfc_edge_in_plane(
             e,
-            gfc_triangle_get_plane(
+            gfc_trigfc_angle_get_plane(
                 gfc_triangle(vertices[0],vertices[1],vertices[2])),//top face
             &contact))
     {
@@ -335,7 +335,7 @@ Uint8 gfc_edge_box_test(
     }
     if (gfc_edge_in_plane(
             e,
-            gfc_triangle_get_plane(
+            gfc_trigfc_angle_get_plane(
                 gfc_triangle(vertices[0],vertices[4],vertices[2])),//left face
             &contact))
     {
@@ -354,7 +354,7 @@ Uint8 gfc_edge_box_test(
     }
     if (gfc_edge_in_plane(
             e,
-            gfc_triangle_get_plane(
+            gfc_trigfc_angle_get_plane(
                 gfc_triangle(vertices[1],vertices[3],vertices[5])),//right face
             &contact))
     {
@@ -373,7 +373,7 @@ Uint8 gfc_edge_box_test(
     }
     if (gfc_edge_in_plane(
             e,
-            gfc_triangle_get_plane(
+            gfc_trigfc_angle_get_plane(
                 gfc_triangle(vertices[0],vertices[1],vertices[4])),//back face
             &contact))
     {
@@ -392,7 +392,7 @@ Uint8 gfc_edge_box_test(
     }
     if (gfc_edge_in_plane(
             e,
-            gfc_triangle_get_plane(
+            gfc_trigfc_angle_get_plane(
                 gfc_triangle(vertices[2],vertices[3],vertices[6])),//front face
             &contact))
     {
@@ -415,7 +415,7 @@ Uint8 gfc_edge_box_test(
     return 1;
 }
 
-Uint8 gfc_triangle_edge_test(
+Uint8 gfc_trigfc_angle_edge_test(
     GFC_Edge3D e,
     GFC_Triangle3D t,
     GFC_Vector3D *contact)
@@ -424,7 +424,7 @@ Uint8 gfc_triangle_edge_test(
     GFC_Plane3D p;
     GFC_Vector3D intersectPoint = {0,0,0};
 
-    p = gfc_triangle_get_plane(t);
+    p = gfc_trigfc_angle_get_plane(t);
     time = gfc_edge_in_plane(e,p,&intersectPoint);
     if ((time <= 0)||(time > 1))
     {

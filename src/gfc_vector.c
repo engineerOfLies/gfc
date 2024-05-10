@@ -695,21 +695,21 @@ float gfc_vector_angle(float x,float y)
     return (atan2(y,x) * GFC_RADTODEG) + 90;
 }
 
-void angle_clamp_radians(float *a)
+void gfc_angle_clamp_radians(float *a)
 {
   if (!a)return;
   while (*a >= GFC_2PI)*a -= GFC_2PI;
   while (*a < 0)*a += GFC_2PI;
 }
 
-void angle_clamp_degrees(float *a)
+void gfc_angle_clamp_degrees(float *a)
 {
   if (!a)return;
   while (*a >= 360)*a -= 360;
   while (*a < 0)*a += 360;
 }
 
-float angle_between_radians(float a, float b)
+float gfc_angle_between_radians(float a, float b)
 {
   float angle;
   angle = b - a;
@@ -721,7 +721,7 @@ float angle_between_radians(float a, float b)
   return angle;
 }
 
-float angle_between_degrees(float a, float b)
+float gfc_angle_between_degrees(float a, float b)
 {
   float angle;
   angle = b - a;
