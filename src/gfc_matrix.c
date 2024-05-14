@@ -28,12 +28,12 @@ GFC_Vector3D gfc_unproject(GFC_Vector3D in,GFC_Matrix4 view, GFC_Matrix4 proj,GF
     tmp.z = (in.z * 2) -1;
     tmp.w = 1;
         
-    gfc_matrix_M_multiply_v(
+    gfc_matrix4_multiply_v(
         &eye,
         InvView,
         tmp);
 
-    gfc_matrix_M_multiply_v(
+    gfc_matrix4_multiply_v(
         &obj,
         InvProj,
         eye);
@@ -51,25 +51,25 @@ GFC_Vector3D gfc_unproject(GFC_Vector3D in,GFC_Matrix4 view, GFC_Matrix4 proj,GF
     return out;
 }
 
-void gfc_matrix4_slog(GFC_Matrix4 mat)
+void _gfc_matrix4_slog(const char *filename,Uint32 line,GFC_Matrix4 mat)
 {
-    slog("%f,%f,%f,%f",mat[0][0],mat[0][1],mat[0][2],mat[0][3]);
-    slog("%f,%f,%f,%f",mat[1][0],mat[1][1],mat[1][2],mat[1][3]);
-    slog("%f,%f,%f,%f",mat[2][0],mat[2][1],mat[2][2],mat[2][3]);
-    slog("%f,%f,%f,%f",mat[3][0],mat[3][1],mat[3][2],mat[3][3]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[0][0],mat[0][1],mat[0][2],mat[0][3]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[1][0],mat[1][1],mat[1][2],mat[1][3]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[2][0],mat[2][1],mat[2][2],mat[2][3]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[3][0],mat[3][1],mat[3][2],mat[3][3]);
 }
 
-void gfc_matrix3_slog(GFC_Matrix3 mat)
+void _gfc_matrix3_slog(const char *filename,Uint32 line,GFC_Matrix3 mat)
 {
-    slog("%f,%f,%f",mat[0][0],mat[0][1],mat[0][2]);
-    slog("%f,%f,%f",mat[1][0],mat[1][1],mat[1][2]);
-    slog("%f,%f,%f",mat[2][0],mat[2][1],mat[2][2]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[0][0],mat[0][1],mat[0][2],mat[0][3]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[1][0],mat[1][1],mat[1][2],mat[1][3]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[2][0],mat[2][1],mat[2][2],mat[2][3]);
 }
 
-void gfc_matrix2_slog(GFC_Matrix2 mat)
+void _gfc_matrix2_slog(const char *filename,Uint32 line,GFC_Matrix2 mat)
 {
-    slog("%f,%f",mat[0][0],mat[0][1]);
-    slog("%f,%f",mat[1][0],mat[1][1]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[0][0],mat[0][1],mat[0][2],mat[0][3]);
+    _slog(filename,line,"%f,%f,%f,%f",mat[1][0],mat[1][1],mat[1][2],mat[1][3]);
 }
 
 void gfc_matrix4_to_vectors(
@@ -114,11 +114,11 @@ void gfc_matrix4_from_vectors(
     GFC_Vector3D rotation,
     GFC_Vector3D scale)
 {
-    gfc_matrix_identity(out);
+    gfc_matrix4_identity(out);
     
-    gfc_matrix_scale(out,scale);
-    gfc_matrix_rotate_by_vector(out,out,rotation);
-    gfc_matrix_translate(out,translation);
+    gfc_matrix4_scale(out,out,scale);
+    gfc_matrix4_rotate_by_vector(out,out,rotation);
+    gfc_matrix4_translate(out,out,translation);
 }
 
 void gfc_matrix4_to_matrix16(float m16[16],GFC_Matrix4 m4)
@@ -302,10 +302,21 @@ Uint8 gfc_matrix4_invert(GFC_Matrix4 mOut, GFC_Matrix4 mIn)
 }
 
 
-void gfc_matrix_copy(
-    GFC_Matrix4 d,
-    GFC_Matrix4 s
-  )
+void gfc_matrix2_copy(GFC_Matrix2 d,GFC_Matrix2 s)
+{
+    if ((!d)||(!s))return;
+    if (d == s)return;
+    memcpy(d,s,sizeof(GFC_Matrix2));
+}
+
+void gfc_matrix3_copy(GFC_Matrix3 d,GFC_Matrix3 s)
+{
+    if ((!d)||(!s))return;
+    if (d == s)return;
+    memcpy(d,s,sizeof(GFC_Matrix3));
+}
+
+void gfc_matrix4_copy(GFC_Matrix4 d,GFC_Matrix4 s)
 {
     if ((!d)||(!s))return;
     if (d == s)return;
@@ -313,134 +324,248 @@ void gfc_matrix_copy(
 }
 
 
-void gfc_matrix_multiply_scalar(GFC_Matrix4 out,GFC_Matrix4 m1,float s)
+void gfc_matrix4_multiply_scalar(GFC_Matrix4 out,GFC_Matrix4 m1,float s)
 {
     GFC_Matrix4 temp;
-  temp[0][0] = s*m1[0][0];
-  temp[0][1] = s*m1[0][1];
-  temp[0][2] = s*m1[0][2];
-  temp[0][3] = s*m1[0][3];
+    temp[0][0] = s*m1[0][0];
+    temp[0][1] = s*m1[0][1];
+    temp[0][2] = s*m1[0][2];
+    temp[0][3] = s*m1[0][3];
 
-  temp[1][0] = s*m1[1][0];
-  temp[1][1] = s*m1[1][1];
-  temp[1][2] = s*m1[1][2];
-  temp[1][3] = s*m1[1][3];
+    temp[1][0] = s*m1[1][0];
+    temp[1][1] = s*m1[1][1];
+    temp[1][2] = s*m1[1][2];
+    temp[1][3] = s*m1[1][3];
 
-  temp[2][0] = s*m1[2][0];
-  temp[2][1] = s*m1[2][1];
-  temp[2][2] = s*m1[2][2];
-  temp[2][3] = s*m1[2][3];
+    temp[2][0] = s*m1[2][0];
+    temp[2][1] = s*m1[2][1];
+    temp[2][2] = s*m1[2][2];
+    temp[2][3] = s*m1[2][3];
 
-  temp[3][0] = s*m1[3][0];
-  temp[3][1] = s*m1[3][1];
-  temp[3][2] = s*m1[3][2];
-  temp[3][3] = s*m1[3][3];
-  gfc_matrix_copy(out,temp);
+    temp[3][0] = s*m1[3][0];
+    temp[3][1] = s*m1[3][1];
+    temp[3][2] = s*m1[3][2];
+    temp[3][3] = s*m1[3][3];
+    gfc_matrix4_copy(out,temp);
 }
 
+void gfc_matrix3_multiply_scalar(GFC_Matrix3 out,GFC_Matrix3 m1,float s)
+{
+    GFC_Matrix3 temp;
+    temp[0][0] = s*m1[0][0];
+    temp[0][1] = s*m1[0][1];
+    temp[0][2] = s*m1[0][2];
 
-void gfc_matrix_multiply(
+    temp[1][0] = s*m1[1][0];
+    temp[1][1] = s*m1[1][1];
+    temp[1][2] = s*m1[1][2];
+
+    temp[2][0] = s*m1[2][0];
+    temp[2][1] = s*m1[2][1];
+    temp[2][2] = s*m1[2][2];
+    gfc_matrix3_copy(out,temp);
+}
+
+void gfc_matrix2_multiply_scalar(GFC_Matrix2 out,GFC_Matrix2 m1,float s)
+{
+    GFC_Matrix2 temp;
+    temp[0][0] = s*m1[0][0];
+    temp[0][1] = s*m1[0][1];
+
+    temp[1][0] = s*m1[1][0];
+    temp[1][1] = s*m1[1][1];
+    gfc_matrix2_copy(out,temp);
+}
+
+void gfc_matrix4_multiply(
     GFC_Matrix4 out,
     GFC_Matrix4 m2,
-    GFC_Matrix4 m1
-  )
+    GFC_Matrix4 m1)
 {
-  GFC_Matrix4 out1;
-  out1[0][0] = m2[0][0]*m1[0][0] + m2[0][1]*m1[1][0] + m2[0][2]*m1[2][0] + m2[0][3]*m1[3][0];
-  out1[0][1] = m2[0][0]*m1[0][1] + m2[0][1]*m1[1][1] + m2[0][2]*m1[2][1] + m2[0][3]*m1[3][1];
-  out1[0][2] = m2[0][0]*m1[0][2] + m2[0][1]*m1[1][2] + m2[0][2]*m1[2][2] + m2[0][3]*m1[3][2];
-  out1[0][3] = m2[0][0]*m1[0][3] + m2[0][1]*m1[1][3] + m2[0][2]*m1[2][3] + m2[0][3]*m1[3][3];
- 
-  out1[1][0] = m2[1][0]*m1[0][0] + m2[1][1]*m1[1][0] + m2[1][2]*m1[2][0] + m2[1][3]*m1[3][0];
-  out1[1][1] = m2[1][0]*m1[0][1] + m2[1][1]*m1[1][1] + m2[1][2]*m1[2][1] + m2[1][3]*m1[3][1];
-  out1[1][2] = m2[1][0]*m1[0][2] + m2[1][1]*m1[1][2] + m2[1][2]*m1[2][2] + m2[1][3]*m1[3][2];
-  out1[1][3] = m2[1][0]*m1[0][3] + m2[1][1]*m1[1][3] + m2[1][2]*m1[2][3] + m2[1][3]*m1[3][3];
-     
-  out1[2][0] = m2[2][0]*m1[0][0] + m2[2][1]*m1[1][0] + m2[2][2]*m1[2][0] + m2[2][3]*m1[3][0];
-  out1[2][1] = m2[2][0]*m1[0][1] + m2[2][1]*m1[1][1] + m2[2][2]*m1[2][1] + m2[2][3]*m1[3][1];
-  out1[2][2] = m2[2][0]*m1[0][2] + m2[2][1]*m1[1][2] + m2[2][2]*m1[2][2] + m2[2][3]*m1[3][2];
-  out1[2][3] = m2[2][0]*m1[0][3] + m2[2][1]*m1[1][3] + m2[2][2]*m1[2][3] + m2[2][3]*m1[3][3];
-     
-  out1[3][0] = m2[3][0]*m1[0][0] + m2[3][1]*m1[1][0] + m2[3][2]*m1[2][0] + m2[3][3]*m1[3][0];
-  out1[3][1] = m2[3][0]*m1[0][1] + m2[3][1]*m1[1][1] + m2[3][2]*m1[2][1] + m2[3][3]*m1[3][1];
-  out1[3][2] = m2[3][0]*m1[0][2] + m2[3][1]*m1[1][2] + m2[3][2]*m1[2][2] + m2[3][3]*m1[3][2];
-  out1[3][3] = m2[3][0]*m1[0][3] + m2[3][1]*m1[1][3] + m2[3][2]*m1[2][3] + m2[3][3]*m1[3][3];
-  gfc_matrix_copy(out,out1);
+    GFC_Matrix4 out1;//just in case its the same matrix
+    out1[0][0] = m2[0][0]*m1[0][0] + m2[0][1]*m1[1][0] + m2[0][2]*m1[2][0] + m2[0][3]*m1[3][0];
+    out1[0][1] = m2[0][0]*m1[0][1] + m2[0][1]*m1[1][1] + m2[0][2]*m1[2][1] + m2[0][3]*m1[3][1];
+    out1[0][2] = m2[0][0]*m1[0][2] + m2[0][1]*m1[1][2] + m2[0][2]*m1[2][2] + m2[0][3]*m1[3][2];
+    out1[0][3] = m2[0][0]*m1[0][3] + m2[0][1]*m1[1][3] + m2[0][2]*m1[2][3] + m2[0][3]*m1[3][3];
+
+    out1[1][0] = m2[1][0]*m1[0][0] + m2[1][1]*m1[1][0] + m2[1][2]*m1[2][0] + m2[1][3]*m1[3][0];
+    out1[1][1] = m2[1][0]*m1[0][1] + m2[1][1]*m1[1][1] + m2[1][2]*m1[2][1] + m2[1][3]*m1[3][1];
+    out1[1][2] = m2[1][0]*m1[0][2] + m2[1][1]*m1[1][2] + m2[1][2]*m1[2][2] + m2[1][3]*m1[3][2];
+    out1[1][3] = m2[1][0]*m1[0][3] + m2[1][1]*m1[1][3] + m2[1][2]*m1[2][3] + m2[1][3]*m1[3][3];
+        
+    out1[2][0] = m2[2][0]*m1[0][0] + m2[2][1]*m1[1][0] + m2[2][2]*m1[2][0] + m2[2][3]*m1[3][0];
+    out1[2][1] = m2[2][0]*m1[0][1] + m2[2][1]*m1[1][1] + m2[2][2]*m1[2][1] + m2[2][3]*m1[3][1];
+    out1[2][2] = m2[2][0]*m1[0][2] + m2[2][1]*m1[1][2] + m2[2][2]*m1[2][2] + m2[2][3]*m1[3][2];
+    out1[2][3] = m2[2][0]*m1[0][3] + m2[2][1]*m1[1][3] + m2[2][2]*m1[2][3] + m2[2][3]*m1[3][3];
+        
+    out1[3][0] = m2[3][0]*m1[0][0] + m2[3][1]*m1[1][0] + m2[3][2]*m1[2][0] + m2[3][3]*m1[3][0];
+    out1[3][1] = m2[3][0]*m1[0][1] + m2[3][1]*m1[1][1] + m2[3][2]*m1[2][1] + m2[3][3]*m1[3][1];
+    out1[3][2] = m2[3][0]*m1[0][2] + m2[3][1]*m1[1][2] + m2[3][2]*m1[2][2] + m2[3][3]*m1[3][2];
+    out1[3][3] = m2[3][0]*m1[0][3] + m2[3][1]*m1[1][3] + m2[3][2]*m1[2][3] + m2[3][3]*m1[3][3];
+    gfc_matrix4_copy(out,out1);
 }
 
-void gfc_matrix_v_multiply_M(
-  GFC_Vector4D * out,
-  GFC_Matrix4    mat,
-  GFC_Vector4D   vec
-)
+void gfc_matrix3_multiply(
+    GFC_Matrix3 out,
+    GFC_Matrix3 m2,
+    GFC_Matrix3 m1)
 {
-  float x,y,z,w;
+    GFC_Matrix3 out1;
+    out1[0][0] = m2[0][0]*m1[0][0] + m2[0][1]*m1[1][0] + m2[0][2]*m1[2][0];
+    out1[0][1] = m2[0][0]*m1[0][1] + m2[0][1]*m1[1][1] + m2[0][2]*m1[2][1];
+    out1[0][2] = m2[0][0]*m1[0][2] + m2[0][1]*m1[1][2] + m2[0][2]*m1[2][2];
+
+    out1[1][0] = m2[1][0]*m1[0][0] + m2[1][1]*m1[1][0] + m2[1][2]*m1[2][0];
+    out1[1][1] = m2[1][0]*m1[0][1] + m2[1][1]*m1[1][1] + m2[1][2]*m1[2][1];
+    out1[1][2] = m2[1][0]*m1[0][2] + m2[1][1]*m1[1][2] + m2[1][2]*m1[2][2];
+        
+    out1[2][0] = m2[2][0]*m1[0][0] + m2[2][1]*m1[1][0] + m2[2][2]*m1[2][0];
+    out1[2][1] = m2[2][0]*m1[0][1] + m2[2][1]*m1[1][1] + m2[2][2]*m1[2][1];
+    out1[2][2] = m2[2][0]*m1[0][2] + m2[2][1]*m1[1][2] + m2[2][2]*m1[2][2];
+    gfc_matrix3_copy(out,out1);
+}
+
+void gfc_matrix2_multiply(
+    GFC_Matrix2 out,
+    GFC_Matrix2 m2,
+    GFC_Matrix2 m1)
+{
+    GFC_Matrix2 out1;
+    out1[0][0] = m2[0][0]*m1[0][0] + m2[0][1]*m1[1][0];
+    out1[0][1] = m2[0][0]*m1[0][1] + m2[0][1]*m1[1][1];
+
+    out1[1][0] = m2[1][0]*m1[0][0] + m2[1][1]*m1[1][0];
+    out1[1][1] = m2[1][0]*m1[0][1] + m2[1][1]*m1[1][1];
+    gfc_matrix2_copy(out,out1);
+}
+
+
+void gfc_matrix4_v_multiply(GFC_Vector4D *out,GFC_Vector4D vec,GFC_Matrix4 mat)
+{
   float ox,oy,oz,ow;
   if (!out)return;
-  x=vec.x;
-  y=vec.y;
-  z=vec.z;
-  w=vec.w;
-  ox=x*mat[0][0] + y*mat[1][0] + mat[2][0]*z + mat[3][0]*w;
-  oy=x*mat[0][1] + y*mat[1][1] + mat[2][1]*z + mat[3][1]*w;
-  oz=x*mat[0][2] + y*mat[1][2] + mat[2][2]*z + mat[3][2]*w;
-  ow=x*mat[0][3] + y*mat[1][3] + mat[2][3]*z + mat[3][3]*w;
+  ox=vec.x*mat[0][0] + vec.y*mat[1][0] + mat[2][0]*vec.z + mat[3][0]*vec.w;
+  oy=vec.x*mat[0][1] + vec.y*mat[1][1] + mat[2][1]*vec.z + mat[3][1]*vec.w;
+  oz=vec.x*mat[0][2] + vec.y*mat[1][2] + mat[2][2]*vec.z + mat[3][2]*vec.w;
+  ow=vec.x*mat[0][3] + vec.y*mat[1][3] + mat[2][3]*vec.z + mat[3][3]*vec.w;
   out->x = ox;
   out->y = oy;
   out->z = oz;
   out->w = ow;
 }
 
-void gfc_matrix_M_multiply_v(
-  GFC_Vector4D * out,
-  GFC_Matrix4    mat,
-  GFC_Vector4D   vec
-)
+void gfc_matrix3_v_multiply(GFC_Vector3D *out,GFC_Vector3D vec,GFC_Matrix3 mat)
 {
-  float x,y,z,w;
+  float ox,oy,oz;
+  if (!out)return;
+  ox=vec.x*mat[0][0] + vec.y*mat[1][0] + mat[2][0]*vec.z;
+  oy=vec.x*mat[0][1] + vec.y*mat[1][1] + mat[2][1]*vec.z;
+  oz=vec.x*mat[0][2] + vec.y*mat[1][2] + mat[2][2]*vec.z;
+  out->x = ox;
+  out->y = oy;
+  out->z = oz;
+}
+
+void gfc_matrix2_v_multiply(GFC_Vector2D *out,GFC_Vector2D vec,GFC_Matrix2 mat)
+{
+  float ox,oy;
+  if (!out)return;
+  ox=vec.x*mat[0][0] + vec.y*mat[1][0];
+  oy=vec.x*mat[0][1] + vec.y*mat[1][1];
+  
+  out->x = ox;
+  out->y = oy;
+}
+
+void gfc_matrix4_multiply_v(GFC_Vector4D * out,GFC_Matrix4 mat,GFC_Vector4D vec)
+{
   float ox,oy,oz,ow;
   if (!out)return;
-  x=vec.x;
-  y=vec.y;
-  z=vec.z;
-  w=vec.w;
-  ox=x*mat[0][0] + y*mat[0][1] + mat[0][2]*z + mat[0][3]*w;
-  oy=x*mat[1][0] + y*mat[1][1] + mat[1][2]*z + mat[1][3]*w;
-  oz=x*mat[2][0] + y*mat[2][1] + mat[2][2]*z + mat[2][3]*w;
-  ow=x*mat[3][0] + y*mat[3][1] + mat[3][2]*z + mat[3][3]*w;
+  ox=vec.x*mat[0][0] + vec.y*mat[0][1] + mat[0][2]*vec.z + mat[0][3]*vec.w;
+  oy=vec.x*mat[1][0] + vec.y*mat[1][1] + mat[1][2]*vec.z + mat[1][3]*vec.w;
+  oz=vec.x*mat[2][0] + vec.y*mat[2][1] + mat[2][2]*vec.z + mat[2][3]*vec.w;
+  ow=vec.x*mat[3][0] + vec.y*mat[3][1] + mat[3][2]*vec.z + mat[3][3]*vec.w;
   out->x = ox;
   out->y = oy;
   out->z = oz;
   out->w = ow;
 }
 
-void gfc_matrix_zero(GFC_Matrix4 zero)
+void gfc_matrix3_multiply_v(GFC_Vector3D * out,GFC_Matrix3 mat,GFC_Vector3D vec)
+{
+  float ox,oy,oz;
+  if (!out)return;
+  ox=vec.x*mat[0][0] + vec.y*mat[0][1] + mat[0][2]*vec.z;
+  oy=vec.x*mat[1][0] + vec.y*mat[1][1] + mat[1][2]*vec.z;
+  oz=vec.x*mat[2][0] + vec.y*mat[2][1] + mat[2][2]*vec.z;
+  out->x = ox;
+  out->y = oy;
+  out->z = oz;
+}
+
+void gfc_matrix2_multiply_v(GFC_Vector2D * out,GFC_Matrix2 mat,GFC_Vector2D vec)
+{
+  float ox,oy;
+  if (!out)return;
+  ox=vec.x*mat[0][0] + vec.y*mat[0][1];
+  oy=vec.x*mat[1][0] + vec.y*mat[1][1];
+  out->x = ox;
+  out->y = oy;
+}
+
+
+void gfc_matrix4_zero(GFC_Matrix4 zero)
 {
     memset(zero,0,sizeof(GFC_Matrix4));
 }
 
-void gfc_matrix_identity(GFC_Matrix4 one)
+void gfc_matrix3_zero(GFC_Matrix3 zero)
 {
-    gfc_matrix_zero(one);
+    memset(zero,0,sizeof(GFC_Matrix3));
+}
+
+void gfc_matrix2_zero(GFC_Matrix2 zero)
+{
+    memset(zero,0,sizeof(GFC_Matrix2));
+}
+
+
+void gfc_matrix4_identity(GFC_Matrix4 one)
+{
+    gfc_matrix4_zero(one);
     one[0][0] = 1;
     one[1][1] = 1;
     one[2][2] = 1;
     one[3][3] = 1;
 }
 
+void gfc_matrix3_identity(GFC_Matrix3 one)
+{
+    gfc_matrix3_zero(one);
+    one[0][0] = 1;
+    one[1][1] = 1;
+    one[2][2] = 1;
+}
 
-void gfc_matrix_rotate_by_vector(
+void gfc_matrix2_identity(GFC_Matrix2 one)
+{
+    gfc_matrix2_zero(one);
+    one[0][0] = 1;
+    one[1][1] = 1;
+}
+
+void gfc_matrix4_rotate_by_vector(
     GFC_Matrix4     out,
     GFC_Matrix4     m,
     GFC_Vector3D    v
 )
 {
-    gfc_matrix_rotate_y(out,out,v.y);
-    gfc_matrix_rotate_x(out,m,  v.x);
-    gfc_matrix_rotate_z(out,out,v.z);
+    gfc_matrix4_rotate_y(out,m,v.y);
+    gfc_matrix4_rotate_x(out,out,v.x);
+    gfc_matrix4_rotate_z(out,out,v.z);
 }
 
-void gfc_matrix_rotate_x(
+void gfc_matrix4_rotate_x(
     GFC_Matrix4     out,
     GFC_Matrix4     m,
     float       theta
@@ -448,15 +573,15 @@ void gfc_matrix_rotate_x(
 {
     GFC_Matrix4     Result;
     
-    gfc_matrix_identity(Result);
+    gfc_matrix4_identity(Result);
     Result[0][0] = cos(-theta);
     Result[0][2] = sin(-theta);
     Result[2][0] = -sin(-theta);
     Result[2][2] = cos(-theta);
-    gfc_matrix_multiply(out,m,Result);
+    gfc_matrix4_multiply(out,m,Result);
 }
 
-void gfc_matrix_rotate_y(
+void gfc_matrix4_rotate_y(
     GFC_Matrix4     out,
     GFC_Matrix4     m,
     float       theta
@@ -464,16 +589,16 @@ void gfc_matrix_rotate_y(
 {
     GFC_Matrix4     Result;
     
-    gfc_matrix_identity(Result);
+    gfc_matrix4_identity(Result);
     Result[1][1] = cos(-theta);
     Result[1][2] = -sin(-theta);
     Result[2][1] = sin(-theta);
     Result[2][2] = cos(-theta);
     
-    gfc_matrix_multiply(out,m,Result);
+    gfc_matrix4_multiply(out,m,Result);
 }
 
-void gfc_matrix_rotate_z(
+void gfc_matrix4_rotate_z(
     GFC_Matrix4     out,
     GFC_Matrix4     m,
     float       theta
@@ -481,70 +606,27 @@ void gfc_matrix_rotate_z(
 {
     GFC_Matrix4     Result;
     
-    gfc_matrix_identity(Result);
+    gfc_matrix4_identity(Result);
     Result[0][0] = cos(-theta);
     Result[0][1] = -sin(-theta);
     Result[1][0] = sin(-theta);
     Result[1][1] = cos(-theta);
-    gfc_matrix_multiply(out,m,Result);
+    gfc_matrix4_multiply(out,m,Result);
 }
 
 
-void gfc_matrix_rotate(
+void gfc_matrix4_rotate(
     GFC_Matrix4     out,
     GFC_Matrix4     m,
-    float       degree,
+    float           radians,
     GFC_Vector3D    axis
 )
 {
-    GFC_Matrix4 Rotate;
-    GFC_Matrix4 Result;
-    GFC_Vector3D temp;
-    float a = degree;
-    float c = cos(a);
-    float s = sin(a);
-
-    gfc_vector3d_normalize(&axis);
-    
-    gfc_vector3d_scale(temp,axis,(1 - c));
-
-    Rotate[0][0] = c + temp.x * axis.x;
-    Rotate[0][1] = temp.x * axis.y + s * axis.z;
-    Rotate[0][2] = temp.x * axis.z - s * axis.y;
-
-    Rotate[1][0] = temp.y * axis.x - s * axis.z;
-    Rotate[1][1] = c + temp.y * axis.y;
-    Rotate[1][2] = temp.y * axis.z + s * axis.x;
-
-    Rotate[2][0] = temp.z * axis.x + s * axis.y;
-    Rotate[2][1] = temp.z * axis.y - s * axis.x;
-    Rotate[2][2] = c + temp.z * axis.z;
-
-    Result[0][0] = m[0][0] * Rotate[0][0] + m[1][0] * Rotate[0][1] + m[2][0] * Rotate[0][2];
-    Result[0][1] = m[0][1] * Rotate[0][0] + m[1][1] * Rotate[0][1] + m[2][1] * Rotate[0][2];
-    Result[0][2] = m[0][2] * Rotate[0][0] + m[1][2] * Rotate[0][1] + m[2][2] * Rotate[0][2];
-    Result[0][3] = m[0][3] * Rotate[0][0] + m[1][3] * Rotate[0][1] + m[2][3] * Rotate[0][2];
-
-    Result[1][0] = m[0][0] * Rotate[1][0] + m[1][0] * Rotate[1][1] + m[2][0] * Rotate[1][2];
-    Result[1][1] = m[0][1] * Rotate[1][0] + m[1][1] * Rotate[1][1] + m[2][1] * Rotate[1][2];
-    Result[1][2] = m[0][2] * Rotate[1][0] + m[1][2] * Rotate[1][1] + m[2][2] * Rotate[1][2];
-    Result[1][3] = m[0][3] * Rotate[1][0] + m[1][3] * Rotate[1][1] + m[2][3] * Rotate[1][2];
-
-    Result[2][0] = m[0][0] * Rotate[2][0] + m[1][0] * Rotate[2][1] + m[2][0] * Rotate[2][2];
-    Result[2][1] = m[0][1] * Rotate[2][0] + m[1][1] * Rotate[2][1] + m[2][1] * Rotate[2][2];
-    Result[2][2] = m[0][2] * Rotate[2][0] + m[1][2] * Rotate[2][1] + m[2][2] * Rotate[2][2];
-    Result[2][3] = m[0][3] * Rotate[2][0] + m[1][3] * Rotate[2][1] + m[2][3] * Rotate[2][2];
-
-    Result[3][0] = m[3][0];
-    Result[3][1] = m[3][1];
-    Result[3][2] = m[3][2];
-    Result[3][3] = m[3][3];
-    
-    gfc_matrix_copy(out,Result);
-
+    gfc_matrix4_from_quaternion(out,gfc_vector4d(axis.x,axis.y,axis.z,radians));
+    gfc_matrix4_multiply(out,m,out);
 }
 
-void gfc_matrix_perspective(
+void gfc_matrix4_perspective(
     GFC_Matrix4     out,
     float      fov,
     float      aspect,
@@ -553,25 +635,25 @@ void gfc_matrix_perspective(
 )
 {
     float halftanfov = tan(fov * 0.5);
-    gfc_matrix_zero(out);
+    gfc_matrix4_zero(out);
 
     if (aspect == 0)
     {
-        slog("gfc_matrix_perspective: aspect ratio cannot be zero");
+        slog("gfc_matrix4_perspective: aspect ratio cannot be zero");
         return;
     }
     if (halftanfov == 0)
     {
-        slog("gfc_matrix_perspective: bad fov");
+        slog("gfc_matrix4_perspective: bad fov");
         return;
     }
     if (near == far)
     {
-        slog("gfc_matrix_perspective: near plane and far plane cannot be the same");
+        slog("gfc_matrix4_perspective: near plane and far plane cannot be the same");
         return;
     }
 
-    gfc_matrix_zero(out);
+    gfc_matrix4_zero(out);
     out[0][0] = 1 / (aspect * halftanfov);
     out[1][1] = 1 / (halftanfov);
     out[2][2] = - ((far + near) / (far - near));
@@ -585,7 +667,7 @@ void gfc_matrix_perspective(
     return;
 }
 
-void gfc_matrix_view(
+void gfc_matrix4_view(
     GFC_Matrix4  out,
     GFC_Vector3D position,
     GFC_Vector3D target,
@@ -602,7 +684,7 @@ void gfc_matrix_view(
     gfc_vector3d_cross_product(&u,f,r);
     gfc_vector3d_normalize(&u);
  
-    gfc_matrix_identity(out);
+    gfc_matrix4_identity(out);
     out[0][0] = r.x;
     out[1][0] = r.y;
     out[2][0] = r.z;
@@ -617,47 +699,57 @@ void gfc_matrix_view(
     out[3][2] = -gfc_vector3d_dot_product(f, position);
 }
 
-void gfc_matrix_scale(
-    GFC_Matrix4 out,
-    GFC_Vector3D scale
-)
+void gfc_matrix4_scale(GFC_Matrix4 out,GFC_Matrix4 in,GFC_Vector3D scale)
 {
     GFC_Matrix4 m;
-    gfc_matrix_zero(m);
+    gfc_matrix4_zero(m);
     m[0][0] = scale.x;
     m[1][1] = scale.y;
     m[2][2] = scale.z;
     m[3][3] = 1;
     
-    gfc_matrix_multiply(
+    gfc_matrix4_multiply(
         out,
-        out,
+        in,
         m
     );
 }
 
-void gfc_matrix_make_translation(
+void gfc_matrix4_make_translation(
     GFC_Matrix4 out,
     GFC_Vector3D move
 )
 {
-    if (!out)return;
-    gfc_matrix_identity(out);
+    gfc_matrix4_identity(out);
     out[3][0] = move.x;
     out[3][1] = move.y;
     out[3][2] = move.z;
 }
 
-void gfc_matrix_translate(
-    GFC_Matrix4 out,
-    GFC_Vector3D move
+void gfc_matrix3_make_translation(
+    GFC_Matrix3 out,
+    GFC_Vector2D move
 )
 {
-    GFC_Matrix4 translate,temp;
-    gfc_matrix_make_translation(translate,move);
-    gfc_matrix_multiply(temp,out,translate);
-    gfc_matrix_copy(out,temp);
+    gfc_matrix3_identity(out);
+    out[2][0] = move.x;
+    out[2][1] = move.y;
 }
+
+void gfc_matrix4_translate(GFC_Matrix4 out,GFC_Matrix4 in, GFC_Vector3D move)
+{
+    GFC_Matrix4 translate;
+    gfc_matrix4_make_translation(translate,move);
+    gfc_matrix4_multiply(out,in,translate);
+}
+
+void gfc_matrix3_translate(GFC_Matrix3 out,GFC_Matrix3 in, GFC_Vector2D move)
+{
+    GFC_Matrix3 translate;
+    gfc_matrix3_make_translation(translate,move);
+    gfc_matrix3_multiply(out,in,translate);
+}
+
 
 void gfc_matrix4_from_vectors_q(
     GFC_Matrix4 out,
@@ -670,20 +762,20 @@ void gfc_matrix4_from_vectors_q(
         
     //M = T * R * S
     
-    gfc_matrix_identity(out);
-    gfc_matrix_scale(out,scale);
+    gfc_matrix4_identity(out);
+    gfc_matrix4_scale(out,out,scale);
 
-    gfc_matrix_from_quaternion(rotateM,quaternion);
-    gfc_matrix_multiply(
+    gfc_matrix4_from_quaternion(rotateM,quaternion);
+    gfc_matrix4_multiply(
             out,
             out,
             rotateM
         );
     
-    gfc_matrix_translate(out,translation);
+    gfc_matrix4_translate(out,out,translation);
 }
 
-void gfc_matrix_from_quaternion(
+void gfc_matrix4_from_quaternion(
     GFC_Matrix4     out,
     GFC_Vector4D    q)
 {

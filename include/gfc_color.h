@@ -99,8 +99,7 @@ GFC_Color gfc_color_to_float(GFC_Color color);
 /**
  * @brief convert a color to 8 bit integer representation
  * @param color the color to convert
- * @return a new color         gf2d_element_set_color(gf2d_window_get_element_by_name(win,"staff"),gfc_color(1,1,1,1));        
-in the format CT_RGBA8
+ * @return a new color
  */
 GFC_Color gfc_color_to_int8(GFC_Color color);
 

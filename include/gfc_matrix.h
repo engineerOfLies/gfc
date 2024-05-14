@@ -15,22 +15,25 @@ typedef float GFC_Matrix2[2][2];
  * @param d the destination matrix
  * @param s the source matrix
  */
-void gfc_matrix_copy(
-    GFC_Matrix4 d,
-    GFC_Matrix4 s
-  );
+void gfc_matrix2_copy(GFC_Matrix2 d,GFC_Matrix2 s);
+void gfc_matrix3_copy(GFC_Matrix3 d,GFC_Matrix3 s);
+void gfc_matrix4_copy(GFC_Matrix4 d,GFC_Matrix4 s);
 
 /**
  * @brief set the matrix to an identity matrix
  * @param one the matrix to become an identity
  */
-void gfc_matrix_identity(GFC_Matrix4 one);
+void gfc_matrix2_identity(GFC_Matrix2 one);
+void gfc_matrix3_identity(GFC_Matrix3 one);
+void gfc_matrix4_identity(GFC_Matrix4 one);
 
 /**
  * @brief set the matrix to a zero matrix
  * @param zero the matrix to be set to zero
  */
-void gfc_matrix_zero(GFC_Matrix4 zero);
+void gfc_matrix2_zero(GFC_Matrix2 zero);
+void gfc_matrix3_zero(GFC_Matrix3 zero);
+void gfc_matrix4_zero(GFC_Matrix4 zero);
 
 /**
  * @brief invert a matrix
@@ -38,6 +41,8 @@ void gfc_matrix_zero(GFC_Matrix4 zero);
  * @param in the matrix to invert
  * @return 1 on success, 0 if the matrix has no inverse.  On 0, out will not be changed
  */
+Uint8 gfc_matrix2_invert(GFC_Matrix4 out, GFC_Matrix4 in);
+Uint8 gfc_matrix3_invert(GFC_Matrix4 out, GFC_Matrix4 in);
 Uint8 gfc_matrix4_invert(GFC_Matrix4 out, GFC_Matrix4 in);
 
 /**
@@ -45,15 +50,17 @@ Uint8 gfc_matrix4_invert(GFC_Matrix4 out, GFC_Matrix4 in);
  * @param out the output matrix, the contents of this matrix are overwritten
  * @param move the gfc_vector describing the translation
  */
-void gfc_matrix_make_translation(
-    GFC_Matrix4 out,
-    GFC_Vector3D move
-);
+void gfc_matrix3_make_translation(GFC_Matrix3 out,GFC_Vector2D move);
+void gfc_matrix4_make_translation(GFC_Matrix4 out,GFC_Vector3D move);
 
-void gfc_matrix_translate(
-    GFC_Matrix4 out,
-    GFC_Vector3D move
-);
+/**
+ * @brief translate a matrix by the supplied vector
+ * @param out the output matrix
+ * @param in the input matrix
+ * @param move the vector to move it by
+ */
+void gfc_matrix3_translate(GFC_Matrix3 out,GFC_Matrix3 in, GFC_Vector2D move);
+void gfc_matrix4_translate(GFC_Matrix4 out,GFC_Matrix4 in, GFC_Vector3D move);
 
 /**
  * @brief setup a view matrix for a frustum centered at position, pointed at target, with up as the up direction
@@ -63,7 +70,7 @@ void gfc_matrix_translate(
  * @param target location to look
  * @param up the direction considered "up"
  */
-void gfc_matrix_view(
+void gfc_matrix4_view(
     GFC_Matrix4  out,
     GFC_Vector3D position,
     GFC_Vector3D target,
@@ -72,11 +79,17 @@ void gfc_matrix_view(
 
 /**
  * @brief send the information from a matrix to the log out
+ * @note use the macro version to have file and linenumber automaticly passed in
  * @param mat the matrix to print
  */
-void gfc_matrix4_slog(GFC_Matrix4 mat);
-void gfc_matrix3_slog(GFC_Matrix3 mat);
-void gfc_matrix2_slog(GFC_Matrix2 mat);
+
+#define gfc_matrix4_slog(mat) _gfc_matrix4_slog(__FILE__,__LINE__,mat)
+#define gfc_matrix3_slog(mat) _gfc_matrix3_slog(__FILE__,__LINE__,mat)
+#define gfc_matrix2_slog(mat) _gfc_matrix2_slog(__FILE__,__LINE__,mat)
+
+void _gfc_matrix4_slog(const char *filename,Uint32 line,GFC_Matrix4 mat);
+void _gfc_matrix3_slog(const char *filename,Uint32 line,GFC_Matrix3 mat);
+void _gfc_matrix2_slog(const char *filename,Uint32 line,GFC_Matrix2 mat);
 
 /**
  * @brief setup a perspective projection matrix
@@ -87,7 +100,7 @@ void gfc_matrix2_slog(GFC_Matrix2 mat);
  * @param near the near z plane
  * @param far the far z plane
  */
-void gfc_matrix_perspective(
+void gfc_matrix4_perspective(
     GFC_Matrix4     out,
     float      fov,
     float      aspect,
@@ -115,7 +128,17 @@ GFC_Vector3D gfc_unproject(GFC_Vector3D in,GFC_Matrix4 view, GFC_Matrix4 proj,GF
  * @param a one multiplicand matrix
  * @param b another multiplicand matrix
  */
-void gfc_matrix_multiply(
+void gfc_matrix2_multiply(
+    GFC_Matrix2 out,
+    GFC_Matrix2 a,
+    GFC_Matrix2 b
+  );
+void gfc_matrix3_multiply(
+    GFC_Matrix3 out,
+    GFC_Matrix3 a,
+    GFC_Matrix3 b
+  );
+void gfc_matrix4_multiply(
     GFC_Matrix4 out,
     GFC_Matrix4 a,
     GFC_Matrix4 b
@@ -127,11 +150,9 @@ void gfc_matrix_multiply(
  * @param mat input matrix to multiply by
  * @param vec input matrix to multiply by
  */
-void gfc_matrix_v_multiply_M(
-    GFC_Vector4D * out,
-    GFC_Matrix4    mat,
-    GFC_Vector4D   vec
-);
+void gfc_matrix2_v_multiply(GFC_Vector2D *out,GFC_Vector2D vec,GFC_Matrix2 mat);
+void gfc_matrix3_v_multiply(GFC_Vector3D *out,GFC_Vector3D vec,GFC_Matrix3 mat);
+void gfc_matrix4_v_multiply(GFC_Vector4D *out,GFC_Vector4D vec,GFC_Matrix4 mat);
 
 /**
  * @brief multiply a matrix by a gfc_vector, M * v
@@ -139,11 +160,9 @@ void gfc_matrix_v_multiply_M(
  * @param mat input matrix to multiply by
  * @param vec input matrix to multiply by
  */
-void gfc_matrix_M_multiply_v(
-  GFC_Vector4D * out,
-  GFC_Matrix4    mat,
-  GFC_Vector4D   vec
-);
+void gfc_matrix2_multiply_v(GFC_Vector2D * out,GFC_Matrix2 mat,GFC_Vector2D vec);
+void gfc_matrix3_multiply_v(GFC_Vector3D * out,GFC_Matrix3 mat,GFC_Vector3D vec);
+void gfc_matrix4_multiply_v(GFC_Vector4D * out,GFC_Matrix4 mat,GFC_Vector4D vec);
 
 
 /**
@@ -189,17 +208,19 @@ void gfc_matrix4_to_vectors(
  * @param out the resulting matrix
  * @param q the quaternion gfc_vector
  */
-void gfc_matrix_from_quaternion(
+void gfc_matrix4_from_quaternion(
     GFC_Matrix4     out,
     GFC_Vector4D    q);
 
 /**
  * @brief multiply a matrix by the scalar value
- * @param out the output matrix
+ * @param out the output matr it is changed by this functionix
  * @param m1 input matrix to multiply by
  * @param s input scalar value to multiply by
  */
-void gfc_matrix_multiply_scalar(GFC_Matrix4 out,GFC_Matrix4 m1,float s);
+void gfc_matrix2_multiply_scalar(GFC_Matrix2 out,GFC_Matrix2 m1,float s);
+void gfc_matrix3_multiply_scalar(GFC_Matrix3 out,GFC_Matrix3 m1,float s);
+void gfc_matrix4_multiply_scalar(GFC_Matrix4 out,GFC_Matrix4 m1,float s);
 
 /**
  * @brief rotate a matrix around the cardinal axis by the provided amount
@@ -207,21 +228,10 @@ void gfc_matrix_multiply_scalar(GFC_Matrix4 out,GFC_Matrix4 m1,float s);
  * @param m the matrix to rotate
  * @param theta the amount to rotate by
  */
-void gfc_matrix_rotate_x(
-    GFC_Matrix4     out,
-    GFC_Matrix4     m,
-    float       theta
-);
-void gfc_matrix_rotate_y(
-    GFC_Matrix4     out,
-    GFC_Matrix4     m,
-    float       theta
-);
-void gfc_matrix_rotate_z(
-    GFC_Matrix4     out,
-    GFC_Matrix4     m,
-    float       theta
-);
+
+void gfc_matrix4_rotate_x(GFC_Matrix4 out,GFC_Matrix4 m,float theta);
+void gfc_matrix4_rotate_y(GFC_Matrix4 out,GFC_Matrix4 m,float theta);
+void gfc_matrix4_rotate_z(GFC_Matrix4 out,GFC_Matrix4 m,float theta);
 
 /**
  * @brief sequentially apply the cardinal axis rotations about the x, y, and z axis accordingly
@@ -229,7 +239,7 @@ void gfc_matrix_rotate_z(
  * @param m the matrix to rotate
  * @param v the amount to rotate by in the x, y, and z axis
  */
-void gfc_matrix_rotate_by_vector(
+void gfc_matrix4_rotate_by_vector(
     GFC_Matrix4     out,
     GFC_Matrix4     m,
     GFC_Vector3D    v
@@ -239,25 +249,18 @@ void gfc_matrix_rotate_by_vector(
  * @brief multiply a matrix around a specific axis
  * @param out the output matrix
  * @param in  the input matrix
- * @param degree the amount, in radians, to rotate by
+ * @param radians the amount, in radians, to rotate by
  * @param axis the axis about which to rotate
  */
-void gfc_matrix_rotate(
-    GFC_Matrix4     out,
-    GFC_Matrix4     in,
-    float       degree,
-    GFC_Vector3D    axis
-);
+void gfc_matrix4_rotate(GFC_Matrix4 out,GFC_Matrix4 in,float radians,GFC_Vector3D axis);
 
 /**
  * @brief scale a matrix based on the input scale gfc_vector
- * @param out the matrix to be scaled.  it is changed by this function
+ * @param out the matrix to be scaled.
+ * @param in the matrix to be scaled.  
  * @param scale the amount to scale it by
  */
-void gfc_matrix_scale(
-    GFC_Matrix4 out,
-    GFC_Vector3D scale
-);
+void gfc_matrix4_scale(GFC_Matrix4 out,GFC_Matrix4 in,GFC_Vector3D scale);
 
 
 #endif

@@ -1,6 +1,207 @@
 #include "simple_logger.h"
 #include "gfc_config.h"
 
+
+// string stuff
+
+GFC_String *sj_value_as_gfc_string(SJson *json)
+{
+    const char *text;
+    text = sj_get_string_value(json);
+    if (!text)return NULL;
+    return gfc_string(text);
+}
+
+GFC_String *sj_object_get_gfc_string(SJson *json,const char *key)
+{
+    return sj_value_as_gfc_string(sj_object_get_value(json,key));
+}
+
+SJson *sj_gfc_string_new(GFC_String *string)
+{
+    if (!string)return NULL;
+    return sj_new_str(string->buffer);
+}
+
+
+//matrix stuff
+int sj_object_get_matrix4(SJson *json,const char *key,GFC_Matrix4 output)
+{
+    return sj_value_as_matrix4(sj_object_get_value(json,key),output);
+}
+
+int sj_object_get_matrix3(SJson *json,const char *key,GFC_Matrix3 output)
+{
+    return sj_value_as_matrix3(sj_object_get_value(json,key),output);
+}
+
+int sj_object_get_matrix2(SJson *json,const char *key,GFC_Matrix2 output)
+{
+    return sj_value_as_matrix2(sj_object_get_value(json,key),output);
+}
+
+int sj_value_as_matrix4(SJson *matrix,GFC_Matrix4 output)
+{
+    int i,c;
+    int j,d;
+    GFC_Matrix4 temp;
+    SJson *row;
+    SJson *column;
+    if (!matrix)return 0;
+    c = sj_array_get_count(matrix);
+    if (c != 4)return 0;//not the right size
+    for (i = 0; i < c; i++)
+    {
+        row = sj_array_get_nth(matrix,i);
+        if (!row)
+        {
+            return 0;
+        }
+        d = sj_array_get_count(row);
+        if (d != 4)return 0;//not the right size
+        for (j = 0;j < d;j++)
+        {
+            column = sj_array_get_nth(row,j);
+            if (!column)return 0;//something is wrong
+            sj_get_float_value(column,&temp[i][j]);
+        }
+    }
+    gfc_matrix4_copy(output,temp);
+    return 1;
+}
+
+int sj_value_as_matrix3(SJson *matrix,GFC_Matrix3 output)
+{
+    int i,c;
+    int j,d;
+    GFC_Matrix3 temp;
+    SJson *row;
+    SJson *column;
+    if (!matrix)return 0;
+    c = sj_array_get_count(matrix);
+    if (c != 3)return 0;//not the right size
+    for (i = 0; i < c; i++)
+    {
+        row = sj_array_get_nth(matrix,i);
+        if (!row)
+        {
+            return 0;
+        }
+        d = sj_array_get_count(row);
+        if (d != 3)return 0;//not the right size
+        for (j = 0;j < d;j++)
+        {
+            column = sj_array_get_nth(row,j);
+            if (!column)return 0;//something is wrong
+            sj_get_float_value(column,&temp[i][j]);
+        }
+    }
+    gfc_matrix3_copy(output,temp);
+    return 1;
+}
+
+int sj_value_as_matrix2(SJson *matrix,GFC_Matrix2 output)
+{
+    int i,c;
+    int j,d;
+    GFC_Matrix2 temp;
+    SJson *row;
+    SJson *column;
+    if (!matrix)return 0;
+    c = sj_array_get_count(matrix);
+    if (c != 2)return 0;//not the right size
+    for (i = 0; i < c; i++)
+    {
+        row = sj_array_get_nth(matrix,i);
+        if (!row)
+        {
+            return 0;
+        }
+        d = sj_array_get_count(row);
+        if (d != 2)return 0;//not the right size
+        for (j = 0;j < d;j++)
+        {
+            column = sj_array_get_nth(row,j);
+            if (!column)return 0;//something is wrong
+            sj_get_float_value(column,&temp[i][j]);
+        }
+    }
+    gfc_matrix2_copy(output,temp);
+    return 1;
+}
+
+SJson *sj_matrix4_new(GFC_Matrix4 input)
+{
+    int i;
+    SJson *row,*matrix;
+    
+    matrix = sj_array_new();
+    if (!matrix)return NULL;
+    for (i = 0;i < 4;i++)
+    {
+        row = sj_array_new();
+        if (!row)
+        {
+            sj_free(matrix);
+            return NULL;
+        }
+        sj_array_append(row,sj_new_float(input[i][0]));
+        sj_array_append(row,sj_new_float(input[i][1]));
+        sj_array_append(row,sj_new_float(input[i][2]));
+        sj_array_append(row,sj_new_float(input[i][3]));
+        sj_array_append(matrix,row);
+    }
+    return matrix;
+}
+
+SJson *sj_matrix3_new(GFC_Matrix3 input)
+{
+    int i;
+    SJson *row,*matrix;
+    
+    matrix = sj_array_new();
+    if (!matrix)return NULL;
+    for (i = 0;i < 3;i++)
+    {
+        row = sj_array_new();
+        if (!row)
+        {
+            sj_free(matrix);
+            return NULL;
+        }
+        sj_array_append(row,sj_new_float(input[i][0]));
+        sj_array_append(row,sj_new_float(input[i][1]));
+        sj_array_append(row,sj_new_float(input[i][2]));
+        sj_array_append(matrix,row);
+    }
+    return matrix;
+}
+
+SJson *sj_matrix2_new(GFC_Matrix2 input)
+{
+    int i;
+    SJson *row,*matrix;
+    
+    matrix = sj_array_new();
+    if (!matrix)return NULL;
+    for (i = 0;i < 2;i++)
+    {
+        row = sj_array_new();
+        if (!row)
+        {
+            sj_free(matrix);
+            return NULL;
+        }
+        sj_array_append(row,sj_new_float(input[i][0]));
+        sj_array_append(row,sj_new_float(input[i][1]));
+        sj_array_append(matrix,row);
+    }
+    return matrix;
+}
+
+
+// vector stuff
+
 SJson *sj_vector2d_new(GFC_Vector2D input)
 {
     SJson *json;
@@ -35,22 +236,6 @@ SJson *sj_vector4d_new(GFC_Vector4D input)
     sj_array_append(json,sj_new_float(input.z));
     sj_array_append(json,sj_new_float(input.w));
     return json;
-}
-
-GFC_Color sj_object_get_color(SJson *json,const char *key)
-{
-    return sj_value_as_color(sj_object_get_value(json,key));
-}
-
-GFC_Color sj_value_as_color(SJson *value)
-{
-    GFC_Color color;
-    GFC_Vector4D colorv = {255,255,255,255};
-    color = gfc_color8(255,255,255,255);
-    if (!value)return color;
-    sj_value_as_vector4d(value,&colorv);
-    color = gfc_color_from_vector4(colorv);
-    return color;
 }
 
 int sj_object_get_vector2d(SJson *json,const char *key,GFC_Vector2D *output)
@@ -206,4 +391,36 @@ int sj_value_as_vector4d(SJson *json,GFC_Vector4D *output)
     return 0;
 }
 
+// color stuff
+
+GFC_Color sj_object_get_color(SJson *json,const char *key)
+{
+    return sj_value_as_color(sj_object_get_value(json,key));
+}
+
+GFC_Color sj_value_as_color(SJson *value)
+{
+    GFC_Color color;
+    GFC_Vector4D colorv = {255,255,255,255};
+    color = gfc_color8(255,255,255,255);
+    if (!value)return color;
+    sj_value_as_vector4d(value,&colorv);
+    color = gfc_color_from_vector4(colorv);
+    return color;
+}
+
+SJson *sj_color_new(GFC_Color input)
+{
+    GFC_Color color;
+    SJson *json;
+    json = sj_array_new();
+    if (!json)return NULL;
+    color = gfc_color_to_int8(input);
+    sj_array_append(json,sj_new_int(color.r));
+    sj_array_append(json,sj_new_int(color.g));
+    sj_array_append(json,sj_new_int(color.b));
+    sj_array_append(json,sj_new_int(color.a));
+    return json;
+    
+}
 /*eol@eof*/
