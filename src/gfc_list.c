@@ -39,6 +39,7 @@ GFC_List *gfc_list_new_size(Uint32 count)
         slog("cannot make a list of size zero");
         return NULL;
     }
+    if (count < 8)count = 8;
     l = (GFC_List *)malloc(sizeof(GFC_List));
     if (!l)
     {
@@ -278,6 +279,90 @@ Uint32 gfc_list_get_count(GFC_List *list)
 {
     if (!list)return 0;
     return list->count;
+}
+
+void gfc_list_split(GFC_List *base,GFC_List **leftOut,GFC_List **rightOut)
+{
+    Uint32 halfway;
+    Uint32 i;
+    GFC_List *left,*right;
+    if ((!base)||(!leftOut)||(!rightOut))return;
+    if (base->count < 2)return;//nothing to do
+    halfway = base->count / 2;
+    left = gfc_list_new_size(halfway + 1);//pad for an extra
+    right = gfc_list_new_size(halfway + 1);//pad for an extra
+    for (i =0; i < halfway;i++)
+    {
+        gfc_list_append(left,gfc_list_get_nth(base,i));
+    }
+    for (;i < base->count;i++)
+    {
+        gfc_list_append(right,gfc_list_get_nth(base,i));
+    }
+    *leftOut = left;
+    *rightOut = right;
+}
+
+//plan: merge sort.  First split the list into two smaller lists, and then recursively have each one sort
+void gfc_list_sort(GFC_List *list,int (*compare)(void *a,void *b))
+{
+    int l,r;
+    void *leftItem,*rightItem;
+    GFC_List *left,*right;
+    if ((!list)||(!compare))return;//no list or no compare function, so stop
+    if (list->count <= 1)return;//not enough to sort
+    //now split it
+    gfc_list_split(list,&left,&right);
+    if ((left == NULL)||(right == NULL))
+    {
+        return;//nothing left to do
+    }
+    //sort each half
+    gfc_list_sort(left,compare);
+    gfc_list_sort(right,compare);
+    //now merge the halves
+    //for each element in each list (until one of them 
+    l = 0;
+    r = 0;
+    //clear the original list
+    gfc_list_clear(list);
+    //using the count getter in case either list is NULL
+    while((l < gfc_list_get_count(left))&&(r < gfc_list_get_count(right)))
+    {
+        leftItem = gfc_list_get_nth(left,l);
+        rightItem = gfc_list_get_nth(right,r);
+        if ((!leftItem)||(!rightItem))break;//nothing left to compare;
+        if (compare(leftItem,rightItem) <= 0)
+        {
+            gfc_list_append(list,leftItem);
+            l++;//advance our trek through the left list
+        }
+        else
+        {
+            gfc_list_append(list,rightItem);
+            r++;//advance our trek through the right list
+        }
+    }
+    if (l < gfc_list_get_count(left))
+    {
+        //finish with the remaining left
+        for (;l < gfc_list_get_count(left);l++)
+        {
+            gfc_list_append(list,gfc_list_get_nth(left,l));
+        }
+    }
+    else if (r < gfc_list_get_count(right))//these should be mutually exclusive and no more than 1 item
+    {
+        //finish with the remaining right
+        for (;r < gfc_list_get_count(right);r++)
+        {
+            gfc_list_append(list,gfc_list_get_nth(right,r));
+        }
+    }
+    //at this point the main list should be sorted in place
+    //cleanup
+    gfc_list_delete(left);
+    gfc_list_delete(right);
 }
 
 void gfc_list_foreach(GFC_List *list,void (*function)(void *data))

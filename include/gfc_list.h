@@ -3,8 +3,21 @@
 
 #include <SDL.h>
 
+/**
+ * @brief to be used in gfc_list_foreach
+ */
 typedef void gfc_work_func(void*);/**<prototype for a work function*/
+
+/**
+ * @brief to be used in gfc_list_foreach_context
+ */
 typedef void gfc_work_func_context(void*,void*);/**<prototype for a work function*/
+
+/**
+ * @brief to be used in gfc_list_sort
+ * @note It must return < 0 if the left should be before the right, or > 0 if right should be before the left, 0 if they are equal priority (like strcmp)
+ */
+typedef int  gfc_compare_func(void*,void*);/**<prototype for a compare function for sorting*/
 
 typedef struct
 {
@@ -45,7 +58,8 @@ GFC_List *gfc_list_new_size(Uint32 count);
 GFC_List *gfc_list_copy(GFC_List *old);
 
 /**
- * @brief deletes a list that has been previously allocated
+ * @brief deletes a list that has been previously alloc
+ated
  * @param list the list to delete;
  */
 void gfc_list_delete(GFC_List *list);
@@ -183,6 +197,14 @@ GFC_List *gfc_list_concat(GFC_List *a,GFC_List *b);
  * @return NULL on failure, a pointer to the new list otherwise
  */
 GFC_List *gfc_list_concat_free(GFC_List *a,GFC_List *b);
+
+/**
+ * @brief perform a sort on the provided list.
+ * @note This uses the merge sort algorithm.  It will end up created log(n) more lists in memory but not duplicate the data.
+ * @param list the list to sort. This list will be sorted if this is successful
+ * @param compar the comparison function,gfc_compare_func can be used as a prototype.  It must return < 0 if the left should be before the right, or > 0 if right should be before the left, 0 if they are equal priority (like strcmp)
+ */
+void gfc_list_sort(GFC_List *list,int (*compare)(void *a,void *b));
 
 
 #endif
