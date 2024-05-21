@@ -18,21 +18,20 @@ GFC_Vector3D gfc_vector4dxyz(GFC_Vector4D v)
   return gfc_vector3d(v.x,v.y,v.z);
 }
 
-GFC_Vector3D gfc_vector2dxyz(GFC_Vector2D v,float z)
+GFC_Vector3D gfc_vector2dz(GFC_Vector2D v,float z)
 {
   return gfc_vector3d(v.x,v.y,z);
 }
 
-GFC_Vector4D gfc_vector3dxyzw(GFC_Vector3D v,float w)
+GFC_Vector4D gfc_vector3dw(GFC_Vector3D v,float w)
 {
   return gfc_vector4d(v.x,v.y,v.z,w);
 }
 
-GFC_Vector4D gfc_vector2dxyzw(GFC_Vector2D v,float z,float w)
+GFC_Vector4D gfc_vector2dzw(GFC_Vector2D v,float z,float w)
 {
   return gfc_vector4d(v.x,v.y,z,w);
 }
-
 
 GFC_Vector2D gfc_vector2d(float x, float y)
 {

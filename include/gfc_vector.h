@@ -67,7 +67,7 @@ typedef struct
     int x,y,z,w;
 }GFC_Vector4I;
 
-//unsiened 8 bit gfc_vectors
+//unsigned 8 bit gfc_vectors
 typedef struct
 {
     Uint8 x,y;
@@ -83,21 +83,17 @@ typedef struct
     Uint8 x,y,z,w;
 }GFC_Vector4UI8;
 
-#define gfc_vector_in_rect(v, r)  ((v.x >= r.x)&&(v.x < (r.x + r.w))&&(v.y >= r.y)&&(v.y < (r.y + r.h)))
+/**
+ * @brief throw this in with the variable arguments in a printf to shorthand the slogging of a vector
+ * It only shortens the work if you use auto-complete
+ */
+#define gfc_vector3d_to_slog(vec) vec.x,vec.y,vec.z
 
 /**
  * @brief create and return an GFC_Vector2D
  */
 GFC_Vector2D gfc_vector2d(float x, float y);
-
-/**
- * @brief create and return an GFC_Vector3D
- */
 GFC_Vector3D gfc_vector3d(float x, float y, float z);
-
-/**
- * @brief create and return an GFC_Vector4D
- */
 GFC_Vector4D gfc_vector4d(float x, float y, float z, float w);
 
 /**
@@ -127,7 +123,7 @@ GFC_Vector3D gfc_vector4dxyz(GFC_Vector4D v);
  * @param z the new z component
  * @return the new 3d gfc_vector
  */
-GFC_Vector3D gfc_vector2dxyz(GFC_Vector2D v,float z);
+GFC_Vector3D gfc_vector2dz(GFC_Vector2D v,float z);
 
 /**
  * @brief convert a 3d gfc_vector into a 4d gfc_vector
@@ -135,7 +131,7 @@ GFC_Vector3D gfc_vector2dxyz(GFC_Vector2D v,float z);
  * @param w the new w component
  * @return the new 4d gfc_vector
  */
-GFC_Vector4D gfc_vector3dxyzw(GFC_Vector3D v,float w);
+GFC_Vector4D gfc_vector3dw(GFC_Vector3D v,float w);
 
 /**
  * @brief convert a 2d gfc_vector into a 4d gfc_vector
@@ -144,7 +140,7 @@ GFC_Vector4D gfc_vector3dxyzw(GFC_Vector3D v,float w);
  * @param w the new w component
  * @return the new 4d gfc_vector
  */
-GFC_Vector4D gfc_vector2dxyzw(GFC_Vector2D v,float z,float w);
+GFC_Vector4D gfc_vector2dzw(GFC_Vector2D v,float z,float w);
 
 /**
  * @brief sets the outvector to a unit gfc_vector pointing at the angle specified
@@ -152,7 +148,6 @@ GFC_Vector4D gfc_vector2dxyzw(GFC_Vector2D v,float z,float w);
  * @param radians specify the angle of the gfc_vector to be set.
  */
 void gfc_vector3d_set_angle_by_radians(GFC_Vector3D *out,float radians);
-
 void gfc_vector2d_set_angle_by_radians(GFC_Vector2D *out,float radians);
 
 /**
@@ -217,8 +212,6 @@ void gfc_angle_clamp_radians(float *a);
  */
 void gfc_angle_clamp_degrees(float *a);
 
-#define gfc_vector3d_to_slog(vec) vec.x,vec.y,vec.z
-
 /**
  * 3D GFC_Vector Math
  * These macros handle most of the common operations for gfc_vector math.
@@ -270,14 +263,14 @@ GFC_Vector4D gfc_vector4d_multiply(GFC_Vector4D a, GFC_Vector4D b);
 #define gfc_vector4d_copy(dst,src)  (dst.x = src.x,dst.y = src.y,dst.z = src.z,dst.w=src.w)
 
 /**
- * @brief checks if gfc_vectors are exactly matches of each other
- *
- * @param a one gfc_vector to check
- * @param b other gfc_vector to check
+ * @brief macro to check if two gfc_vectors are exactly the same
+ * @param a one gfc_vector to test
+ * @param b one gfc_vector to test
+ * @return true if and only if all parameters are the same
  */
-#define gfc_vector2d_equal(a,b) ((a.x == b.x)&&(a.y == b.y))
-#define gfc_vector3d_equal(a,b) ((a.x == b.x)&&(a.y == b.y)&&(a.z == b.z))
-#define gfc_vector4d_equal(a,b) ((a.x == b.x)&&(a.y == b.y)&&(a.z == b.z)&&(a.w == b.w))
+#define gfc_vector2d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y))
+#define gfc_vector3d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y)&&(a.z==b.z))
+#define gfc_vector4d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y)&&(a.z==b.z)&&(a.w==b.w))
 
 /**
  * @brief Macro to subtract two gfc_vectors
@@ -297,9 +290,9 @@ GFC_Vector4D gfc_vector4d_multiply(GFC_Vector4D a, GFC_Vector4D b);
  * varient ending in p takes a pointer to GFC_Vector3D instead.
  * Varients ending with 2D only operate on the x an y components of gfc_vectors
  *
- * @param dst result GFC_Vector3D output
- * @param a GFC_Vector3D input
- * @param b GFC_Vector3D input
+ * @param dst result Vector output
+ * @param a GFC_Vector input
+ * @param b GFC_Vector input
  */
 #define gfc_vector2d_add(dst,a,b)   (dst.x = a.x+b.x,dst.y = a.y+b.y)
 #define gfc_vector3d_add(dst,a,b)   (dst.x = a.x+b.x,dst.y = a.y+b.y,dst.z = a.z+b.z)
@@ -379,15 +372,6 @@ GFC_Vector3D gfc_vector3d_added(GFC_Vector3D a, GFC_Vector3D b);
 #define gfc_vector3d_is_zero(a)     ((a.x==0)&&(a.y==0)&&(a.z==0))
 #define gfc_vector4d_is_zero(a)     ((a.x==0)&&(a.y==0)&&(a.z==0)&&(a.w==0))
 
-/**
- * @brief macro to check if two gfc_vectors are exactly the same
- * @param a one gfc_vector to test
- * @param b one gfc_vector to test
- * @return true if and only if all parameters are the same
- */
-#define gfc_vector2d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y))
-#define gfc_vector3d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y)&&(a.z==b.z))
-#define gfc_vector4d_compare(a,b)   ((a.x==b.x)&&(a.y==b.y)&&(a.z==b.z)&&(a.w==b.w))
 
 /**
  * @brief Macro to get the negative of a gfc_vector
@@ -412,10 +396,19 @@ GFC_Vector3D gfc_vector3d_added(GFC_Vector3D a, GFC_Vector3D b);
 #define gfc_vector3d_set(v, a, b, c)  (v.x=(a), v.y=(b), v.z=(c))
 #define gfc_vector4d_set(v, a, b, c,d)  (v.x=(a), v.y=(b), v.z=(c), v.w=(d))
 
+/**
+ * @brief allocate an initialize to zero a vector
+ * @return NULL on memory error, or a pointer to a vector that must be free()'d
+ */
 GFC_Vector2D *gfc_vector2d_new();
 GFC_Vector3D *gfc_vector3d_new();
 GFC_Vector4D *gfc_vector4d_new();
 
+/**
+ * @brief allocate and copy the data from a vector
+ * @param old the vector to copy
+ * @return NULL on memory error, or a pointer to a vector that must be free()'d
+ */
 GFC_Vector2D *gfc_vector2d_dup(GFC_Vector2D old);
 GFC_Vector3D *gfc_vector3d_dup(GFC_Vector3D old);
 GFC_Vector4D *gfc_vector4d_dup(GFC_Vector4D old);
@@ -430,11 +423,10 @@ void gfc_vector2d_reflect(GFC_Vector2D *out, GFC_Vector2D normal,GFC_Vector2D in
 void gfc_vector3d_reflect(GFC_Vector3D *out, GFC_Vector3D normal,GFC_Vector3D in);
 void gfc_vector4d_reflect(GFC_Vector4D *out, GFC_Vector4D normal,GFC_Vector4D in);
 
-
 /**
  * @brief normalizes the gfc_vector passed.  does nothing for a zero length gfc_vector.
- *
  * @param v pointer to the gfc_vector to be normalized.
+ * @return the magnitude of the vector provided
  */
 float gfc_vector2d_magnitude(GFC_Vector2D V);
 float gfc_vector3d_magnitude(GFC_Vector3D V);
@@ -449,6 +441,7 @@ float gfc_vector4d_magnitude_between(GFC_Vector4D a,GFC_Vector4D b);
 
 /**
  * @brief normalize a gfc_vector
+ * @param V input and output. this is changed by the process
  * @note changes the gfc_vector
  */
 void gfc_vector2d_normalize (GFC_Vector2D *V);
@@ -458,7 +451,8 @@ void gfc_vector4d_normalize (GFC_Vector4D *V);
 /**
  * @brief get the normal of a gfc_vector
  * @note original gfc_vector is unchanged
- * @return a new unit gfc_vector
+ * @param v the input vector
+ * @return a new unit length gfc_vector
  */
 GFC_Vector2D gfc_vector2d_get_normal(GFC_Vector2D v);
 GFC_Vector3D gfc_vector3d_get_normal(GFC_Vector3D v);
@@ -507,8 +501,8 @@ Bool gfc_vector3d_distance_between_less_than(GFC_Vector3D p1,GFC_Vector3D p2,flo
 Bool gfc_vector4d_distance_between_less_than(GFC_Vector4D p1,GFC_Vector4D p2,float size);
 
 /**
- * @brief given a rotation, get the component gfc_vectors  (in degrees!)
- * @param angles the input rotation
+ * @brief given a rotation, get the component gfc_vectors  (in radians!)
+ * @param angles the input rotation for each axis
  * @param forward output optional calculated forward gfc_vector
  * @param right output optional calculated right gfc_vector
  * @param up output optional calculated up gfc_vector
@@ -550,6 +544,11 @@ GFC_Vector2D gfc_vector2d_rotate_around_center(GFC_Vector2D point,float angle, G
  */
 void gfc_vector3d_rotate_about_vector(GFC_Vector3D *dst, GFC_Vector3D dir, GFC_Vector3D point, float degrees);
 
+/**
+ * @brief rotate a vector around the axis based on the angle provided
+ * @param vect the input and output if NULL this is a no-op
+ * @param angle the amount to rotate in radians
+ */
 void gfc_vector3d_rotate_about_x(GFC_Vector3D *vect, float angle);
 void gfc_vector3d_rotate_about_y(GFC_Vector3D *vect, float angle);
 void gfc_vector3d_rotate_about_z(GFC_Vector3D *vect, float angle);
