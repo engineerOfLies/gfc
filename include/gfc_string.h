@@ -97,11 +97,27 @@ void gfc_string_prependf(GFC_String *string,const char *text,...);
 int gfc_string_cmp(GFC_String *string1,GFC_String *string2);
 
 /**
- * @brief perform a string compare against the two strings
+ * @brief perform a string compare against the two strings, also validating length
  * @param string1 one string to check
  * @param string2 second string to check
  * @return -3 if there are any NULL values, -2 if the strings are different length, otherwise the results a strcmp on the two buffers
  */
 int gfc_string_l_cmp(GFC_String *string1,GFC_String *string2);
+
+/**
+ * @brief perform a string compare against a string and char buffer
+ * @param string1 one string to check
+ * @param string2 second string to check
+ * @return -3 if there are any NULL values, otherwise the results a strcmp on the two buffers
+ */
+int gfc_string_strcmp(GFC_String *string1,const char *string2);
+
+/**
+ * @brief perform a string compare against a string and char buffer, also validating length
+ * @param string1 one string to check
+ * @param string2 second string to check
+ * @return -3 if there are any NULL values, -2 if the strings are different length, otherwise the results a strcmp on the two buffers
+ */
+int gfc_string_l_strcmp(GFC_String *string1,const char *string2);
 
 #endif

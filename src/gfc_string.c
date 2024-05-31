@@ -220,6 +220,18 @@ void gfc_string_prependf(GFC_String *string,const char *format,...)
     free(buffer);
 }
 
+int gfc_string_strcmp(GFC_String *string1,const char *string2)
+{
+    if ((!string1)||(!string2)||(!string1->buffer))return -3;
+    return strcmp(string1->buffer,string2);
+}
+
+int gfc_string_l_strcmp(GFC_String *string1,const char *string2)
+{
+    if ((!string1)||(!string2)||(!string1->buffer))return -3;
+    return gfc_strlcmp(string1->buffer,string2);
+}
+
 int gfc_string_cmp(GFC_String *string1,GFC_String *string2)
 {
     if ((!string1)||(!string2)||(!string1->buffer)||(!string2->buffer))return -3;
