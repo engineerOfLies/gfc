@@ -6,17 +6,17 @@
 
 typedef struct
 {
-    GFC_List *input_list;
-    const Uint8 * input_keys;
-    Uint8 * input_old_keys;
-    int input_key_count;
-    int mouse_wheel_x;
-    int mouse_wheel_y;
-    int mouse_wheel_x_old;
-    int mouse_wheel_y_old;
-    GFC_List *controllers;
-    SJson *controller_button_map;
-    SJson *controller_axis_map;
+    GFC_List       *input_list;
+    const Uint8    *input_keys;
+    Uint8          *input_old_keys;
+    int             input_key_count;
+    int             mouse_wheel_x;
+    int             mouse_wheel_y;
+    int             mouse_wheel_x_old;
+    int             mouse_wheel_y_old;
+    GFC_List       *controllers;
+    SJson          *controller_button_map;
+    SJson          *controller_axis_map;
 }GFC_InputData;
 
 static GFC_InputData gfc_input_data = {0};
@@ -138,7 +138,7 @@ void gfc_input_init(char *configFile)
                 controller->old_axis = gfc_allocate_array(sizeof(Sint16),controller->num_axis);
             }
             controller->controller = joystick;
-            gfc_input_data.controllers = gfc_list_append(gfc_input_data.controllers,controller);
+            gfc_list_append(gfc_input_data.controllers,controller);
             break;
         }
     }
@@ -674,7 +674,7 @@ GFC_List *gfc_input_get_by_scancode(SDL_Scancode keysym)
         {
             if ((SDL_Scancode)gfc_list_get_nth(in->keyCodes,ki) == keysym)
             {
-                keylist = gfc_list_append(keylist,in);
+                gfc_list_append(keylist,in);
                 break;
             }
         }
@@ -1031,7 +1031,7 @@ void gfc_input_parse_command_json(SJson *command)
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast"
         if (kc != -1)
         {
-            in->keyCodes = gfc_list_append(in->keyCodes,(void *)kc);
+            gfc_list_append(in->keyCodes,(void *)kc);
         }
     }
     index = 0;
@@ -1053,7 +1053,7 @@ void gfc_input_parse_command_json(SJson *command)
                 index = gfc_input_controller_get_button_index(buffer);
                 if (index >= 0)
                 {
-                    in->buttons = gfc_list_append(in->buttons,(void *)index);
+                    gfc_list_append(in->buttons,(void *)index);
                 }
                 else
                 {
@@ -1072,7 +1072,7 @@ void gfc_input_parse_command_json(SJson *command)
             }            
         }
     }
-    gfc_input_data.input_list = gfc_list_append(gfc_input_data.input_list,(void *)in);
+    gfc_list_append(gfc_input_data.input_list,(void *)in);
 }
 
 void gfc_input_commands_load(char *configFile)

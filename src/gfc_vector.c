@@ -650,7 +650,7 @@ void gfc_vector3d_angle_vectors(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_
   {
     up->x = (cr*sp*cy+-sr*-sy);
     up->y = (cr*sp*sy+-sr*cy);
-    up->z = cr*cp;
+    up->z = -cr*cp;
   }
 }
 

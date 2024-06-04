@@ -87,19 +87,19 @@ void *gfc_list_get_nth(GFC_List *list,Uint32 n)
     return list->elements[n].data;
 }
 
-GFC_List *gfc_list_expand(GFC_List *list)
+int gfc_list_expand(GFC_List *list)
 {
     GFC_List *l;
     if (!list)
     {
         slog("no list provided");
-        return NULL;
+        return 0;
     }
     if (!list->size)list->size = 8;
     l = gfc_list_new_size(list->size * 2);
     if (!l)
     {
-        return list;
+        return 0;
     }
     if (list->count > 0)
     {
@@ -109,27 +109,21 @@ GFC_List *gfc_list_expand(GFC_List *list)
     free(list->elements);//free the old data
     list->elements = l->elements;//point to new memory address
     free(l);//free the temp list
-    return list;//for backward compatibility
+    return 1;
 }
 
-GFC_List *gfc_list_append(GFC_List *list,void *data)
+void gfc_list_append(GFC_List *list,void *data)
 {
-    if (!list)
-    {
-        list = gfc_list_new();
-    }
     if (list->count >= list->size)
     {
-        list = gfc_list_expand(list);
-        if (!list)
+        if (!gfc_list_expand(list))
         {
             slog("append failed due to lack of memory");
-            return NULL;
+            return;
         }
     }
     list->elements[list->count].data = data;
     list->count++;
-    return list;
 }
 
 GFC_List *gfc_list_concat(GFC_List *a,GFC_List *b)
@@ -145,7 +139,7 @@ GFC_List *gfc_list_concat(GFC_List *a,GFC_List *b)
     for (i = 0; i < count;i++)
     {
         data = gfc_list_get_nth(b,i);
-        a = gfc_list_append(a,data);
+        gfc_list_append(a,data);
         if (a == NULL)return NULL;
     }
     return a;
@@ -159,32 +153,32 @@ GFC_List *gfc_list_concat_free(GFC_List *a,GFC_List *b)
     return a;
 }
 
-GFC_List *gfc_list_prepend(GFC_List *list,void *data)
+void gfc_list_prepend(GFC_List *list,void *data)
 {
-    return gfc_list_insert(list,data,0);
+    gfc_list_insert(list,data,0);
 }
 
-GFC_List *gfc_list_insert(GFC_List *list,void *data,Uint32 n)
+void gfc_list_insert(GFC_List *list,void *data,Uint32 n)
 {
     if (!list)
     {
         slog("no list provided");
-        return NULL;
+        return;
     }
     if (n > list->size + 1)
     {
         slog("attempting to insert element beyond length of list");
-        return list;
+        return;
     }
     if (list->count >= list->size)
     {
-        list = gfc_list_expand(list);
-        if (!list)return NULL;
+        gfc_list_expand(list);
+        if (!list)return;
     }
     memmove(&list->elements[n+1],&list->elements[n],sizeof(GFC_ListElementData)*(list->count - n));//copy all elements after n
     list->elements[n].data = data;
     list->count++;
-    return list;
+    return;
 }
 
 

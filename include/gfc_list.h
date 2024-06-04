@@ -79,6 +79,9 @@ void gfc_list_clear(GFC_List *list);
  */
 void *gfc_list_get_nth(GFC_List *list,Uint32 n);
 
+//shorthand
+#define gfc_list_nth(list,n) gfc_list_get_nth(list,n) 
+
 /**
  * @brief set the data stored at the nth element
  * @param list the list to change
@@ -93,27 +96,24 @@ void gfc_list_set_nth(GFC_List *list,Uint32 n,void *data);
  * @note as of 2023, the original list is what is returned on success and you do not HAVE to assign it back to this function
  * @param list the list to add to
  * @param data the data to assign to the new element
- * @return NULL on error, your list otherwise
  */
-GFC_List *gfc_list_append(GFC_List *list,void *data);
+void gfc_list_append(GFC_List *list,void *data);
 
 /**
  * @brief add an element to the beginning of the list
  * @note must catch the returned list to replace the list you had
  * @param list the list to add to
  * @param data the data to assign to the new element
- * @return NULL on error, your list otherwise
  */
-GFC_List *gfc_list_prepend(GFC_List *list,void *data);
+void gfc_list_prepend(GFC_List *list,void *data);
 
 /**
  * @brief instert a new element at the position provided
  * @param list the list to insert into
  * @param data the data to assin to the new element
  * @param n the position to insert at
- * @return NULL on error, or the provided list otherwise
  */
-GFC_List *gfc_list_insert(GFC_List *list,void *data,Uint32 n);
+void gfc_list_insert(GFC_List *list,void *data,Uint32 n);
 
 /**
  * @brief delete the element at the nth position in the array
@@ -155,6 +155,9 @@ int gfc_list_get_item_index(GFC_List *list,void *data);
  * @return the count in the list.  Will be zero if list was NULL
  */
 Uint32 gfc_list_get_count(GFC_List *list);
+
+//shorthand
+#define gfc_list_count(list) gfc_list_get_count(list)
 
 /**
  * @brief iterate over each element in the array and call the function provided

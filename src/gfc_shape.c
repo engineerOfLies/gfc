@@ -1459,7 +1459,7 @@ GFC_List *gfc_shape_get_bezier_point_list_2d(GFC_Vector2D p0, GFC_Vector2D p1, G
         point = gfc_allocate_array(sizeof(GFC_Vector2D),1);
         if (!point)continue;
         gfc_vector2d_copy((*point),dp);
-        points = gfc_list_append(points,point);
+        gfc_list_append(points,point);
     }
     return points;
 }
@@ -1494,7 +1494,7 @@ GFC_List *gfc_shape_get_bezier_point_list_3d(GFC_Vector3D p0, GFC_Vector3D p1, G
         point = gfc_allocate_array(sizeof(GFC_Vector3D),1);
         if (!point)continue;
         gfc_vector3d_copy((*point),dp);
-        points = gfc_list_append(points,point);
+        gfc_list_append(points,point);
     }
     return points;
 }

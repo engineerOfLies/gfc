@@ -207,16 +207,16 @@ GFC_List *gfc_hashmap_get_all_values(GFC_HashMap *map)
 {
     int i;
     GFC_HashElement *element;
-    GFC_List *valueGFC_List = NULL;
+    GFC_List *valueList = NULL;
     if ((!map) || (!map->map))return NULL;
-    valueGFC_List = gfc_list_new();
+    valueList = gfc_list_new();
     for (i = 0; i < map->map->size; i++)
     {
         element = (GFC_HashElement *)map->map->elements[i].data;
         if (!element)continue;
-        valueGFC_List = gfc_list_append(valueGFC_List,element);
+        gfc_list_append(valueList,element);
     }
-    return valueGFC_List;
+    return valueList;
 }
 
 void gfc_hashmap_foreach(GFC_HashMap *map, gfc_work_func func)

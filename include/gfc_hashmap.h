@@ -28,16 +28,16 @@
 
 typedef struct
 {
-    GFC_TextLine key;
-    Uint32 hashValue;
-    void *data;
+    GFC_TextLine    key;
+    Uint32          hashValue;
+    void           *data;
 }GFC_HashElement;
 
 typedef struct
 {
-    GFC_List* map;      /**<the hash values*/
-    Uint32 size;    /**<how many values are available in the hash*/
-    Uint32 seed;    /**<the seed to calculate the hashed*/
+    GFC_List   *map;      /**<the hash values*/
+    Uint32      size;    /**<how many values are available in the hash*/
+    Uint32      seed;    /**<the seed to calculate the hashed*/
 }GFC_HashMap;
 
 /**
