@@ -93,6 +93,29 @@ int sj_object_get_matrix4(SJson *json,const char *key,GFC_Matrix4 output);
 int sj_object_get_matrix3(SJson *json,const char *key,GFC_Matrix3 output);
 int sj_object_get_matrix2(SJson *json,const char *key,GFC_Matrix2 output);
 
+/**
+ * @brief extract a matrix based on component vectors provided in the json
+ * @note keys in the object should be named "position","rotation", and "scale"
+ * any not provided will default to identity
+ * @note rotation is in degrees not radians
+ * @param json the object json to extract from
+ * @param key the name fo the key to grab
+ * @param output the matrix that will be populated by the json
+ * @return 0 if it failed, 1 if it succeeded
+ */
+int sj_object_get_matrix4_vectors(SJson *json,const char *key,GFC_Matrix4 output);
+
+/**
+ * @brief extract a matrix based on component vectors provided in the json object
+ * @note keys in the object should be named "position","rotation", and "scale"
+ * any not provided will default to identity
+ * @note rotation is in degrees not radians
+ * @param matrix the json containing a 3 vectors
+ * @param output the matrix that will be populated by the json
+ * @return 0 if it failed, 1 if it succeeded
+ */
+int sj_value_as_matrix4_vectors(SJson *matrix,GFC_Matrix4 output);
+
 
 /**
  * @brief parse a color from json

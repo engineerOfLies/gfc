@@ -25,6 +25,27 @@ SJson *sj_gfc_string_new(GFC_String *string)
 
 
 //matrix stuff
+
+int sj_object_get_matrix4_vectors(SJson *json,const char *key,GFC_Matrix4 output)
+{
+    return sj_value_as_matrix4_vectors(sj_object_get_value(json,key),output);
+}
+
+int sj_value_as_matrix4_vectors(SJson *matrix,GFC_Matrix4 output)
+{
+    GFC_Vector3D position = {0};
+    GFC_Vector3D rotation = {0};
+    GFC_Vector3D scale = gfc_vector3d(1,1,1);
+    if (!matrix)return 0;
+    sj_object_get_vector3d(matrix,"position",&position);
+    sj_object_get_vector3d(matrix,"rotation",&rotation);
+    gfc_vector3d_scale(rotation,rotation,GFC_DEGTORAD);
+    sj_object_get_vector3d(matrix,"scale",&scale);
+    gfc_matrix4_from_vectors(output,position,rotation,scale);
+    return 1;
+}
+
+
 int sj_object_get_matrix4(SJson *json,const char *key,GFC_Matrix4 output)
 {
     return sj_value_as_matrix4(sj_object_get_value(json,key),output);
