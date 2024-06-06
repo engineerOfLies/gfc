@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 
+#include "gfc_config.h"
 #include "gfc_shape.h"
 #include "gfc_primitives.h"
 
@@ -181,7 +182,7 @@ Uint8 gfc_point_in_triangle(
     return 0;
 }
 
-Uint8 gfc_point_in_trigfc_angle_old(
+Uint8 gfc_point_in_triangle_old(
     GFC_Vector3D point,
     GFC_Triangle3D t,
     GFC_Plane3D p)
@@ -546,4 +547,151 @@ Uint8 gfc_edge3d_to_sphere_intersection(GFC_Edge3D e,GFC_Sphere s,GFC_Vector3D *
     }
 }
 
+/*
+ * "edge":
+ * {
+ *      "a":[x,y,z],
+ *      "b":[x,y,z]
+ * }
+ */
+GFC_Edge3D gfc_edge_from_config(SJson *config)
+{
+    GFC_Edge3D edge = {0};
+    if (!config)return edge;
+    sj_object_get_vector3d(config,"a",&edge.a);
+    sj_object_get_vector3d(config,"b",&edge.b);    
+    return edge;
+}
+
+/*
+ * "triangle":
+ * {
+ *      "a":[x,y,z],
+ *      "b":[x,y,z],
+ *      "c":[x,y,z]
+ * }
+ */
+GFC_Triangle3D gfc_triangle_from_config(SJson *config)
+{
+    GFC_Triangle3D triangle= {0};
+    if (!config)return triangle;
+    sj_object_get_vector3d(config,"a",&triangle.a);
+    sj_object_get_vector3d(config,"b",&triangle.b);
+    sj_object_get_vector3d(config,"c",&triangle.c);
+    return triangle;
+}
+
+/*
+ * "plane":
+ * {
+ *      "n":[x,y,z],
+ *      "d":d
+ * }
+ */
+GFC_Plane3D gfc_plane_from_config(SJson *config)
+{
+    GFC_Vector3D v;
+    GFC_Plane3D plane = {0};
+    if (!config)return plane;
+    sj_object_get_vector3d(config,"n",&v);
+    sj_object_get_value_as_float(config,"d",&plane.d);
+    gfc_vector3d_copy(plane,v);
+    return plane;
+}
+
+/*
+ * "sphere":
+ * {
+ *      "c":[x,y,z],
+ *      "r":d
+ * }
+ */
+GFC_Sphere gfc_sphere_from_config(SJson *config)
+{
+    GFC_Vector3D v;
+    GFC_Sphere sphere = {0};
+    if (!config)return sphere;
+    sj_object_get_vector3d(config,"c",&v);
+    sj_object_get_value_as_float(config,"r",&sphere.r);
+    gfc_vector3d_copy(sphere,v);
+    return sphere;
+}
+
+/*
+ * "box":
+ * {
+ *      "m":[x,y,z],
+ *      "s":[w,h,d]
+ * }
+ */
+GFC_Box gfc_box_from_config(SJson *config)
+{
+    GFC_Vector3D v;
+    GFC_Box box = {0};
+    if (!config)return box;
+    sj_object_get_vector3d(config,"m",&v);
+    gfc_vector3d_copy(box,v);
+    sj_object_get_vector3d(config,"s",&v);
+    box.w = v.x;
+    box.h = v.y;
+    box.d = v.z;
+    return box;
+}
+
+/*
+ * "shape":{"box":{"m":[x,y,z],"s":[w,h,d]}}
+ * - or -
+ * "shape":{"edge":{"a":[x,y,z],"b":[z,y,z]}}
+ * - or -
+ * "shape":{"point":[x,y,z]}
+ */
+GFC_Primitive gfc_primitive_from_config(SJson *config)
+{
+    SJson *shape = NULL;
+    GFC_Primitive primitive = {0};
+    if (!config)return primitive;
+    shape = sj_object_get_value(config,"triangle");
+    if (shape)
+    {
+        primitive.type = GPT_TRIANGLE;
+        primitive.s.t = gfc_triangle_from_config(shape);
+        return primitive;
+    }
+    shape = sj_object_get_value(config,"plane");
+    if (shape)
+    {
+        primitive.type = GPT_PLANE;
+        primitive.s.pl = gfc_plane_from_config(shape);
+        return primitive;
+    }
+    shape = sj_object_get_value(config,"edge");
+    if (shape)
+    {
+        primitive.type = GPT_EDGE;
+        primitive.s.e = gfc_edge_from_config(shape);
+        return primitive;
+    }
+    shape = sj_object_get_value(config,"box");
+    if (shape)
+    {
+        primitive.type = GPT_BOX;
+        primitive.s.b = gfc_box_from_config(shape);
+        return primitive;
+    }
+    shape = sj_object_get_value(config,"point");
+    if (shape)
+    {
+        primitive.type = GPT_POINT;
+        sj_value_as_vector3d(shape,&primitive.s.p);
+        return primitive;
+    }
+    shape = sj_object_get_value(config,"sphere");
+    if (shape)
+    {
+        primitive.type = GPT_SPHERE;
+        primitive.s.s = gfc_sphere_from_config(shape);
+        return primitive;
+    }
+    return primitive;
+}
 /*eol@eof*/

@@ -45,12 +45,13 @@ typedef struct
 
 typedef enum
 {
-    VT_POINT,
-    VT_SPHERE,
-    VT_EDGE,
-    VT_PLANE,
-    VT_TRIANLGE,
-    VT_BOX
+    GPT_POINT,
+    GPT_SPHERE,
+    GPT_EDGE,
+    GPT_PLANE,
+    GPT_TRIANGLE,
+    GPT_BOX,
+    GPT_MAX
 }GFC_PrimitiveTypes;
 
 typedef struct
@@ -219,5 +220,85 @@ Uint8 gfc_edge_box_test(
     GFC_Box b,
     GFC_Vector3D *poc,
     GFC_Vector3D *normal);
+
+/**
+ * @brief load a primitive from json config.  Json must match the example
+ * @param config to parse
+ * @return a zero shape or one extracted from config
+ * @example:
+ * "shape":{"box":{"m":[x,y,z],"s":[w,h,d]}}
+ * - or -
+ * "shape":{"edge":{"a":[x,y,z],"b":[z,y,z]}}
+ * - or -
+ * "shape":{"point":[x,y,z]}
+ * - etc -
+ */
+GFC_Primitive gfc_primitive_from_config(SJson *config);
+
+/**
+ * @brief load box information from json config.  Json must match the example
+ * @param config to parse
+ * @return a zero shape or one extracted from config
+ * @example:
+ * "box":
+ * {
+ *      "m":[x,y,z],
+ *      "s":[w,h,d]
+ * }
+ */
+GFC_Box gfc_box_from_config(SJson *config);
+
+/**
+ * @brief load sphere information from json config.  Json must match the example
+ * @param config to parse
+ * @return a zero shape or one extracted from config
+ * @example:
+ * "sphere":
+ * {
+ *      "c":[x,y,z],
+ *      "r":d
+ * }
+ */
+GFC_Sphere gfc_sphere_from_config(SJson *config);
+
+/**
+ * @brief load plane information from json config.  Json must match the example
+ * @param config to parse
+ * @return a zero shape or one extracted from config
+ * @example:
+ * "plane":
+ * {
+ *      "n":[x,y,z],
+ *      "d":d
+ * }
+ */
+GFC_Plane3D gfc_plane_from_config(SJson *config);
+
+/**
+ * @brief load triangle information from json config.  Json must match the example
+ * @param config to parse
+ * @return a zero shape or one extracted from config
+ * @example:
+ * "triangle":
+ * {
+ *      "a":[x,y,z],
+ *      "b":[x,y,z],
+ *      "c":[x,y,z]
+ * }
+ */
+GFC_Triangle3D gfc_triangle_from_config(SJson *config);
+
+/**
+ * @brief load edge information from json config.  Json must match the example
+ * @param config to parse
+ * @return a zero shape or one extracted from config
+ * @example:
+ * "edge":
+ * {
+ *      "a":[x,y,z],
+ *      "b":[x,y,z]
+ * }
+ */
+GFC_Edge3D gfc_edge_from_config(SJson *config);
 
 #endif
