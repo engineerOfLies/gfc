@@ -691,7 +691,7 @@ GFC_Vector2D gfc_vector2d_rotate(GFC_Vector2D in, float angle)
 
 float gfc_vector_angle(float x,float y)
 {
-    return (atan2(y,x) * GFC_RADTODEG) + 90;
+    return atan2f(y,x) + GFC_HALF_PI;
 }
 
 void gfc_angle_clamp_radians(float *a)

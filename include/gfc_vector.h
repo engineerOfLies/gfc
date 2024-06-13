@@ -161,14 +161,14 @@ GFC_Vector2D gfc_vector2d_from_angle(float angle);
  * @brief returns the angle of a gfc_vector in 2D space.
  * @param x the x component of the gfc_vector
  * @param y the y component of the gfc_vector
- * @return the angle of the gfc_vector in degrees from vertical.
+ * @return the angle of the gfc_vector in radians from vertical.
  */
 float gfc_vector_angle(float x,float y);
 
 /**
  * @brief returns the angle of a gfc_vector in 2D space.
  * @param v the gfc_vector
- * @return the angle of the gfc_vector in degrees.
+ * @return the angle of the gfc_vector in radian. off of the y axis, not x
  */
 float gfc_vector2d_angle(GFC_Vector2D v);
 
