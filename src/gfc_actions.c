@@ -194,6 +194,16 @@ GFC_ActionList *gfc_action_list_parse(SJson *actionList)
     return al;
 }
 
+GFC_Action *gfc_action_list_get_action_frame(GFC_ActionList *al, const char *name,float *frame)
+{
+    GFC_Action *action;
+    action = gfc_action_list_get_action(al, name);
+    if (!action)return NULL;
+    if (frame)*frame = action->startFrame;
+    return action;
+}
+
+
 GFC_Action *gfc_action_list_get_action(GFC_ActionList *al, const char *name)
 {
     GFC_Action *action;

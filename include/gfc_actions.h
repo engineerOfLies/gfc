@@ -100,6 +100,15 @@ SJson *gfc_action_list_to_json(GFC_ActionList *actionList);
 GFC_Action *gfc_action_list_get_action_by_name(GFC_ActionList *list,const char *name);
 
 /**
+ * @brief given a list of Actions, search for the name, and set the frame to the start frame if provided
+ * @param list list containing actions
+ * @param name the search criteria
+ * @param frame [output] set to the starting frame of the action if provided.
+ * @return NULL on error or not found, the Action otherwise
+ */
+GFC_Action *gfc_action_list_get_action_frame(GFC_ActionList *al, const char *name,float *frame);
+
+/**
  * @brief call if you insert an animation frame and need to keep the actions in line
  * @param list the action list to modify
  * @param index the index of the frame that was inserted
