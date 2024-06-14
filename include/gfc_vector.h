@@ -434,10 +434,19 @@ float gfc_vector4d_magnitude(GFC_Vector4D V);
 
 /**
  * @brief get the magnitude of the difference of the two gfc_vectors
+ * @return the magnitude between the two vectors
  */
 float gfc_vector2d_magnitude_between(GFC_Vector2D a,GFC_Vector2D b);
 float gfc_vector3d_magnitude_between(GFC_Vector3D a,GFC_Vector3D b);
 float gfc_vector4d_magnitude_between(GFC_Vector4D a,GFC_Vector4D b);
+
+/**
+ * @brief get the magnitude of the difference of the two gfc_vectors
+ * @return the magnitude squared between the two vectors (avoids a square root)
+ */
+float gfc_vector2d_magnitude_between_squared(GFC_Vector2D a,GFC_Vector2D b);
+float gfc_vector3d_magnitude_between_squared(GFC_Vector3D a,GFC_Vector3D b);
+float gfc_vector4d_magnitude_between_squared(GFC_Vector4D a,GFC_Vector4D b);
 
 /**
  * @brief normalize a gfc_vector

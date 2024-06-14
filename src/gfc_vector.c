@@ -175,6 +175,28 @@ float gfc_vector4d_magnitude_between(GFC_Vector4D a,GFC_Vector4D b)
     return gfc_vector4d_magnitude(c);
 }
 
+float gfc_vector2d_magnitude_between_squared(GFC_Vector2D a,GFC_Vector2D b)
+{
+    GFC_Vector2D c;
+    gfc_vector2d_sub(c,a,b);
+    return gfc_vector2d_magnitude_squared(c);
+}
+
+float gfc_vector3d_magnitude_between_squared(GFC_Vector3D a,GFC_Vector3D b)
+{
+    GFC_Vector3D c;
+    gfc_vector3d_sub(c,a,b);
+    return gfc_vector3d_magnitude_squared(c);
+}
+
+float gfc_vector4d_magnitude_between_squared(GFC_Vector4D a,GFC_Vector4D b)
+{
+    GFC_Vector4D c;
+    gfc_vector4d_sub(c,a,b);
+    return gfc_vector4d_magnitude_squared(c);
+}
+
+
 int gfc_vector2d_magnitude_compare(GFC_Vector2D V,float size)
 {
     float ms = gfc_vector2d_magnitude_squared(V);
