@@ -547,6 +547,67 @@ Uint8 gfc_edge3d_to_sphere_intersection(GFC_Edge3D e,GFC_Sphere s,GFC_Vector3D *
     }
 }
 
+GFC_Primitive gfc_primitive_offset(GFC_Primitive primitive,GFC_Vector3D offset)
+{
+    GFC_Primitive p;
+    memcpy(&p,&primitive,sizeof(GFC_Primitive));
+    switch(primitive.type)
+    {
+        case GPT_POINT:
+            gfc_vector3d_add(p.s.p,p.s.p,offset);
+            break;
+        case GPT_SPHERE:
+            gfc_vector3d_add(p.s.s,p.s.s,offset);
+            break;
+        case GPT_EDGE:
+            gfc_vector3d_add(p.s.e.a,p.s.e.a,offset);
+            gfc_vector3d_add(p.s.e.b,p.s.e.b,offset);
+            break;
+        case GPT_PLANE:
+            slog("not yet supported");
+            break;
+        case GPT_TRIANGLE:
+            gfc_vector3d_add(p.s.t.a,p.s.t.a,offset);
+            gfc_vector3d_add(p.s.t.b,p.s.t.b,offset);
+            gfc_vector3d_add(p.s.t.c,p.s.t.c,offset);
+            break;
+        case GPT_BOX:
+            gfc_vector3d_add(p.s.b,p.s.b,offset);
+            break;
+        default:
+            break;
+    }
+    return p;
+}
+
+Uint8 gfc_point3d_in_primitive(GFC_Vector3D point, GFC_Primitive primitive)
+{
+    switch(primitive.type)
+    {
+        case GPT_POINT:
+            return gfc_vector3d_compare(point,primitive.s.p);
+        case GPT_SPHERE:
+            return gfc_point_in_sphere(point,primitive.s.s);
+        case GPT_EDGE:
+            return gfc_edge3d_to_sphere_intersection(
+                primitive.s.e,
+                gfc_sphere(point.x,point.y,point.z,0),
+                NULL,
+                NULL);
+        case GPT_PLANE:
+            slog("not yet supported");
+            break;
+        case GPT_TRIANGLE:
+            slog("not yet supported");
+            break;
+        case GPT_BOX:
+            return gfc_point_in_box(point,primitive.s.b);
+        default:
+            return 0;
+    }
+    return 0;
+}
+
 /*
  * "edge":
  * {

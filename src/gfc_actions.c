@@ -95,15 +95,15 @@ GFC_Action *gfc_action_json_parse(SJson *actionSJ)
         gfc_line_cpy(action->name,tempStr);
     }
     tempStr = sj_get_string_value(sj_object_get_value(actionSJ,"type"));
-    if (strcmp(tempStr,"loop")==0)
+    if (gfc_strlcmp(tempStr,"loop")==0)
     {
         action->type = AT_LOOP;
     }
-    else if (strcmp(tempStr,"pass")==0)
+    else if (gfc_strlcmp(tempStr,"pass")==0)
     {
         action->type = AT_PASS;
     }
-    else if (strcmp(tempStr,"none")==0)
+    else if (gfc_strlcmp(tempStr,"none")==0)
     {
         action->type = AT_NONE;
     }
@@ -369,7 +369,7 @@ GFC_Action *gfc_action_list_get_action_by_name(GFC_ActionList *list,const char *
     {
         action = gfc_list_get_nth(list->actions,i);
         if (!action)continue;
-        if (strcmp(action->name,name)==0)return action;
+        if (gfc_strlcmp(action->name,name)==0)return action;
     }
     return NULL;
 }
@@ -442,8 +442,8 @@ int gfc_action_get_action_frame(GFC_Action *action,float frame)
 GFC_ActionType gfc_action_type_from_text(const char *text)
 {
     if (!text)return AT_NONE;
-    if (strcmp(text,"pass")==0)return AT_PASS;
-    if (strcmp(text,"loop")==0)return AT_LOOP;
+    if (gfc_strlcmp(text,"pass")==0)return AT_PASS;
+    if (gfc_strlcmp(text,"loop")==0)return AT_LOOP;
     return AT_NONE;
 }
 

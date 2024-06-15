@@ -222,6 +222,19 @@ Uint8 gfc_edge_box_test(
     GFC_Vector3D *normal);
 
 /**
+ * @brief check if a point is contained within a shape
+ * @param point to check
+ * @param primitive the shape to check
+ * @return 0 if no overlap, 1 if there is
+ */
+Uint8 gfc_point3d_in_primitive(GFC_Vector3D point, GFC_Primitive primitive);
+
+/**
+ * @brief move a shape based on an offset.
+ */
+GFC_Primitive gfc_primitive_offset(GFC_Primitive primitive,GFC_Vector3D offset);
+
+/**
  * @brief load a primitive from json config.  Json must match the example
  * @param config to parse
  * @return a zero shape or one extracted from config
