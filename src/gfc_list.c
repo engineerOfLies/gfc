@@ -235,7 +235,6 @@ int gfc_list_delete_data(GFC_List *list,void *data)
             return 0;
         }
     }
-    slog("data not found");
     return -1;
 }
 
