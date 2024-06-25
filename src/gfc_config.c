@@ -4,6 +4,48 @@
 
 // string stuff
 
+int sj_value_as_textword(SJson *json,GFC_TextWord text)
+{
+    const char *str;
+    str = sj_get_string_value(json);
+    if (!str)return 0;
+    gfc_word_cpy(text,str);
+    return 1;
+}
+
+int sj_value_as_textline(SJson *json,GFC_TextLine text)
+{
+    const char *str;
+    str = sj_get_string_value(json);
+    if (!str)return 0;
+    gfc_line_cpy(text,str);
+    return 1;
+}
+
+int sj_value_as_textblock(SJson *json,GFC_TextBlock text)
+{
+    const char *str;
+    str = sj_get_string_value(json);
+    if (!str)return 0;
+    gfc_block_cpy(text,str);
+    return 1;
+}
+
+int sj_object_word_value(SJson *json,const char *key,GFC_TextWord text)
+{
+    return sj_value_as_textword(sj_object_get_value(json,key),text);
+}
+
+int sj_object_line_value(SJson *json,const char *key,GFC_TextLine text)
+{
+    return sj_value_as_textline(sj_object_get_value(json,key),text);
+}
+
+int sj_object_block_value(SJson *json,const char *key,GFC_TextBlock text)
+{
+    return sj_value_as_textblock(sj_object_get_value(json,key),text);
+}
+
 GFC_String *sj_value_as_gfc_string(SJson *json)
 {
     const char *text;

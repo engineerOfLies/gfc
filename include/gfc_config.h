@@ -6,8 +6,28 @@
 #include "gfc_vector.h"
 #include "gfc_matrix.h"
 #include "gfc_string.h"
+#include "gfc_text.h"
 #include "gfc_color.h"
+/**
+ * @brief get a text word/line/block from the json value
+ * @param json the json string to extract from
+ * @param text [output] if found this will be populated, otherwise left untouched
+ * @return 0 if not found or other error, 1 if it was found and the text populated
+ */
+int sj_value_as_textword(SJson *json,GFC_TextWord text);
+int sj_value_as_textline(SJson *json,GFC_TextLine text);
+int sj_value_as_textblock(SJson *json,GFC_TextBlock text);
 
+/**
+ * @brief get a text word/line/block from the json object by key
+ * @param json the json object to extract from
+ * @param key the key to get
+ * @param text [output] if found this will be populated, otherwise left untouched
+ * @return 0 if not found or other error, 1 if it was found and the text populated
+ */
+int sj_object_word_value(SJson *json,const char *key,GFC_TextWord text);
+int sj_object_line_value(SJson *json,const char *key,GFC_TextLine text);
+int sj_object_block_value(SJson *json,const char *key,GFC_TextBlock text);
 
 /**
  * @brief extract a gfc_string from json
