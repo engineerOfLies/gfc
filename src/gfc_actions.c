@@ -176,6 +176,18 @@ GFC_ActionList *gfc_action_list_new()
     return NULL;
 }
 
+GFC_ActionList *gfc_action_list_load(const char *filename)
+{
+    GFC_ActionList *actionList;
+    SJson *json;
+    if (!filename)return NULL;
+    json = sj_load(filename);
+    if (!json)return NULL;
+    actionList = gfc_action_list_parse(sj_object_get_value(json,"actionList"));
+    sj_free(json);
+    return actionList;
+}
+
 GFC_ActionList *gfc_action_list_parse(SJson *actionList)
 {
     GFC_ActionList *al;

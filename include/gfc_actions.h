@@ -85,6 +85,14 @@ void gfc_action_list_append(GFC_ActionList *list,GFC_Action *action);
 GFC_ActionList *gfc_action_list_parse(SJson *actionListJson);
 
 /**
+ * @brief parse out an aciton list from a json file.  
+ * @note The action list must be contained in the "actionList" key
+ * @param filename to load
+ * @return NULL on error or not found, the action list otherwise
+ */
+GFC_ActionList *gfc_action_list_load(const char *filename);
+
+/**
  * @brief encode an action list into json
  * @param actionList list of Actions to encode
  * @return NULL on error or SJSon
