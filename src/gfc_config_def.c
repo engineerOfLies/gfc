@@ -45,6 +45,14 @@ void gfc_config_def_load(const char *filename)
     gfc_list_append(config_manager.defs,json);
 }
 
+const char *gfc_config_get_display_name(const char *resource, const char *name)
+{
+    SJson *item;
+    item = gfc_config_def_get_by_name(resource,name);
+    if (!item)return NULL;
+    return sj_object_get_value_as_string(item,"displayName");
+}
+
 SJson *gfc_config_def_get_resource_by_name(const char *resource)
 {
     SJson *list,*item;
