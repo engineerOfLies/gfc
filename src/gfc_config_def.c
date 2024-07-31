@@ -93,7 +93,28 @@ SJson *gfc_config_def_get_value(const char *resource, const char *name, const ch
     return sj_object_get_value(def,key);
 }
 
-const char *gfc_config_def_get_name_by_index(const char *resource,Uint8 index)
+int gfc_config_def_get_index_by_name(const char *resource, const char *name)
+{
+    const char *str;
+    int i,c;
+    SJson *item,*list;
+    if (!config_manager.defs)return -1;
+    list = gfc_config_def_get_resource_by_name(resource);
+    if (!list)return -1;
+    c = sj_array_get_count(list);
+    for (i = 0; i < c;i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        str = sj_object_get_value_as_string(item,"name");
+        if (!str)continue;
+        if (strlen(str) != strlen(name))continue;
+        if (strcmp(name,str)==0)return i;
+    }
+    return -1;
+}
+
+const char *gfc_config_def_get_name_by_index(const char *resource,Uint32 index)
 {
     SJson *list;
     SJson *def;
