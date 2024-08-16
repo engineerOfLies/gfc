@@ -515,8 +515,19 @@ Bool gfc_vector4d_distance_between_less_than(GFC_Vector4D p1,GFC_Vector4D p2,flo
  * @param forward output optional calculated forward gfc_vector
  * @param right output optional calculated right gfc_vector
  * @param up output optional calculated up gfc_vector
+ * @note this works by rotating a unit vectors along the p,r,y of the angles
  */
 void gfc_vector3d_angle_vectors(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up);
+
+/**
+ * @brief given a rotation, get the component gfc_vectors  (in radians!)
+ * @param angles the input rotation for each axis
+ * @param forward output optional calculated forward gfc_vector
+ * @param right output optional calculated right gfc_vector
+ * @param up output optional calculated up gfc_vector
+ * @note this will fail to gimble lock
+ */
+void gfc_vector3d_angle_vectors2(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up);
 
 /**
  * @brief given a gfc_vector, get the angles, in radians for yaw,roll, pitch
@@ -571,5 +582,12 @@ void gfc_vector3d_rotate_about_z(GFC_Vector3D *vect, float angle);
  * @param distance the amount to move the point
  */
 void gfc_vector2d_move_towards(GFC_Vector2D *out, GFC_Vector2D point, GFC_Vector2D destination, float distance);
+
+/**
+ * @brief given a vector multiply its components by gfc_crandom() range of [-1.0 - 1.0]
+ * @param out [output] results saved here
+ * @param in the input vector.
+ */
+void gfc_vector3d_randomize(GFC_Vector3D *out,GFC_Vector3D in);
 
 #endif

@@ -639,9 +639,35 @@ void gfc_vector3d_angles (GFC_Vector3D value1, GFC_Vector3D * angles)
 //    angles->y = 0;  //leave this alone
 }
 
-
-
 void gfc_vector3d_angle_vectors(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up)
+{
+    if (forward)
+    {
+        forward->x = 0;
+        forward->y = 1;
+        forward->z = 0;
+        gfc_vector3d_rotate_about_x(forward, angles.x);
+        gfc_vector3d_rotate_about_z(forward, angles.z);
+    }
+    if (right)
+    {
+        right->x = 1;
+        right->y = 0;
+        right->z = 0;
+        gfc_vector3d_rotate_about_y(right, angles.y);
+        gfc_vector3d_rotate_about_z(right, angles.z);
+    }
+    if (up)
+    {
+        up->x = 0;
+        up->y = 0;
+        up->z = 1;
+        gfc_vector3d_rotate_about_y(up, angles.y);
+        gfc_vector3d_rotate_about_x(up, angles.x);
+    }
+}
+
+void gfc_vector3d_angle_vectors2(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up)
 {
   float angle;
   float sr, sp, sy, cr, cp, cy;
@@ -795,6 +821,14 @@ void gfc_vector2d_move_towards(GFC_Vector2D *out, GFC_Vector2D point, GFC_Vector
     gfc_vector2d_set_magnitude(&dir,distance);
     out->x = point.x + dir.x;
     out->y = point.y + dir.y;
+}
+
+void gfc_vector3d_randomize(GFC_Vector3D *out,GFC_Vector3D in)
+{
+    if (!out)return;
+    out->x = in.x * gfc_crandom();
+    out->y = in.y * gfc_crandom();
+    out->z = in.z * gfc_crandom();
 }
 
 /*eol@eof*/
