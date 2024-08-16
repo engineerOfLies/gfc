@@ -30,7 +30,7 @@ void gfc_audio_init(
 {
     int flags = 0;
 
-    if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 1024)==-1)
+    if(Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 2048)==-1)
     {
         slog("Failed to open audio: %s\n", SDL_GetError());
         return;
