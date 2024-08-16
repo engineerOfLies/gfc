@@ -150,6 +150,15 @@ GFC_Color sj_value_as_color(SJson *value);
 GFC_Color sj_object_get_color(SJson *json,const char *key);
 
 /**
+ * @brief get the object key as a color / populating a pointer to one
+ * @param json the json object containing a color
+ * @param key the key for the color value
+ * @param color [output] no op if not provided
+ * @return 1 if the color was found and populated, 0 otherwise
+ */
+int sj_object_get_color_value(SJson *json,const char *key,GFC_Color *color);
+
+/**
  * @brief convert a color to json format
  * @note all color will be stored in [r8,g8,b8,a8] format
  * @param input the color to convert

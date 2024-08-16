@@ -461,6 +461,18 @@ GFC_Color sj_object_get_color(SJson *json,const char *key)
     return sj_value_as_color(sj_object_get_value(json,key));
 }
 
+int sj_object_get_color_value(SJson *json,const char *key,GFC_Color *color)
+{
+    SJson *value;
+    GFC_Vector4D colorv;
+    if (!color)return 0;
+    value = sj_object_get_value(json,key);
+    if (!value)return 0;
+    if (!sj_value_as_vector4d(value,&colorv))return 0;
+    *color = gfc_color_from_vector4(colorv);
+    return 1;
+}
+
 GFC_Color sj_value_as_color(SJson *value)
 {
     GFC_Color color;
