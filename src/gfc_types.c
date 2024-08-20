@@ -29,6 +29,12 @@ float gfc_random_seeded(Uint32 seed)
     return gfc_random();
 }
 
+int gfc_random_int(int range)
+{
+    if (!range)return 0;
+    return (rand()%range);
+}
+
 SDL_Rect gfc_sdl_rect(Sint32 x,Sint32 y,Uint32 w, Uint32 h)
 {
     SDL_Rect r;
