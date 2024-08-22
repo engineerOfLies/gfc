@@ -247,6 +247,7 @@ void gfc_list_clear(GFC_List *list)
 
 int gfc_list_delete_nth(GFC_List *list,Uint32 n)
 {
+    int i;
     if (!list)
     {
         slog("no list provided");
@@ -263,7 +264,11 @@ int gfc_list_delete_nth(GFC_List *list,Uint32 n)
         list->elements[n].data = NULL;
         return 0;
     }
-    memmove(&list->elements[n],&list->elements[n+1],sizeof(GFC_ListElementData)*(list->count - n));//copy all elements after n
+    for (i = n; i < (list->count - 1);i++)
+    {
+        list->elements[i].data = list->elements[i+1].data;
+    }
+    if (i+1 < list->count)list->elements[i+1].data = NULL;
     list->count--;
     return 0;
 }
