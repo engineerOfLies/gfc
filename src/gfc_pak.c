@@ -98,7 +98,7 @@ void *gfc_pak_load_file_from_disk(const char *filename,size_t *fileSize)
     void *data;
     FILE *file;
     if (!filename)return NULL;
-    file = fopen(filename,"r");
+    file = fopen(filename,"r+b");
     if (!file)return NULL;
     size = get_file_Size(file);
     if (!size)

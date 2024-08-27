@@ -83,7 +83,7 @@ void *gfc_allocate_array(size_t typeSize,size_t count);
  * @param file the file to take a look at
  * @return the size of the file in bytes
  */
-long get_file_Size(FILE *file);
+size_t get_file_Size(FILE *file);
 
 #if defined(WIN32)
 #ifndef snprintf
