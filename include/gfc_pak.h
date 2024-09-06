@@ -9,7 +9,9 @@
  * Pak files (just rename the .zip extenstion to .pak or anything for that matter) are added to the manager.
  * Files can be loaded through the manager where it will first check to see if a file is on disk, and then iterate through all of the registered pak files looking for the file in question before giving up.
  */
-
+/**
+ * @note THIS IS BROKEN FOR WINDOWS.  Depricating until I can resolve it
+ */
 /**
  * @brief initialize the internal pak manager, queueing up its cleanup on program exit
  */

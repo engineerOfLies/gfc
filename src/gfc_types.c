@@ -5,22 +5,22 @@
 
 #include "simple_logger.h"
 
-long get_file_Size(FILE *file)
+size_t get_file_Size(FILE *file)
 {
-  long size;
+    size_t size = 0;
+    size_t lastSize = 0;
 
-  if(file != NULL){
-    if( fseek(file, 0, SEEK_END) ){
-      fclose(file);
-      return -1;
+    if (!file)
+    {
+        return 0;
     }
-
+    do
+    {
+        fgetc(file);
+    } while (!feof(file));
     size = ftell(file);
     rewind(file);
     return size;
-  }
-
-  return -1;
 }
 
 float gfc_random_seeded(Uint32 seed)

@@ -149,9 +149,6 @@ GFC_Sound *gfc_sound_get_by_filename(const char * filename)
 GFC_Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
 {
     GFC_Sound *sound;
-    SDL_RWops* rwops;
-    void *mem = NULL;
-    size_t fileSize = 0;
     if (!filename)return NULL;
     if (strlen(filename) == 0)return NULL;
     sound = gfc_sound_get_by_filename(filename);
@@ -165,21 +162,7 @@ GFC_Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
     {
         return NULL;
     }
-    mem = gfc_pak_file_extract(filename,&fileSize);
-    if (!mem)
-    {
-        slog("failed to load sound file %s",filename);
-        return NULL;
-    }
-    rwops = SDL_RWFromMem(mem, fileSize);
-    if (!rwops)
-    {
-        slog("failed to read sound file %s",filename);
-        free(mem);
-        return NULL;
-    }
-    sound->sound = Mix_LoadWAV_RW(rwops, 1);
-    free(mem);
+    sound->sound = Mix_LoadWAV(filename);
     if (!sound->sound)
     {
         slog("failed to load sound file %s",filename);
@@ -350,24 +333,7 @@ void gfc_sound_sequence_channel_callback(int channel)
 Mix_Music *gfc_sound_load_music(const char *filename)
 {
     Mix_Music *music;
-    SDL_RWops* rwops;
-    void *mem = NULL;
-    size_t fileSize = 0;
-    mem = gfc_pak_file_extract(filename,&fileSize);
-    if (!mem)
-    {
-        slog("failed to load music file %s",filename);
-        return NULL;
-    }
-    rwops = SDL_RWFromMem(mem, fileSize);
-    if (!rwops)
-    {
-        slog("failed to read music file %s",filename);
-        free(mem);
-        return NULL;
-    }
-    music = Mix_LoadMUS_RW(rwops, 1);
-    free(mem);
+    music = Mix_LoadMUS(filename);
     return music;
 }
 /*eol@eof*/
