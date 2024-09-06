@@ -201,7 +201,7 @@ float gfc_angle_between_degrees(float a, float b);
 float gfc_angle_between_radians(float a, float b);
 
 /**
- * @brief prevent an angle from going beyond the range of +/- 2Pi
+ * @brief prevent an angle from going beyond the range of 0 to 2Pi
  * @param a the angle to clamp
  */
 void gfc_angle_clamp_radians(float *a);
