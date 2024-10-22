@@ -582,6 +582,7 @@ void gfc_vector3d_rotate_about_z(GFC_Vector3D *vect, float angle);
  * @param distance the amount to move the point
  */
 void gfc_vector2d_move_towards(GFC_Vector2D *out, GFC_Vector2D point, GFC_Vector2D destination, float distance);
+void gfc_vector3d_move_towards(GFC_Vector3D* out, GFC_Vector3D point, GFC_Vector3D destination, float distance);
 
 /**
  * @brief given a vector multiply its components by gfc_crandom() range of [-1.0 - 1.0]

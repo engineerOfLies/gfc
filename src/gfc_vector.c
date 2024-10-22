@@ -823,6 +823,17 @@ void gfc_vector2d_move_towards(GFC_Vector2D *out, GFC_Vector2D point, GFC_Vector
     out->y = point.y + dir.y;
 }
 
+void gfc_vector3d_move_towards(GFC_Vector3D* out, GFC_Vector3D point, GFC_Vector3D destination, float distance)
+{
+    GFC_Vector3D dir;
+    if (!out)return;
+    gfc_vector3d_sub(dir, destination, point);
+    gfc_vector3d_set_magnitude(&dir, distance);
+    out->x = point.x + dir.x;
+    out->y = point.y + dir.y;
+    out->z = point.z + dir.z;
+}
+
 void gfc_vector3d_randomize(GFC_Vector3D *out,GFC_Vector3D in)
 {
     if (!out)return;
