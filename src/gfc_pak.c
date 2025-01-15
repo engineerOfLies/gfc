@@ -128,6 +128,8 @@ SJson *gfc_pak_load_json(const char *filename)
     size_t fileSize;
     json = sj_load(filename);
     if (json)return json;
+    json = gfc_decode_json_file(filename);
+    if (json)return json;
     data = gfc_pak_file_extract(filename,&fileSize);
     if (!data)return NULL;
     json = sj_parse_buffer(data,fileSize);
