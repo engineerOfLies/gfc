@@ -651,19 +651,16 @@ void gfc_vector3d_angle_vectors(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_
     }
     if (right)
     {
-        right->x = 1;
-        right->y = 0;
+        right->x = 0;
+        right->y = 1;
         right->z = 0;
-        gfc_vector3d_rotate_about_y(right, angles.y);
-        gfc_vector3d_rotate_about_z(right, angles.z);
+        gfc_vector3d_rotate_about_z(right, angles.z + GFC_HALF_PI);
     }
     if (up)
     {
         up->x = 0;
         up->y = 0;
         up->z = 1;
-        gfc_vector3d_rotate_about_y(up, angles.y);
-        gfc_vector3d_rotate_about_x(up, angles.x);
     }
 }
 
