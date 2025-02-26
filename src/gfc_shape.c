@@ -155,7 +155,7 @@ GFC_Vector2D gfc_rect_get_normal_for_rect(GFC_Rect r, GFC_Rect ref)
     return out;
 }
 
-GFC_Vector2D gfc_rect_get_normal_for_cirlce(GFC_Rect r, GFC_Circle c)
+GFC_Vector2D gfc_rect_get_normal_for_circle(GFC_Rect r, GFC_Circle c)
 {
     GFC_Vector2D out = {0};
     if (c.x < r.x)out.x = -1;
@@ -309,7 +309,7 @@ GFC_Vector2D gfc_shape_get_normal_for_cirlce(GFC_Shape s, GFC_Circle c)
     switch(s.type)
     {
         case ST_RECT:
-            out = gfc_rect_get_normal_for_cirlce(s.s.r, c);
+            out = gfc_rect_get_normal_for_circle(s.s.r, c);
             break;
         case ST_CIRCLE:
             out = gfc_circle_get_normal_for_cirlce(s.s.c, c);
@@ -633,7 +633,7 @@ Uint8 gfc_circle_rect_overlap_poc(GFC_Circle a, GFC_Rect b,GFC_Vector2D *poc,GFC
                     normal->y = -1;
                 }
             }
-            else if (a.y > b.y + b.y)
+            else if (a.y > b.y + b.h)
             {
                 poc->y = b.y + b.h;
                 poc->x = a.x;
