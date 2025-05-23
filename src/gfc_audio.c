@@ -3,28 +3,42 @@
 
 #include "gfc_pak.h"
 #include "gfc_hashmap.h"
+#include "gfc_config.h"
 #include "gfc_audio.h"
 
+typedef struct
+{
+    GFC_TextLine    name;
+    float           volume;
+    int             from;
+    int             to;
+    int             tag;//should corellate to the order it appeared in the list
+}ChannelGroup;
 
 typedef struct
 {
     Uint32  max_sounds;
+    Uint32  channels;
     GFC_Sound * sound_list;
     GFC_List  * sound_sequences;
+    GFC_List  * channelGroups;
+    float       masterVolume;
+    Uint8       musicVolume;
+    float       effectsVolume;
+
 }GFC_SoundManager;
 
-static GFC_SoundManager sound_manager={0,NULL};
+static GFC_SoundManager sound_manager={0};
 
 void gfc_sound_sequence_channel_callback(int channel);
-
-void gfc_audio_close();
+void gfc_sound_close();
 void gfc_sound_init(Uint32 max);
 
+ChannelGroup *gfc_audio_channel_group_new();
+void gfc_audio_channel_group_free(ChannelGroup *cg);
+
 void gfc_audio_init(
-    Uint32 maxGFC_Sounds,
-    Uint32 channels,
-    Uint32 channelGroups,
-    Uint32 maxMusic,
+    Uint32 maxSounds,
     Uint8  enableMP3,
     Uint8  enableOgg)
 {
@@ -49,13 +63,11 @@ void gfc_audio_init(
         slog("failed to initialize some audio support: %s",SDL_GetError());
     }
     atexit(Mix_Quit);
-    atexit(gfc_audio_close);
-    gfc_sound_init(maxGFC_Sounds);
+    atexit(gfc_sound_close);
+    gfc_sound_init(maxSounds);
 }
 
-void gfc_audio_close()
-{
-}
+
 
 void gfc_sound_close()
 {
@@ -64,8 +76,122 @@ void gfc_sound_close()
     {
         free(sound_manager.sound_list);
     }
+    if (sound_manager.channelGroups)
+    {
+        gfc_list_foreach(sound_manager.channelGroups,(gfc_work_func*)gfc_audio_channel_group_free);
+        gfc_list_delete(sound_manager.channelGroups);
+        sound_manager.channelGroups = NULL;
+    }
     sound_manager.sound_list = NULL;
     sound_manager.max_sounds = 0;
+}
+
+void gfc_audio_channel_group_free(ChannelGroup *cg)
+{
+    if (!cg)return;
+    free(cg);
+}
+
+ChannelGroup *gfc_audio_channel_group_new()
+{
+    return gfc_allocate_array(sizeof(ChannelGroup),1);
+}
+
+ChannelGroup *gfc_audio_get_group(const char *groupName)
+{
+    int i,c;
+    ChannelGroup *group;
+    if (!groupName)return NULL;
+    c = gfc_list_count(sound_manager.channelGroups);
+    for (i = 0; i < c;i++)
+    {
+        group = gfc_list_nth(sound_manager.channelGroups,i);
+        if (!group)continue;
+        if (gfc_stricmp(groupName,group->name) == 0)return group;
+    }
+    return NULL;
+}
+
+void gfc_audio_parse_groups(SJson *json)
+{
+    int from = 0;
+    int count;
+    int i,c;
+    Uint8 groupVolume;
+    SJson *item;
+    ChannelGroup *group;
+    if (!json)return;
+    if (!sound_manager.channelGroups)
+    {
+        sound_manager.channelGroups = gfc_list_new();
+    }
+    else
+    {
+        gfc_list_foreach(sound_manager.channelGroups,(gfc_work_func*)gfc_audio_channel_group_free);
+        gfc_list_clear(sound_manager.channelGroups);
+    }
+    c = sj_array_get_count(json);
+    for (i = 0;i < c;i++)
+    {
+        item = sj_array_nth(json,i);
+        if (!item)continue;
+        group = gfc_audio_channel_group_new();
+        if (!group)continue;
+        count = 0;
+        sj_object_line_value(item,"name",group->name);
+        sj_object_get_int(item,"channels",&count);
+        if (sj_object_get_uint8(item,"volume",&groupVolume))
+        {
+            if (groupVolume > MIX_MAX_VOLUME)groupVolume = MIX_MAX_VOLUME;
+            group->volume = groupVolume / (float)MIX_MAX_VOLUME;
+        }
+        group->tag = i;
+        group->from = from;
+        group->to = from + count - 1;
+        from += count;
+        gfc_list_append(sound_manager.channelGroups,group);
+    }
+    sound_manager.channels = Mix_AllocateChannels(from + 8);//padded so -1 channels can still have a try
+    for (i = 0;i < c;i++)
+    {
+        group = gfc_list_nth(sound_manager.channelGroups,i);
+        if (!group)continue;
+        Mix_GroupChannels(group->from, group->to, group->tag);
+    }
+}
+
+void gfc_sound_init_config(const char *configFile)
+{
+    Uint32 maxSounds = 256;
+    Uint8 enableMp3 = 0,enableOgg = 0;
+    Uint8 masterVolume = MIX_MAX_VOLUME,effectsVolume = MIX_MAX_VOLUME;
+    SJson *json,*soundGroups;
+    if (!configFile)return;
+    json = sj_load(configFile);
+    if (!json)
+    {
+        slog("failed to load audio config, using defaults");
+        gfc_audio_init(256,1,1);
+        return;
+    }
+    sj_object_get_uint32(json,"maxSounds",&maxSounds);
+    sj_object_get_uint8(json,"enableMp3",&enableMp3);
+    sj_object_get_uint8(json,"enableOgg",&enableOgg);
+    
+    gfc_audio_init(maxSounds,enableMp3,enableOgg);
+    
+    sj_object_get_uint8(json,"masterVolume",&masterVolume);
+    if (masterVolume > MIX_MAX_VOLUME)masterVolume = MIX_MAX_VOLUME;
+    sound_manager.masterVolume = masterVolume / (float)MIX_MAX_VOLUME;
+    sj_object_get_uint8(json,"musicVolume",&sound_manager.musicVolume);
+    sound_manager.musicVolume = (float)sound_manager.musicVolume * sound_manager.masterVolume;
+    sj_object_get_uint8(json,"effectsVolume",&effectsVolume);
+    if (effectsVolume > MIX_MAX_VOLUME)effectsVolume = MIX_MAX_VOLUME;
+    sound_manager.effectsVolume = effectsVolume / (float)MIX_MAX_VOLUME;
+    
+    soundGroups = sj_object_get_value(json,"soundGroups");
+    Mix_VolumeMusic(sound_manager.musicVolume);
+    gfc_audio_parse_groups(soundGroups);
 }
 
 void gfc_sound_init(Uint32 max)
@@ -79,7 +205,6 @@ void gfc_sound_init(Uint32 max)
     sound_manager.sound_list = gfc_allocate_array(sizeof(GFC_Sound),max);
     sound_manager.sound_sequences = gfc_list_new();
     Mix_ChannelFinished(gfc_sound_sequence_channel_callback);
-    atexit(gfc_sound_close);
 }
 
 void gfc_sound_delete(GFC_Sound *sound)
@@ -175,10 +300,22 @@ GFC_Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
     return sound;
 }
 
-void gfc_sound_play(GFC_Sound *sound,int loops,float volume,int channel,int group)
+void gfc_sound_play_to_group(GFC_Sound *sound,int loops,float volume,const char *groupName)
+{
+    ChannelGroup *group;
+    group = gfc_audio_get_group(groupName);
+    if (!group)
+    {
+        gfc_sound_play(sound,loops,volume,-1);
+        return;
+    }
+    gfc_sound_play(sound,loops,volume * group->volume,Mix_GroupAvailable(group->tag));
+}
+
+void gfc_sound_play(GFC_Sound *sound,int loops,float volume,int channel)
 {
     int chan;
-    float netVolume = 1;
+    float netVolume = sound_manager.masterVolume;
     if (!sound)return;
     if (!sound->sound)return;
     if (volume > 0)
@@ -198,15 +335,23 @@ void gfc_sound_play(GFC_Sound *sound,int loops,float volume,int channel,int grou
 
 }
 
-void gfc_sound_pack_play(GFC_HashMap *pack, const char *name,int loops,float volume,int channel,int group)
+void gfc_sound_pack_play(GFC_HashMap *pack, const char *name,int loops,float volume,int channel)
 {
     GFC_Sound *sound;
     if ((!pack)||(!name))return;
     sound = gfc_hashmap_get(pack,name);
     if (!sound)return;
-    gfc_sound_play(sound,loops,volume,channel,group);
+    gfc_sound_play(sound,loops,volume,channel);
 }
 
+void gfc_sound_pack_play_to_group(GFC_HashMap *pack, const char *name,int loops,float volume,const char *group)
+{
+    GFC_Sound *sound;
+    if ((!pack)||(!name))return;
+    sound = gfc_hashmap_get(pack,name);
+    if (!sound)return;
+    gfc_sound_play_to_group(sound,loops,volume,group);
+}
 
 void gfc_sound_pack_load_sound(GFC_HashMap *pack, const char *name,const char *file)
 {
@@ -320,7 +465,7 @@ void gfc_sound_sequence_channel_callback(int channel)
         sound = gfc_list_get_nth(sequence->sequence,sequence->current);
         if (!sound)continue;
         sequence->current++;
-        gfc_sound_play(sound,0,sound->volume,channel,-1);
+        gfc_sound_play(sound,0,sound->volume,channel);
         if (sequence->current >= gfc_list_get_count(sequence->sequence))//we are finished with this sequence
         {
             gfc_list_delete_data(sound_manager.sound_sequences,sequence);

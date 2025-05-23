@@ -29,20 +29,21 @@ typedef struct
 
 /**
  * @brief initializes the audio system based on the passed in parameters
- * @param maxGFC_Sounds the maximum number of sounds that can be loaded into memory at once
- * @param channels the nrumber of allocated audio channels (excluding music channel)
- * @param channelGroups the number of channels to be reserved for groups to be set up
- * @param maxMusic the number of simultaneous music files that will be supported
+ * @param maxSounds the maximum number of sounds that can be loaded into memory at once
  * @param enableMP3 if true, initializes audio system with mp3 support, if available
  * @param enableOgg if true, initializes audio system with ogg vorbis support, if available
  */
 void gfc_audio_init(
-    Uint32 maxGFC_Sounds,
-    Uint32 channels,
-    Uint32 channelGroups,
-    Uint32 maxMusic,
+    Uint32 maxSounds,
     Uint8  enableMP3,
     Uint8  enableOgg);
+
+/**
+ * @brief initialize the audio subsystem based on the provided config.  
+ * @note If it fails to load the config file, it will still initialize, but with default settings
+ * @param configFile the filepath to the json file containing the config for it
+ */
+void gfc_sound_init_config(const char *configFile);
 
 /**
  * @brief load a music file (ogg or mp3 or other supported music file) from disk or pak
@@ -62,12 +63,21 @@ GFC_Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel);
 
 /**
  * @brief play a sound file that has been loaded
- * @param loops number of times to loop,  0 means play once, no loops
- * @param volume how loud to play it
- * @param channel which channel to play on, -1 means use default
- * @param group which group to play on, -1 means use default
+ * @param sound the sound to play
+ * @param loops number of times to loop,  0 means play once, no loops, -1 is infinite loops
+ * @param volume how loud to play it as a percentage
+ * @param channel which channel to play on, -1 means use any
  */
-void gfc_sound_play(GFC_Sound *sound,int loops,float volume,int channel,int group);
+void gfc_sound_play(GFC_Sound *sound,int loops,float volume,int channel);
+
+/**
+ * @brief play a sound file to a channel group
+ * @param sound the sound to play
+ * @param loops number of times to loop,  0 means play once, no loops, -1 is infinite loops
+ * @param volume how loud to play it as a percentage
+ * @param groupName the name of the group to play on. If not found, it will use any if available
+ */
+void gfc_sound_play_to_group(GFC_Sound *sound,int loops,float volume,const char *groupName);
 
 /**
  * @brief decrement references to the sound.  Free it when needed
@@ -95,15 +105,24 @@ GFC_HashMap *gfc_sound_pack_parse_file(const char *filename);
 GFC_HashMap *gfc_sound_pack_parse(SJson *sounds);
 
 /**
- * @brief player a sound from a sound pack by its name
+ * @brief play a sound from a sound pack by its name
  * @param pack the sound pack to play from
  * @param name the name of the sound to play
  * @param loops number of times to loop,  0 means play once, no loops
  * @param volume how loud to play it
- * @param channel which channel to play on, -1 means use default
- * @param group which group to play on, -1 means use default
+ * @param channel which channel to play on, -1 means use any available
  */
-void gfc_sound_pack_play(GFC_HashMap *pack, const char *name,int loops,float volume,int channel,int group);
+void gfc_sound_pack_play(GFC_HashMap *pack, const char *name,int loops,float volume,int channel);
+
+/**
+ * @brief play a sound to a channel group from a sound pack by its name
+ * @param pack the sound pack to play from
+ * @param name the name of the sound to play
+ * @param loops number of times to loop,  0 means play once, no loops
+ * @param volume how loud to play it
+ * @param group which group to play on, NULL means use any available
+ */
+void gfc_sound_pack_play_to_group(GFC_HashMap *pack, const char *name,int loops,float volume,const char *group);
 
 /**
  * @brief free a previously loaded sound pack
