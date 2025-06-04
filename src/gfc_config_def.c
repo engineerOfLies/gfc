@@ -99,6 +99,7 @@ int gfc_config_def_get_index_by_name(const char *resource, const char *name)
     int i,c;
     SJson *item,*list;
     if (!config_manager.defs)return -1;
+    if (!name)return -1;
     list = gfc_config_def_get_resource_by_name(resource);
     if (!list)return -1;
     c = sj_array_get_count(list);
@@ -147,6 +148,7 @@ SJson *gfc_config_def_get_by_parameter(const char *resource,const char *paramete
     int i,c;
     SJson *item,*list;
     if (!config_manager.defs)return NULL;
+    if (!name)return NULL;
     list = gfc_config_def_get_resource_by_name(resource);
     if (!list)return NULL;
     c = sj_array_get_count(list);
@@ -169,6 +171,7 @@ SJson *gfc_config_def_get_by_name(const char *resource,const char *name)
     int i,c;
     SJson *item,*list;
     if (!config_manager.defs)return NULL;
+    if (!name)return NULL;
     list = gfc_config_def_get_resource_by_name(resource);
     if (!list)return NULL;
     c = sj_array_get_count(list);
