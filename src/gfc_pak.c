@@ -1,6 +1,7 @@
 #include "miniz.h"
 #include "simple_logger.h"
 #include "simple_json_parse.h"
+#include "gfc_decode.h"
 #include "gfc_text.h"
 #include "gfc_list.h"
 #include "gfc_pak.h"

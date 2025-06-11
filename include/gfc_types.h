@@ -42,7 +42,7 @@ float gfc_random_seeded(Uint32 seed);
  * This macro exposes the more random bits from the rand() function
  * @return a random float between 0 and 1.0
  */
-#define gfc_random()  ((rand ()%1000)/(float)1000.0)
+#define gfc_random()  ((float)(rand ()%1000)/(float)1000.0)
 
 /**
  * @brief random macro taken from Id Software's Quake 2 Source.

@@ -8,7 +8,6 @@
 size_t get_file_Size(FILE *file)
 {
     size_t size = 0;
-    size_t lastSize = 0;
 
     if (!file)
     {
