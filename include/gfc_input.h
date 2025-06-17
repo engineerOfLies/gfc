@@ -7,52 +7,102 @@
 
 typedef enum
 {
-    EMK_None = 0,
-    EMK_Shift = 1000,
-    EMK_Alt,
-    EMK_Ctrl,
-    EMK_Super
+    GFC_EMK_None = 0,
+    GFC_EMK_Shift = 1000,
+    GFC_EMK_Alt,
+    GFC_EMK_Ctrl,
+    GFC_EMK_Super
 }GFC_InputModKey;
 
 typedef enum
 {
-    IET_Idle    = 0,
-    IET_Press   = 1,
-    IET_Hold    = 2,
-    IET_Release = 3
+    GFC_IET_Idle    = 0,
+    GFC_IET_Press   = 1,
+    GFC_IET_Hold    = 2,
+    GFC_IET_Release = 3
 }GFC_InputEventType;
+
+typedef enum
+{
+    GFC_IAS_Whole,
+    GFC_IAS_Positive,
+    GFC_IAS_Negative,
+    GFC_IAS_MAX
+}GFC_InputAxisStyle;
 
 typedef struct
 {
-    Uint32 num_buttons;
-    Uint8 *buttons;
-    Uint8 *old_buttons;
-    Uint32 num_axis;
-    Sint16 *axis_maxes;
-    Sint16 *axis;
-    Sint16 *old_axis;
-    Sint16 *axis_threshold;
-    SDL_Joystick *controller;
+    Uint8               index;      /**<map to the SDL_Joystick axis*/
+    GFC_TextWord        name;       /**<name from config*/    
+}GFC_InputButtonConf;
+
+typedef struct
+{
+    Uint8               index;      /**<map to the SDL_Joystick axis*/
+    GFC_TextWord        name;       /**<name from config*/
+    int                 threshold;  /**<anything less than this is ignored as input*/
+    GFC_InputAxisStyle  style;      /**<how this input is treated*/
+    int                 min;        /**<minimum possible value - can be negative for some axes*/
+    int                 max;        /**<maximum possible value - can be negative for some axes*/
+    float               range;      /**<max - min*/
+}GFC_InputAxisConf;
+
+typedef struct
+{
+    Uint32          num_buttons;    /**<how many ACTUAL buttons are on the controller*/
+    Uint8          *buttons;        /**<array of current button states (on or off)*/
+    Uint8          *old_buttons;    /**<last frame's button states*/
+    GFC_List       *buttonMap;      /**<how to read each button*/
+    Uint32          num_axis;       /**<how many axes there are for the controller*/
+    Sint16         *axis;           /**<measured values of each axis*/
+    Sint16         *old_axis;       /**<last frame's axis states*/
+    GFC_List       *axisMap;        /**<how to read each axis*/
+    SDL_Joystick   *controller;     /**<handle for the hardware*/
 }GFC_InputController;
 
+
+typedef enum
+{
+    GFC_ITT_None,
+    GFC_ITT_Any,
+    GFC_ITT_Combo,
+    GFC_ITT_MAX
+}GFC_InputTriggerType;
+
+typedef enum
+{
+    GFC_IT_Key,
+    GFC_IT_Button,
+    GFC_IT_Axis,
+    GFC_IT_MouseMotion,
+    GFC_IT_MouseButton,
+    GFC_IT_MouseWheel,
+    GFC_IT_MAX
+}GFC_InputType;
+
+/**
+ * @brief config for a single input
+ */
+typedef struct
+{
+    GFC_InputType   inputType;
+    GFC_TextWord    name;
+    Uint8           controller;
+    Uint32          keyCode;
+}GFC_Input;
 /**
  * @brief Inputs abstract user input collection.  They can be setup to trigger callbacks and/or polled for current state
  */
 typedef struct
 {
-    GFC_TextLine command;
-    GFC_List *keyCodes;                     /**<list of keys that must be pressed together to count as a single input*/
-    Uint8 controller;                   /**<Index of the controller to use to update this input*/
-    GFC_List *buttons;                      /**<list of buttons that must be pressed together to count as a single input*/
-    GFC_List *axes;                         /**<list of axes that must be pressed together to count as a single input*/
-    int downCount;
-    Uint32 pressTime;                   /**<clock ticks when button was pressed*/
-    GFC_InputEventType state;               /**<updated each frame*/
-    void (*onPress)(void *data);        /**<callback for press event*/
-    void (*onHold)(void *data);         /**<callback for hold event*/
-    void (*onRelease)(void *data);      /**<callback for release event*/
-    void *data;                         /**<pointer to be passed to callbacks*/
-}Input;
+    GFC_TextLine            name;           /**<the name of this command*/
+    GFC_InputTriggerType    trigger;        /**<what it takes to trigger this input, combo or any*/
+    GFC_List               *inputs;         /**<inputs that are part of the input*/
+    int                     downCount;      /**<how many of the inputs are down*/
+    int                     lastDownCount;  /**<previous frame's status*/
+    Uint32                  pressTime;      /**<clock ticks when button was pressed*/
+    GFC_InputEventType      state;          /**<updated each frame*/
+}GFC_Command;
 
 /**
  * @brief initializes the config system
@@ -67,18 +117,7 @@ void gfc_input_init(char *configFile);
 void gfc_input_update();
 
 /**
- * @brief load user configuration from file.
- * @note this operation appends to existing commands
- */
-void gfc_input_commands_load(char *configFile);
-
-/**
- * @brief clears all user input configuration
- */
-void gfc_input_commands_purge();
-
-/**
- * @brief check if a command was pressed this frame
+ * @brief check if a command was pressed/held/release/down this frame
  * @param command the name of the command to check
  * @returns true if pressed, false otherwise
  */
@@ -87,6 +126,9 @@ Uint8 gfc_input_command_held(const char *command);
 Uint8 gfc_input_command_released(const char *command);
 Uint8 gfc_input_command_down(const char *command);
 
+/**
+ * @brief get the current state of a given command
+ */
 GFC_InputEventType gfc_input_command_get_state(const char *command);
 
 /**
@@ -135,23 +177,8 @@ Uint8 gfc_input_controller_button_released(Uint8 controllerId, const char *butto
  * @brief get the button index given the "name" of the button in the config file
  * @return -1 on not found or error, or the index of the button otherwise
  */
-int gfc_input_controller_get_button_index(const char *button);
+int gfc_input_controller_get_button_index(GFC_InputController *con, const char *button);
 
-/**
- * @brief configure callbacks for an input
- * @param command the name of the input to configure
- * @param onPress the function to call when the input is pressed
- * @param onHold the function to call when the input is held
- * @param onRelease the function to call when the input is released
- * @param data pointer to any custom data you want associated with the input
- */
-void gfc_input_set_callbacks(
-    char *command,
-    void (*onPress)(void *data),
-    void (*onHold)(void *data),
-    void (*onRelease)(void *data),
-    void *data
-);
 
 /**
  * @brief check the state of a named axis of a controller
@@ -165,5 +192,11 @@ float gfc_input_controller_get_axis_state(Uint8 controllerId, const char *axis);
  * @brief get the number of controllers that are setup
  */
 int gfc_input_controller_get_count();
+
+/**
+ * @brief slog the state of any buttons axis that are active
+ * @param controllerId the id of the controller to slog
+ */
+void gfc_input_controller_slog(Uint8 controllerId);
 
 #endif
