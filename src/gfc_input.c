@@ -120,8 +120,13 @@ float gfc_controller_determine_a_axis_value(GFC_InputController *con,const char 
             value = measure - conf->min;
             return value / conf->range;
         case GFC_IAS_Positive:
+            if (measure <= conf->threshold)return 0;
+            value = measure - conf->min;
+            return value / conf->range;
         case GFC_IAS_Negative:
-
+            if (measure >= conf->threshold)return 0;
+            value = measure - conf->min;
+            return value / conf->range;
         default:
             return 0;
     }
