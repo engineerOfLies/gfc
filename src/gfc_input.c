@@ -1076,7 +1076,6 @@ void gfc_input_commands_load(SJson *commands)
         if (!in)continue;
         gfc_list_append(gfc_input_manager.commandList,in);
     }
-    slog("parsed %i commands",gfc_list_count(gfc_input_manager.commandList));
 }
 
 void gfc_input_controller_slog(Uint8 controllerId)
