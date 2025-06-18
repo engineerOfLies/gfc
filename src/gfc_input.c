@@ -18,13 +18,42 @@ typedef struct
     int             mouse_wheel_x_old;
     int             mouse_wheel_y_old;
     GFC_List       *controllers;
+    GFC_List       *controllerMaps;
     //TODO make input callbacks a seperate list that can be cleared or set
 }GFC_InputManager;
 
 static GFC_InputManager gfc_input_manager = {0};
 
+static const char * gfc_input_types[] =
+{
+    "key",
+    "button",
+    "axis",
+    "mouseMotion",
+    "mouseButton",
+    "mouseWheel",
+    NULL
+};
+
+static const char *gfc_input_trigger_type[] = 
+{
+    "none",
+    "any",
+    "combo",
+    NULL
+};
+
+static const char * gfc_input_axis_style[] =
+{
+    "whole",
+    "positive",
+    "negative",
+    NULL
+};
+
 void gfc_input_close();
 GFC_InputController *gfc_input_controller_load(SJson *json,Uint8 index);
+GFC_InputControllerMap *gfc_input_controller_map_load(SJson *json);
 void gfc_input_commands_load(SJson *commands);
 
 
@@ -33,6 +62,7 @@ void gfc_input_init(char *configFile)
     SJson *json;
     SJson *array,*item;
     GFC_InputController *controller;
+    GFC_InputControllerMap *map;
     int i,c;
     if (gfc_input_manager.commandList != NULL)
     {
@@ -59,9 +89,27 @@ void gfc_input_init(char *configFile)
         return;//nothing else to do
     }
     //controller support
+    array = sj_object_get_value(json,"controllerMaps");
+    c = sj_array_count(array);
+    if (c > 0)
+    {
+        gfc_input_manager.controllerMaps = gfc_list_new();
+        for (i = 0; i < c; i++)
+        {
+            item = sj_array_nth(array,i);
+            if (!item)continue;
+            map = gfc_input_controller_map_load(item);
+            if (map)
+            {
+                gfc_list_append(gfc_input_manager.controllerMaps,map);
+                break;
+            }
+        }
+    }
+    //MAPS MUST COME FIRST
     array = sj_object_get_value(json,"controllers");
     c = sj_array_count(array);
-    if ((SDL_NumJoysticks() > 0) && (c > 0))
+    if (c > 0)
     {
         gfc_input_manager.controllers = gfc_list_new();
         for (i = 0; i < c; i++)
@@ -80,7 +128,7 @@ void gfc_input_init(char *configFile)
     sj_free(json);
 }
 
-GFC_InputAxisConf *gfc_controller_get_axis_conf(GFC_InputController *con,const char *name)
+GFC_InputAxisConf *gfc_controller_get_axis_conf(GFC_InputControllerMap *con,const char *name)
 {
     int i,c;
     GFC_InputAxisConf *conf = NULL;
@@ -102,8 +150,8 @@ float gfc_controller_determine_a_axis_value(GFC_InputController *con,const char 
     int measure = 0;
     float value;
     Uint8 index = 0;
-    if ((!con)||(!con->axisMap))return 0;
-    conf = gfc_controller_get_axis_conf(con,name);
+    if ((!con)||(!con->map))return 0;
+    conf = gfc_controller_get_axis_conf(con->map,name);
     if (!conf)return 0;
     index = conf->index;
     if (index >= con->num_axis)return 0;
@@ -164,7 +212,7 @@ void gfc_controller_update(GFC_InputController *controller)
     }
 }
 
-void gfc_controller_free(GFC_InputController *controller)
+void gfc_controller_map_free(GFC_InputControllerMap *controller)
 {
     if (!controller)return;
     if (controller->buttonMap)
@@ -177,6 +225,12 @@ void gfc_controller_free(GFC_InputController *controller)
         gfc_list_foreach(controller->axisMap,(gfc_work_func*)free);
         gfc_list_delete(controller->axisMap);
     }
+    free(controller);
+}
+
+void gfc_controller_free(GFC_InputController *controller)
+{
+    if (!controller)return;
     if (controller->buttons)free(controller->buttons);
     if (controller->old_buttons)free(controller->old_buttons);
     if (controller->axis)free(controller->axis);
@@ -187,6 +241,7 @@ void gfc_controller_free(GFC_InputController *controller)
     }
     free(controller);
 }
+
 
 GFC_InputController *gfc_controller_get(Uint8 index)
 {
@@ -200,6 +255,14 @@ GFC_InputController *gfc_controller_new()
     return controller;
 }
 
+GFC_InputControllerMap *gfc_controller_map_new()
+{
+    GFC_InputControllerMap *controller;
+    controller = gfc_allocate_array(sizeof(GFC_InputControllerMap),1);
+    return controller;
+}
+
+
 GFC_InputAxisConf *gfc_controller_config_axis(SJson *json)
 {
     const char *style = NULL;
@@ -209,6 +272,7 @@ GFC_InputAxisConf *gfc_controller_config_axis(SJson *json)
     if (!axis)return NULL;
     sj_object_get_uint8(json,"index",&axis->index);
     sj_object_word_value(json,"name",axis->name);
+    sj_object_word_value(json,"label",axis->label);
     sj_object_get_int(json,"threshold",&axis->threshold);
     sj_object_get_int(json,"min",&axis->min);
     sj_object_get_int(json,"max",&axis->max);
@@ -232,27 +296,41 @@ GFC_InputButtonConf *gfc_controller_config_button(SJson *json)
     if (!button)return NULL;
     sj_object_get_uint8(json,"index",&button->index);
     sj_object_word_value(json,"name",button->name);
+    sj_object_word_value(json,"label",button->label);
     return button;
 }
 
+GFC_InputControllerMap *gfc_input_get_controller_map(const char *name)
+{
+    int i,c;
+    GFC_InputControllerMap *map;
+    if (!name)return NULL;
+    c = gfc_list_count(gfc_input_manager.controllerMaps);
+    for (i = 0; i < c; i++)
+    {
+        map = gfc_list_nth(gfc_input_manager.controllerMaps,i);
+        if (!map)continue;
+        if (gfc_strlcmp(map->name,name) == 0)return map;
+    }
+    return NULL;
+}
 
 GFC_InputController *gfc_input_controller_load(SJson *json,Uint8 index)
 {
-    GFC_InputButtonConf *button;
-    GFC_InputAxisConf *axis;
-    GFC_InputController *controller = NULL;
+    GFC_InputController *controller;
     SDL_Joystick   *joystick;
-    int i,c;
-    SJson *array, *item;
+    const char *map;
     if (!json)return NULL;
-    joystick = SDL_JoystickOpen(index);
-    if (!joystick)return NULL;
     controller = gfc_controller_new();
     if (!controller)
     {
-        SDL_JoystickClose(joystick);
         return NULL;
     }
+    sj_object_line_value(json,"name",controller->name);
+    map = sj_object_get_string(json,"useMap");
+    controller->map = gfc_input_get_controller_map(map);
+    joystick = SDL_JoystickOpen(index);
+    if (!joystick)return controller;
     controller->num_buttons = SDL_JoystickNumButtons(joystick);
     if (controller->num_buttons)
     {
@@ -266,6 +344,23 @@ GFC_InputController *gfc_input_controller_load(SJson *json,Uint8 index)
         controller->old_axis = gfc_allocate_array(sizeof(Sint16),controller->num_axis);
     }
     controller->controller = joystick;
+    return controller;
+}
+
+GFC_InputControllerMap *gfc_input_controller_map_load(SJson *json)
+{
+    GFC_InputButtonConf *button;
+    GFC_InputAxisConf *axis;
+    GFC_InputControllerMap *controller = NULL;
+    int i,c;
+    SJson *array, *item;
+    if (!json)return NULL;
+    controller = gfc_controller_map_new();
+    if (!controller)
+    {
+        return NULL;
+    }
+    sj_object_line_value(json,"name",controller->name);
     array = sj_object_get_value(json,"buttons");
     c = sj_array_count(array);
     if (c)
@@ -296,7 +391,7 @@ GFC_InputController *gfc_input_controller_load(SJson *json,Uint8 index)
 }
 
 //index position of the input in the list of axis map
-int gfc_input_controller_get_axis_index(GFC_InputController *con, const char *axis)
+int gfc_input_controller_get_axis_index(GFC_InputControllerMap *con, const char *axis)
 {
     int i,c;
     GFC_InputAxisConf *axisConf;
@@ -316,7 +411,7 @@ int gfc_input_controller_get_axis_index(GFC_InputController *con, const char *ax
 }
 
 
-int gfc_input_controller_get_button_index(GFC_InputController *con, const char *button)
+int gfc_input_controller_get_button_index(GFC_InputControllerMap *con, const char *button)
 {
     int i,c;
     GFC_InputButtonConf *buttonConf;
@@ -354,7 +449,7 @@ Uint8 gfc_input_controller_button_state(Uint8 controllerId, const char *button)
     GFC_InputController *con;
     con = gfc_controller_get(controllerId);
     if ((!con)||(!button))return 0;
-    index = gfc_input_controller_get_button_index(con, button);
+    index = gfc_input_controller_get_button_index(con->map, button);
     return gfc_input_controller_button_state_by_index(controllerId,index);
 }
 
@@ -363,7 +458,7 @@ Uint8 gfc_input_controller_button_held(Uint8 controllerId, const char *button)
     Uint8 index = 0;
     GFC_InputController *con;
     con = gfc_controller_get(controllerId);
-    index = gfc_input_controller_get_button_index(con,button);
+    index = gfc_input_controller_get_button_index(con->map,button);
     return gfc_input_controller_button_held_by_index(
         controllerId,
         index);
@@ -374,7 +469,7 @@ Uint8 gfc_input_controller_button_pressed(Uint8 controllerId, const char *button
     int index;
     GFC_InputController *con;
     con = gfc_controller_get(controllerId);
-    index = gfc_input_controller_get_button_index(con,button);
+    index = gfc_input_controller_get_button_index(con->map,button);
     return gfc_input_controller_button_pressed_by_index(
         controllerId,
         index);
@@ -385,7 +480,7 @@ Uint8 gfc_input_controller_button_released(Uint8 controllerId, const char *butto
     int index;
     GFC_InputController *con;
     con = gfc_controller_get(controllerId);
-    index = gfc_input_controller_get_button_index(con,button);
+    index = gfc_input_controller_get_button_index(con->map,button);
     return gfc_input_controller_button_released_by_index(
         controllerId,
         index);
@@ -480,12 +575,6 @@ GFC_Command *gfc_command_new()
 
 void gfc_input_close()
 {
-    if (gfc_input_manager.commandList)
-    {
-        gfc_list_foreach(gfc_input_manager.commandList,(gfc_work_func*)gfc_command_delete);
-        gfc_list_delete(gfc_input_manager.commandList);
-        gfc_input_manager.commandList = NULL;
-    }
     if (gfc_input_manager.input_old_keys)
     {
         free(gfc_input_manager.input_old_keys);
@@ -495,6 +584,18 @@ void gfc_input_close()
         gfc_list_foreach(gfc_input_manager.controllers,(gfc_work_func*)gfc_controller_free);
         gfc_list_delete(gfc_input_manager.controllers);
         gfc_input_manager.controllers = NULL;
+    }
+    if (gfc_input_manager.controllerMaps)
+    {
+        gfc_list_foreach(gfc_input_manager.controllerMaps,(gfc_work_func*)gfc_controller_map_free);
+        gfc_list_delete(gfc_input_manager.controllerMaps);
+        gfc_input_manager.controllers = NULL;
+    }
+    if (gfc_input_manager.commandList)
+    {
+        gfc_list_foreach(gfc_input_manager.commandList,(gfc_work_func*)gfc_command_delete);
+        gfc_list_delete(gfc_input_manager.commandList);
+        gfc_input_manager.commandList = NULL;
     }
     memset(&gfc_input_manager,0,sizeof(GFC_InputManager));
 }
@@ -767,6 +868,256 @@ GFC_InputModKey gfc_input_key_mod_check(const char * buffer)
     return GFC_EMK_None;
 }
 
+int gfc_input_keycode_to_label(Uint32 keyCode, GFC_TextWord output)
+{
+    if ((keyCode >= SDL_SCANCODE_1) && (keyCode <= SDL_SCANCODE_9))
+    {
+        gfc_word_sprintf(output,"%i",keyCode - SDL_SCANCODE_1 + 1);
+        return 1;
+    }
+    if ((keyCode >= SDL_SCANCODE_KP_1) && (keyCode <= SDL_SCANCODE_KP_9))
+    {
+        gfc_word_sprintf(output,"KP_%i",keyCode - SDL_SCANCODE_KP_1 + 1);
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_0)
+    {
+        gfc_word_cpy(output,"0");
+        return 1;
+    }
+    if ((keyCode >= SDL_SCANCODE_A) && (keyCode <= SDL_SCANCODE_Z))
+    {
+        gfc_word_sprintf(output,"%c",keyCode - SDL_SCANCODE_A + 'A');
+        return 1;
+    }
+    if ((keyCode >= SDL_SCANCODE_F1) && (keyCode <= SDL_SCANCODE_F12))
+    {
+        gfc_word_sprintf(output,"F%i",keyCode - SDL_SCANCODE_F1 + 1);
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_MINUS)
+    {
+        gfc_word_cpy(output,"-");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_EQUALS)
+    {
+        gfc_word_cpy(output,"=");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_ESCAPE)
+    {
+        gfc_word_cpy(output,"ESCAPE");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_BACKSLASH)
+    {
+        gfc_word_cpy(output,"\\");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_BACKSPACE)
+    {
+        gfc_word_cpy(output,"BACKSPACE");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_SLASH)
+    {
+        gfc_word_cpy(output,"/");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_TAB)
+    {
+        gfc_word_cpy(output,"TAB");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_RETURN)
+    {
+        gfc_word_cpy(output,"RETURN");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_LEFTBRACKET)
+    {
+        gfc_word_cpy(output,"[");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_RIGHTBRACKET)
+    {
+        gfc_word_cpy(output,"]");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_SEMICOLON)
+    {
+        gfc_word_cpy(output,";");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_GRAVE)
+    {
+        gfc_word_cpy(output,"`");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_PERIOD)
+    {
+        gfc_word_cpy(output,".");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_APOSTROPHE)
+    {
+        gfc_word_cpy(output,"'");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_SEMICOLON)
+    {
+        gfc_word_cpy(output,";");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_CAPSLOCK)
+    {
+        gfc_word_cpy(output,"CAPSLOCK");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_PRINTSCREEN)
+    {
+        gfc_word_cpy(output,"PRINTSCREEN");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_SCROLLLOCK)
+    {
+        gfc_word_cpy(output,"SCROLL");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_INSERT)
+    {
+        gfc_word_cpy(output,"INSERT");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_HOME)
+    {
+        gfc_word_cpy(output,"HOME");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_PAGEUP)
+    {
+        gfc_word_cpy(output,"PGUP");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_PAGEDOWN)
+    {
+        gfc_word_cpy(output,"PGDOWN");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_END)
+    {
+        gfc_word_cpy(output,"END");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_DELETE)
+    {
+        gfc_word_cpy(output,"DELETE");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_LEFT)
+    {
+        gfc_word_cpy(output,"LEFT");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_RIGHT)
+    {
+        gfc_word_cpy(output,"RIGHT");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_UP)
+    {
+        gfc_word_cpy(output,"UP");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_DOWN)
+    {
+        gfc_word_cpy(output,"DOWN");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_NUMLOCKCLEAR)
+    {
+        gfc_word_cpy(output,"NUMLOCK");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_DIVIDE)
+    {
+        gfc_word_cpy(output,"KP_/");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_MULTIPLY)
+    {
+        gfc_word_cpy(output,"KP_*");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_MINUS)
+    {
+        gfc_word_cpy(output,"KP_-");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_COMMA)
+    {
+        gfc_word_cpy(output,"KP_,");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_PLUS)
+    {
+        gfc_word_cpy(output,"KP_+");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_ENTER)
+    {
+        gfc_word_cpy(output,"KP_ENTER");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_0)
+    {
+        gfc_word_cpy(output,"KP_0");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_PERIOD)
+    {
+        gfc_word_cpy(output,"KP_.");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_KP_EQUALS)
+    {
+        gfc_word_cpy(output,"KP_=");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_LCTRL)
+    {
+        gfc_word_cpy(output,"LCTRL");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_RCTRL)
+    {
+        gfc_word_cpy(output,"RCTRL");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_RSHIFT)
+    {
+        gfc_word_cpy(output,"RSHIFT");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_LSHIFT)
+    {
+        gfc_word_cpy(output,"LSHIFT");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_LALT)
+    {
+        gfc_word_cpy(output,"LALT");
+        return 1;
+    }
+    if (keyCode == SDL_SCANCODE_RALT)
+    {
+        gfc_word_cpy(output,"RALT");
+        return 1;
+    }
+    return 0;
+}
+
 SDL_Scancode gfc_input_key_to_scancode(const char * buffer)
 {
     int F = 0;
@@ -885,6 +1236,50 @@ SDL_Scancode gfc_input_key_to_scancode(const char * buffer)
                 kc = SDL_SCANCODE_F13 + F - 1; 
             }
         }
+        else if (gfc_strincmp(buffer,"KP_",3))
+        {
+            F = atoi(&buffer[4]);
+            if (gfc_strlcmp(buffer,"KP_ENTER") == 0)
+            {
+                kc = SDL_SCANCODE_KP_ENTER;                
+            }
+            else if (gfc_strlcmp(buffer,"KP_=") == 0)
+            {
+                kc = SDL_SCANCODE_KP_EQUALS;                
+            }
+            else if (gfc_strlcmp(buffer,"KP_+") == 0)
+            {
+                kc = SDL_SCANCODE_KP_PLUS;
+            }
+            else if (gfc_strlcmp(buffer,"KP_.") == 0)
+            {
+                kc = SDL_SCANCODE_KP_PERIOD;
+            }
+            else if (gfc_strlcmp(buffer,"KP_,") == 0)
+            {
+                kc = SDL_SCANCODE_KP_COMMA;
+            }
+            else if (gfc_strlcmp(buffer,"KP_-") == 0)
+            {
+                kc = SDL_SCANCODE_KP_MINUS;                
+            }
+            else if (gfc_strlcmp(buffer,"KP_*") == 0)
+            {
+                kc = SDL_SCANCODE_KP_MULTIPLY;                
+            }
+            else if (gfc_strlcmp(buffer,"KP_/") == 0)
+            {
+                kc = SDL_SCANCODE_KP_DIVIDE;                
+            }
+            else if (F == 0)
+            {
+                kc = SDL_SCANCODE_KP_0;
+            }
+            else if ((F > 1)&&(F <= 9))
+            {
+                kc = SDL_SCANCODE_KP_0 + F;
+            }
+        }
         else if (strcmp(buffer,"BACKSPACE") == 0)
         {
             kc = SDL_SCANCODE_BACKSPACE;
@@ -952,6 +1347,8 @@ SDL_Scancode gfc_input_key_to_scancode(const char * buffer)
     }
     return kc;
 }
+
+
 
 Uint8 gfc_input_key_pressed(const char *key)
 {
@@ -1081,6 +1478,224 @@ void gfc_input_commands_load(SJson *commands)
         if (!in)continue;
         gfc_list_append(gfc_input_manager.commandList,in);
     }
+}
+
+SJson *gfc_input_controller_button_save(GFC_InputButtonConf *button)
+{
+    SJson *json;
+    if (!button)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    sj_object_insert(json,"name",sj_new_str(button->name));
+    sj_object_insert(json,"index",sj_new_uint8(button->index));
+    sj_object_insert(json,"label",sj_new_str(button->label));
+    return json;
+}
+
+const char *gfc_input_style_to_str(GFC_InputAxisStyle style)
+{
+    if (style >= GFC_IAS_MAX)return NULL;
+    return gfc_input_axis_style[style];
+}
+
+const char *gfc_input_type_to_str(GFC_InputType style)
+{
+    if (style >= GFC_IT_MAX)return NULL;
+    return gfc_input_types[style];
+}
+
+const char *gfc_input_trigger_type_to_str(GFC_InputTriggerType style)
+{
+    if (style >= GFC_ITT_MAX)return NULL;
+    return gfc_input_trigger_type[style];
+}
+
+SJson *gfc_input_controller_axis_save(GFC_InputAxisConf *axis)
+{
+    const char *style = NULL;
+    SJson *json;
+    if (!axis)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    sj_object_insert(json,"name",sj_new_str(axis->name));
+    sj_object_insert(json,"index",sj_new_uint8(axis->index));
+    sj_object_insert(json,"label",sj_new_str(axis->label));
+    sj_object_insert(json,"threshold",sj_new_int(axis->threshold));
+    sj_object_insert(json,"min",sj_new_int(axis->min));
+    sj_object_insert(json,"max",sj_new_int(axis->max));
+    style = gfc_input_style_to_str(axis->style);
+    if (style)sj_object_insert(json,"style",sj_new_str(style));
+    return json;
+}
+
+SJson *gfc_input_controller_save(GFC_InputController *con)
+{
+    SJson *json;
+    if (!con)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    sj_object_insert(json,"name",sj_new_str(con->name));
+    if (con->map)
+    {
+        sj_object_insert(json,"useMap",sj_new_str(con->map->name));
+    }
+    return json;
+}
+
+SJson *gfc_input_controller_save_map(GFC_InputControllerMap *con)
+{
+    int i,c;
+    SJson *json,*list,*item;
+    if (!con)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    c = gfc_list_count(con->buttonMap);
+    if (c)
+    {
+        list = sj_array_new();
+        if (list)
+        {
+            for (i = 0; i < c; i++)
+            {
+                item = gfc_input_controller_button_save(gfc_list_nth(con->buttonMap,i));
+                if (item)sj_array_append(list,item);
+            }
+            sj_object_insert(json,"buttons",list);
+        }
+    }
+    c = gfc_list_count(con->axisMap);
+    if (c)
+    {
+        list = sj_array_new();
+        if (list)
+        {
+            for (i = 0; i < c; i++)
+            {
+                item = gfc_input_controller_axis_save(gfc_list_nth(con->axisMap,i));
+                if (item)sj_array_append(list,item);
+            }
+            sj_object_insert(json,"axes",list);
+        }
+    }
+    return json;
+}
+
+SJson *gfc_input_command_input_save(GFC_Input *input)
+{
+    const char *str;
+    SJson *json;
+    if (!input)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    str = gfc_input_type_to_str(input->inputType);
+    if (str)sj_object_insert(json,"type",sj_new_str(str));
+    sj_object_insert(json,"name",sj_new_str(input->name));
+    if ((input->inputType == GFC_IT_Button)||(input->inputType == GFC_IT_Axis))
+    {
+        sj_object_insert(json,"controller",sj_new_uint8(input->controller));
+    }
+    return json;
+}
+
+SJson *gfc_input_command_save(GFC_Command *command)
+{
+    int i,c;
+    const char *style;
+    GFC_Input *input;
+    SJson *json,*list,*item;
+    if (!command)return NULL;
+    json = sj_object_new();
+    if (!json)return NULL;
+    sj_object_insert(json,"command",sj_new_str(command->name));
+    style = gfc_input_trigger_type_to_str(command->trigger);
+    if (style)sj_object_insert(json,"trigger",sj_new_str(style));
+    c = gfc_list_count(command->inputs);
+    if (c)
+    {
+        list = sj_array_new();
+        if (list)
+        {
+            for (i = 0; i < c; i++)
+            {
+                input = gfc_list_nth(command->inputs,i);
+                item = gfc_input_command_input_save(input);
+                if (item)sj_array_append(list,item);
+            }
+            sj_object_insert(json,"inputs",list);
+        }
+    }
+    return json;
+}
+
+SJson *gfc_input_config_save()
+{
+    int i,c;
+    GFC_Command *command;
+    GFC_InputControllerMap *controller;
+    GFC_InputController *con;
+    SJson *json,*array,*item;
+    json = sj_object_new();
+    if (!json)return NULL;
+    c = gfc_list_count(gfc_input_manager.commandList);
+    if (c)
+    {
+        array = sj_array_new();
+        if (array)
+        {
+            for (i = 0;i < c; i++)
+            {
+                command = gfc_list_nth(gfc_input_manager.commandList,i);
+                if (!command)continue;
+                item = gfc_input_command_save(command);
+                if (item)sj_array_append(array,item);
+            }
+            sj_object_insert(json,"commands",array);
+        }
+    }
+    c = gfc_list_count(gfc_input_manager.controllers);
+    if (c)
+    {
+        array = sj_array_new();
+        if (array)
+        {
+            for (i = 0;i < c; i++)
+            {
+                con = gfc_list_nth(gfc_input_manager.controllers,i);
+                if (!con)continue;
+                item = gfc_input_controller_save(con);
+                if (item)sj_array_append(array,item);
+            }
+            sj_object_insert(json,"controllers",array);
+        }
+    }
+    c = gfc_list_count(gfc_input_manager.controllerMaps);
+    if (c)
+    {
+        array = sj_array_new();
+        if (array)
+        {
+            for (i = 0;i < c; i++)
+            {
+                controller = gfc_list_nth(gfc_input_manager.controllerMaps,i);
+                if (!controller)continue;
+                item = gfc_input_controller_save_map(controller);
+                if (item)sj_array_append(array,item);
+            }
+            sj_object_insert(json,"controllerMaps",array);
+        }
+    }
+    return json;
+}
+
+void gfc_input_save_config_to_file(const char *filepath)
+{
+    SJson *json;
+    if (!filepath)return;
+    json = gfc_input_config_save();
+    if (!json)return;
+    sj_save(json,filepath);
+    sj_free(json);
+    return;
 }
 
 void gfc_input_controller_slog(Uint8 controllerId)

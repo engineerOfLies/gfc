@@ -34,12 +34,14 @@ typedef struct
 {
     Uint8               index;      /**<map to the SDL_Joystick axis*/
     GFC_TextWord        name;       /**<name from config*/    
+    GFC_TextWord        label;       /**<name from config*/    
 }GFC_InputButtonConf;
 
 typedef struct
 {
     Uint8               index;      /**<map to the SDL_Joystick axis*/
     GFC_TextWord        name;       /**<name from config*/
+    GFC_TextWord        label;       /**<name from config*/    
     int                 threshold;  /**<anything less than this is ignored as input*/
     GFC_InputAxisStyle  style;      /**<how this input is treated*/
     int                 min;        /**<minimum possible value - can be negative for some axes*/
@@ -49,17 +51,23 @@ typedef struct
 
 typedef struct
 {
+    GFC_TextLine    name;           /**<name of the configuration*/
+    GFC_List       *buttonMap;      /**<how to read each button*/
+    GFC_List       *axisMap;        /**<how to read each axis*/
+}GFC_InputControllerMap;
+
+typedef struct
+{
+    GFC_TextLine    name;           /**<name of the configuration*/
     Uint32          num_buttons;    /**<how many ACTUAL buttons are on the controller*/
     Uint8          *buttons;        /**<array of current button states (on or off)*/
     Uint8          *old_buttons;    /**<last frame's button states*/
-    GFC_List       *buttonMap;      /**<how to read each button*/
     Uint32          num_axis;       /**<how many axes there are for the controller*/
     Sint16         *axis;           /**<measured values of each axis*/
     Sint16         *old_axis;       /**<last frame's axis states*/
-    GFC_List       *axisMap;        /**<how to read each axis*/
     SDL_Joystick   *controller;     /**<handle for the hardware*/
+    GFC_InputControllerMap *map;    /**<use this map for determining what everything does*/
 }GFC_InputController;
-
 
 typedef enum
 {
@@ -177,7 +185,7 @@ Uint8 gfc_input_controller_button_released(Uint8 controllerId, const char *butto
  * @brief get the button index given the "name" of the button in the config file
  * @return -1 on not found or error, or the index of the button otherwise
  */
-int gfc_input_controller_get_button_index(GFC_InputController *con, const char *button);
+int gfc_input_controller_get_button_index(GFC_InputControllerMap *con, const char *button);
 
 
 /**
@@ -192,6 +200,21 @@ float gfc_input_controller_get_axis_state(Uint8 controllerId, const char *axis);
  * @brief get the number of controllers that are setup
  */
 int gfc_input_controller_get_count();
+
+/**
+ * @brief given a keyCode (an SDL_Scancode), get a printable label for the name of the input
+ * @param keyCode a keycode (an SDL_Scancode), the input
+ * @param output a textword where the label will be written to
+ * @return 0 if it failed, or 1 if it successfully wrote to the output
+ */
+int gfc_input_keycode_to_label(Uint32 keyCode, GFC_TextWord output);
+
+/**
+ * @brief save the current input config to file
+ * @note this includes registered named commands as well as controller mappings
+ * @param filepath where to save it.
+ */
+void gfc_input_save_config_to_file(const char *filepath);
 
 /**
  * @brief slog the state of any buttons axis that are active
