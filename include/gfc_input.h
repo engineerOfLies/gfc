@@ -210,6 +210,24 @@ int gfc_input_controller_get_count();
 int gfc_input_keycode_to_label(Uint32 keyCode, GFC_TextWord output);
 
 /**
+ * @brief given the name of a command, get the first key input label
+ * @note this doesn't really work for multiple key inputs
+ * @param command the name of the command to check
+ * @param word [output] this will be set to the label name if it was found
+ * @return 0 if the command doesn't exist, or there are no keys set to it
+ */
+int gfc_input_get_command_key_label(const char *command, GFC_TextWord word);
+
+/**
+ * @brief given the name of a command, get the controller button/axis label for the input
+ * @note this will only find the first input using a controller.  Does not work for combos or optional inputs
+ * @param command the name of the command to check
+ * @param word [output] this will be set to the label name if it was found
+ * @return 0 if the command doesn't exist, or there are no controll inputs set to it
+ */
+int gfc_input_get_command_controller_label(const char *command, GFC_TextWord word);
+
+/**
  * @brief save the current input config to file
  * @note this includes registered named commands as well as controller mappings
  * @param filepath where to save it.

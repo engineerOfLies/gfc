@@ -57,6 +57,7 @@ GFC_InputControllerMap *gfc_input_controller_map_load(SJson *json);
 void gfc_input_commands_load(SJson *commands);
 
 
+
 void gfc_input_init(char *configFile)
 {
     SJson *json;
@@ -126,6 +127,22 @@ void gfc_input_init(char *configFile)
     }
     gfc_input_commands_load(sj_object_get_value(json,"commands"));
     sj_free(json);
+}
+
+GFC_InputButtonConf *gfc_controller_get_button_conf(GFC_InputControllerMap *con,const char *name)
+{
+    int i,c;
+    GFC_InputButtonConf *conf = NULL;
+    if (!name)return NULL;
+    if ((!con)||(!con->buttonMap))return NULL;
+    c = gfc_list_count(con->buttonMap);
+    for (i = 0;i < c; i++)
+    {
+        conf = gfc_list_nth(con->buttonMap,i);
+        if (!conf)continue;
+        if (gfc_word_cmp(name,conf->name) == 0)return conf;
+    }
+    return NULL;
 }
 
 GFC_InputAxisConf *gfc_controller_get_axis_conf(GFC_InputControllerMap *con,const char *name)
@@ -1697,6 +1714,67 @@ void gfc_input_save_config_to_file(const char *filepath)
     sj_free(json);
     return;
 }
+
+int gfc_input_get_command_key_label(const char *command, GFC_TextWord word)
+{
+    int i,c;
+    GFC_Input *input;
+    GFC_Command *in;
+    if (!command)return 0;
+    in = gfc_command_get_by_name(command);
+    if (!in)return 0;
+    c = gfc_list_count(in->inputs);
+    for (i = 0; i < c; i++)
+    {
+        input = gfc_list_nth(in->inputs,i);
+        if (!input)continue;
+        if (input->inputType == GFC_IT_Key)
+        {
+            if (gfc_input_keycode_to_label(input->keyCode, word))return 1;
+            continue;
+        }
+    }
+    return 0;
+}
+
+int gfc_input_get_command_controller_label(const char *command, GFC_TextWord word)
+{
+    int i,c;
+    GFC_InputAxisConf *axis;
+    GFC_InputButtonConf *button;
+    GFC_Input *input;
+    GFC_Command *in;
+    GFC_InputController *con;
+    if (!command)return 0;
+    in = gfc_command_get_by_name(command);
+    if (!in)return 0;
+    c = gfc_list_count(in->inputs);
+    for (i = 0; i < c; i++)
+    {
+        input = gfc_list_nth(in->inputs,i);
+        if (!input)continue;
+        if (input->inputType == GFC_IT_Axis)
+        {
+            con = gfc_controller_get(input->controller);
+            if (!con)continue;
+            axis = gfc_controller_get_axis_conf(con->map,input->name);
+            if (!axis)continue;
+            gfc_word_cpy(word,axis->label);
+            return 1;
+        }
+        if (input->inputType == GFC_IT_Button)
+        {
+            con = gfc_controller_get(input->controller);
+            if (!con)continue;
+            button = gfc_controller_get_button_conf(con->map,input->name);
+            if (!button)continue;
+            gfc_word_cpy(word,button->label);
+            return 1;
+        }
+    }
+    return 0;
+}
+
 
 void gfc_input_controller_slog(Uint8 controllerId)
 {
