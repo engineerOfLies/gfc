@@ -1236,7 +1236,7 @@ SDL_Scancode gfc_input_key_to_scancode(const char * buffer)
                 kc = SDL_SCANCODE_F13 + F - 1; 
             }
         }
-        else if (gfc_strincmp(buffer,"KP_",3))
+        else if (gfc_strincmp(buffer,"KP_",3)==0)
         {
             F = atoi(&buffer[4]);
             if (gfc_strlcmp(buffer,"KP_ENTER") == 0)
