@@ -210,6 +210,32 @@ int gfc_input_controller_get_count();
 int gfc_input_keycode_to_label(Uint32 keyCode, GFC_TextWord output);
 
 /**
+ * @brief get the first key in the keyboard that is down.
+ * @note this will NOT handle multiple keys, so it will miss input if more than one key is down
+ * @param key [output] this will be set to the key name that is down if any are
+ * @return 0 if none are pressed or 1 if at least one is pressed and key has been set
+ */
+int gfc_input_get_active_key(GFC_TextWord key);
+
+/**
+ * @brief get the first button / axis that is active on the given controller
+ * @note this will not handle combinations.  Just the first input in map order
+ * @param output [output] this will be set to the name of the input that is active
+ * @param controllerId the id of the controller to check
+ * @return 0 if none are active or 1 if any are and the first one has been written to output
+ * @note this ONLY checks mapped controls
+ */
+int gfc_input_get_active_controller_input(GFC_TextWord output,Uint8 controllerId);
+
+
+/**
+ * @brief get a command by its name
+ * @param name the command to get
+ * @return NULL if it doesn't exist, or a pointer to its data otherwise
+ */
+GFC_Command *gfc_command_get_by_name(const char *name);
+
+/**
  * @brief given the name of a command, get the first key input label
  * @note this doesn't really work for multiple key inputs
  * @param command the name of the command to check
@@ -226,6 +252,37 @@ int gfc_input_get_command_key_label(const char *command, GFC_TextWord word);
  * @return 0 if the command doesn't exist, or there are no controll inputs set to it
  */
 int gfc_input_get_command_controller_label(const char *command, GFC_TextWord word);
+
+/**
+ * @brief remove any controller input associated with a command
+ * @param command the command to adjust
+ */
+void gfc_input_command_clear_controls(const char *command);
+
+/**
+ * @brief remove any keyboard input associated with a command
+ * @param command the command to adjust
+ */
+void gfc_input_command_clear_keys(const char *commandName);
+
+/**
+ * @brief add a key button to a named command;
+ * @note if the command doesn't exit, it will be created as long as the key is valid
+ * @note if the command is new it defaults to Trigger type "any"
+ * @param commandName the name of the command to add to
+ * @param key the name of the button press to use.  It must map to a keyCode (SDL_Scancode) or this will no-op
+ */
+void gfc_input_command_add_key(const char *commandName,const char *key);
+
+/**
+ * @brief add a key button to a named command;
+ * @note if the command doesn't exit, it will be created as long as the input is valid
+ * @note if the command is new it defaults to Trigger type "any"
+ * @param commandName the name of the command to add to
+ * @param input the name of the controller input to use.  If it doesn't exist, this will no-op
+ * @param controllerId use this controller for the command
+ */
+void gfc_input_command_add_controller_input(const char *commandName,const char *input,Uint8 controllerId);
 
 /**
  * @brief save the current input config to file
