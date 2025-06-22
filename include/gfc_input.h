@@ -59,6 +59,7 @@ typedef struct
 typedef struct
 {
     GFC_TextLine    name;           /**<name of the configuration*/
+    GFC_TextLine    mapName;           /**<name of the configuration*/
     Uint32          num_buttons;    /**<how many ACTUAL buttons are on the controller*/
     Uint8          *buttons;        /**<array of current button states (on or off)*/
     Uint8          *old_buttons;    /**<last frame's button states*/
@@ -117,6 +118,14 @@ typedef struct
  * @param configFile if not NULL it will load the file for user input configuration
  */
 void gfc_input_init(char *configFile);
+
+/**
+ * @brief close the input system and clear out all its config and data
+ * @note this will automatically be called on exit
+ * @note if you wish to reload controls call this before callign init again
+ */
+void gfc_input_close();
+
 
 /**
  * @brief called as often as you want your input data update.  Every Frame, or faster if you like

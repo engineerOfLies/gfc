@@ -22,6 +22,7 @@ typedef struct
     //TODO make input callbacks a seperate list that can be cleared or set
 }GFC_InputManager;
 
+static Uint8            init = 0;
 static GFC_InputManager gfc_input_manager = {0};
 
 static const char * gfc_input_types[] =
@@ -79,18 +80,23 @@ void gfc_input_init(char *configFile)
     gfc_input_manager.input_keys = SDL_GetKeyboardState(&gfc_input_manager.input_key_count);
     if (!gfc_input_manager.input_key_count)
     {
-        slog("failed to get keyboard count!");
+        slog("failed to get keyboard!");
     }
     else
     {
         gfc_input_manager.input_old_keys = (Uint8*)malloc(sizeof(Uint8)*gfc_input_manager.input_key_count);
         memcpy(gfc_input_manager.input_old_keys,gfc_input_manager.input_keys,sizeof(Uint8)*gfc_input_manager.input_key_count);
     }
-    atexit(gfc_input_close);
+    if (!init)
+    {
+        atexit(gfc_input_close);
+        init = 1;//make sure we only ever queue up one cleanup
+    }
     
     json = sj_load(configFile);
     if (!json)
     {
+        slog("failed load input config file %s",configFile);
         return;//nothing else to do
     }
     //controller support
@@ -339,7 +345,7 @@ GFC_InputControllerMap *gfc_input_get_controller_map(const char *name)
 GFC_InputController *gfc_input_controller_load(SJson *json,Uint8 index)
 {
     GFC_InputController *controller;
-    SDL_Joystick   *joystick;
+    SDL_Joystick   *joystick = NULL;
     const char *map;
     if (!json)return NULL;
     controller = gfc_controller_new();
@@ -349,6 +355,7 @@ GFC_InputController *gfc_input_controller_load(SJson *json,Uint8 index)
     }
     sj_object_line_value(json,"name",controller->name);
     map = sj_object_get_string(json,"useMap");
+    if (map)gfc_line_cpy(controller->mapName,map);
     controller->map = gfc_input_get_controller_map(map);
     joystick = SDL_JoystickOpen(index);
     if (!joystick)return controller;
@@ -1814,10 +1821,7 @@ SJson *gfc_input_controller_save(GFC_InputController *con)
     json = sj_object_new();
     if (!json)return NULL;
     sj_object_insert(json,"name",sj_new_str(con->name));
-    if (con->map)
-    {
-        sj_object_insert(json,"useMap",sj_new_str(con->map->name));
-    }
+    sj_object_insert(json,"useMap",sj_new_str(con->mapName));
     return json;
 }
 
@@ -1828,6 +1832,7 @@ SJson *gfc_input_controller_save_map(GFC_InputControllerMap *con)
     if (!con)return NULL;
     json = sj_object_new();
     if (!json)return NULL;
+    sj_object_insert(json,"name",sj_new_str(con->name));
     c = gfc_list_count(con->buttonMap);
     if (c)
     {
