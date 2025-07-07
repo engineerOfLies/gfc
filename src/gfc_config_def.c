@@ -171,7 +171,7 @@ SJson *gfc_config_def_get_by_name(const char *resource,const char *name)
     int i,c;
     SJson *item,*list;
     if (!config_manager.defs)return NULL;
-    if (!name)return NULL;
+    if ((!name)||(!strlen(name)))return NULL;
     list = gfc_config_def_get_resource_by_name(resource);
     if (!list)return NULL;
     c = sj_array_get_count(list);
