@@ -641,26 +641,35 @@ void gfc_vector3d_angles (GFC_Vector3D value1, GFC_Vector3D * angles)
 
 void gfc_vector3d_angle_vectors(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up)
 {
+    GFC_Vector3D tempF = gfc_vector3d(0,1,0);
+    GFC_Vector3D tempU = gfc_vector3d(0,0,1);
+    GFC_Vector3D tempR = gfc_vector3d(1,0,0);
+
+    gfc_vector3d_rotate_about_x(&tempF, angles.x);
+    gfc_vector3d_rotate_about_z(&tempF, angles.z);
+
+    if (fabs(gfc_vector3d_dot_product(tempU,tempF)) <= 0.01)//vector is UP/DOWN, so lets handle this edge case
+    {
+        gfc_vector3d_cross_product(&tempU,tempR,tempF);//get the relative up
+        gfc_vector3d_cross_product(&tempR,tempU,tempF);//get the relative right
+    }
+    else
+    {
+        gfc_vector3d_cross_product(&tempR,tempU,tempF);
+        gfc_vector3d_cross_product(&tempU,tempR,tempF);
+    }
+
     if (forward)
     {
-        forward->x = 0;
-        forward->y = 1;
-        forward->z = 0;
-        gfc_vector3d_rotate_about_x(forward, angles.x);
-        gfc_vector3d_rotate_about_z(forward, angles.z);
+      gfc_vector3d_copy((*forward),tempF);
     }
     if (right)
     {
-        right->x = 0;
-        right->y = 1;
-        right->z = 0;
-        gfc_vector3d_rotate_about_z(right, angles.z + GFC_HALF_PI);
+      gfc_vector3d_copy((*right),tempR);
     }
     if (up)
     {
-        up->x = 0;
-        up->y = 0;
-        up->z = 1;
+      gfc_vector3d_copy((*up),tempU);
     }
 }
 
