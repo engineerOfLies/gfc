@@ -673,6 +673,36 @@ void gfc_vector3d_angle_vectors(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_
     }
 }
 
+void gfc_vector3d_get_directions(GFC_Vector3D forward, GFC_Vector3D *right, GFC_Vector3D *up)
+{
+    GFC_Vector3D tempU = gfc_vector3d(0,0,1);
+    GFC_Vector3D tempR;
+    
+    gfc_vector3d_normalize(&forward);
+
+    if (fabs(gfc_vector3d_dot_product(tempU,forward)) >= 0.99)//vector is UP/DOWN, so lets handle this edge case
+    {
+        tempR = gfc_vector3d(1,0,0);
+        gfc_vector3d_cross_product(&tempU,tempR,forward);//get the relative up
+        gfc_vector3d_cross_product(&tempR,tempU,forward);//get the relative right
+    }
+    else
+    {
+        gfc_vector3d_cross_product(&tempR,tempU,forward);
+        gfc_vector3d_cross_product(&tempU,tempR,forward);
+    }
+
+    if (right)
+    {
+      gfc_vector3d_copy((*right),tempR);
+    }
+    if (up)
+    {
+      gfc_vector3d_copy((*up),tempU);
+    }
+}
+
+
 void gfc_vector3d_angle_vectors2(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up)
 {
   float angle;

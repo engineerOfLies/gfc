@@ -512,12 +512,22 @@ Bool gfc_vector4d_distance_between_less_than(GFC_Vector4D p1,GFC_Vector4D p2,flo
 /**
  * @brief given a rotation, get the component gfc_vectors  (in radians!)
  * @param angles the input rotation for each axis
+ * @note as of now, roll is ignored
  * @param forward output optional calculated forward gfc_vector
  * @param right output optional calculated right gfc_vector
  * @param up output optional calculated up gfc_vector
- * @note this works by rotating a unit vectors along the p,r,y of the angles
+ * @note this works by getting the cross products relative to the world UP (or Right if the vector is straight up/down)
  */
 void gfc_vector3d_angle_vectors(GFC_Vector3D angles, GFC_Vector3D *forward, GFC_Vector3D *right, GFC_Vector3D *up);
+
+/**
+ * @brief from a forward vector, get the right and up vectors for it
+ * @note this assumes +z is the world up
+ * @param forward the input direction
+ * @param right [output] the vector perpindicular to foward to the right
+ * @param up [output] the vector perpindicular to foward up
+ */
+void gfc_vector3d_get_directions(GFC_Vector3D forward, GFC_Vector3D *right, GFC_Vector3D *up);
 
 /**
  * @brief given a rotation, get the component gfc_vectors  (in radians!)
