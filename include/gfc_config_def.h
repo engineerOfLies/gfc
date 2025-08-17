@@ -49,6 +49,14 @@ SJson *gfc_config_def_get_by_index(const char *resource,Uint8 index);
 SJson *gfc_config_def_get_by_name(const char *resource,const char *name);
 
 /**
+ * @brief get definition information for a given resource by the "displayName" key
+ * @param resource the name of the resource list
+ * @param name the search item
+ * @return NULL if not found or error, the JSON otherwise.  DO NOT FREE IT, you do not own it.
+ */
+SJson *gfc_config_def_get_by_display_name(const char *resource,const char *name);
+
+/**
  * @brief get the name of a resource by its index
  * @param resource the name of the resource list
  * @param index the search item

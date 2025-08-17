@@ -161,7 +161,6 @@ SJson *gfc_config_def_get_by_parameter(const char *resource,const char *paramete
         if (strlen(str) != strlen(name))continue;
         if (strcmp(name,str)==0)return item;
     }
-    slog("no resource of %s found by parameter of %s and name of %s",resource,parameter,name);
     return NULL;
 }
 
@@ -184,8 +183,30 @@ SJson *gfc_config_def_get_by_name(const char *resource,const char *name)
         if (strlen(str) != strlen(name))continue;
         if (strcmp(name,str)==0)return item;
     }
-    slog("no resource of %s found by name of %s",resource,name);
     return NULL;
 }
+
+SJson *gfc_config_def_get_by_display_name(const char *resource,const char *name)
+{
+    const char *str;
+    int i,c;
+    SJson *item,*list;
+    if (!config_manager.defs)return NULL;
+    if ((!name)||(!strlen(name)))return NULL;
+    list = gfc_config_def_get_resource_by_name(resource);
+    if (!list)return NULL;
+    c = sj_array_get_count(list);
+    for (i = 0; i < c;i++)
+    {
+        item = sj_array_get_nth(list,i);
+        if (!item)continue;
+        str = sj_object_get_value_as_string(item,"displayName");
+        if (!str)continue;
+        if (strlen(str) != strlen(name))continue;
+        if (strcmp(name,str)==0)return item;
+    }
+    return NULL;
+}
+
 
 /*eol@eof*/
