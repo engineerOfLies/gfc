@@ -114,6 +114,7 @@ int gfc_list_expand(GFC_List *list)
 
 void gfc_list_append(GFC_List *list,void *data)
 {
+    if (!list)return;
     if (list->count >= list->size)
     {
         if (!gfc_list_expand(list))
