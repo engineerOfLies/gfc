@@ -377,7 +377,7 @@ GFC_InputController *gfc_input_controller_load(SJson *json,Uint8 index)
 
 GFC_InputControllerMap *gfc_input_controller_map_load(SJson *json)
 {
-    GFC_InputButtonConf *button;
+    GFC_InputButtonConf *button = NULL;
     GFC_InputAxisConf *axis;
     GFC_InputControllerMap *controller = NULL;
     int i,c;
