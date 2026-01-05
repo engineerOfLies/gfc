@@ -13,6 +13,8 @@ typedef struct
 
 static ConfigManager config_manager = {0};
 
+SJson *gfc_config_def_get_resource_by_name(const char *resource);
+
 void gfc_config_def_close()
 {
     if (config_manager.defs)
@@ -32,17 +34,49 @@ void gfc_config_def_init()
 
 void gfc_config_def_load(const char *filename)
 {
-    SJson *json;
+    int i,c;
+    const char *resource = NULL;
+    SJList *keys;
+    SJson *json,*defs,*list;
     if (!filename)return;
     
-
     json = gfc_pak_load_json(filename);
     if (!json)
     {
         slog("failed to load config def file %s",filename);
         return;
     }
-    gfc_list_append(config_manager.defs,json);
+    //lets do a little check first to see if the config type is already in memory, in which case we will append to it
+    keys = sj_object_get_keys_list(json);
+    if (!keys)
+    {
+        slog("config def %s missing data",filename);
+        sj_free(json);
+        return;
+    }
+    resource = sj_list_get_nth(keys,0);
+    if (!resource)
+    {
+        slog("config def %s missing resource list",filename);
+        sj_free(json);
+        return;
+    }
+    defs = gfc_config_def_get_resource_by_name(resource);
+    if (!defs)
+    {
+        //no resource yet by this name, so lets add it
+        gfc_list_append(config_manager.defs,json);
+        return;
+    }
+    list = sj_object_get_value(json,resource);
+    c = sj_array_count(list);
+    for (i = 0; i < c; i++)
+    {
+        sj_array_append(
+            defs,//append to the existing array of the resource
+            sj_copy(sj_array_nth(list,i)));//a copy of this object's resource list
+    }
+    sj_free(json);
 }
 
 const char *gfc_config_get_display_name(const char *resource, const char *name)
