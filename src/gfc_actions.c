@@ -311,7 +311,7 @@ void gfc_action_list_frame_deleted(GFC_ActionList *list,Uint32 index)
     }
 }
 
-GFC_ActionReturnType gfc_action_next_frame(GFC_Action *action,float *frame)
+GFC_ActionReturnType gfc_action_next_frame_scaled(GFC_Action *action,float *frame,float scale)
 {
     if ((!action)||(!frame))
     {
@@ -322,7 +322,7 @@ GFC_ActionReturnType gfc_action_next_frame(GFC_Action *action,float *frame)
         *frame = action->startFrame;
         return ART_START;
     }
-    *frame = *frame + action->frameRate;
+    *frame = *frame + (action->frameRate * scale);
     if (*frame >= action->endFrame)
     {
         switch (action->type)
@@ -340,6 +340,12 @@ GFC_ActionReturnType gfc_action_next_frame(GFC_Action *action,float *frame)
     }
     return ART_NORMAL;
 }
+
+GFC_ActionReturnType gfc_action_next_frame(GFC_Action *action,float *frame)
+{
+    return gfc_action_next_frame_scaled(action,frame,1);
+}
+
 
 void gfc_action_list_frame_inserted(GFC_ActionList *list,Uint32 index)
 {

@@ -182,6 +182,16 @@ Uint32 gfc_action_list_get_framecount(GFC_ActionList *list);
 GFC_ActionReturnType gfc_action_next_frame(GFC_Action *action,float *frame);
 
 /**
+ * @brief given an action get the next frame from the current frame with an animation scale
+ * @param action the action to base the animation on
+ * @param frame (input and output) given this starting frame, this frame will be set to the next frame
+ * @param scale how much to adjust the frameRate
+ * @note this is useful when you want custom animation rates from a common action list
+ * @return if not an ART_ERROR, it will let you know its return status.  
+ */
+GFC_ActionReturnType gfc_action_next_frame_scaled(GFC_Action *action,float *frame,float scale);
+
+/**
  * @brief given a frame, what is the next whole number frame that will come afterwards
  * @param action the action to query
  * @param frame the current frame
