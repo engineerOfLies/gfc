@@ -21,7 +21,7 @@
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
     SOFTWARE.
  */
-
+#include <math.h>
 #include "gfc_types.h"
 
 /*
@@ -261,6 +261,15 @@ GFC_Vector4D gfc_vector4d_multiply(GFC_Vector4D a, GFC_Vector4D b);
 #define gfc_vector2d_copy(dst,src)  (dst.x = src.x,dst.y = src.y)
 #define gfc_vector3d_copy(dst,src)  (dst.x = src.x,dst.y = src.y,dst.z = src.z)
 #define gfc_vector4d_copy(dst,src)  (dst.x = src.x,dst.y = src.y,dst.z = src.z,dst.w=src.w)
+
+/**
+ * @brief if you ever need a quick way to round a vector to integer values here it is
+ * @param a the vector to round
+ * @note just casting to (int) can break things close to the next number
+ */
+#define gfc_vector2d_round(a)   (a.x = roundf(a.x),a.y = roundf(a.y))
+#define gfc_vector3d_round(a)   (a.x = roundf(a.x),a.y = roundf(a.y),a.z = roundf(a.z))
+#define gfc_vector4d_round(a)   (a.x = roundf(a.x),a.y = roundf(a.y),a.z = roundf(a.z),a.w = roundf(a.w))
 
 /**
  * @brief macro to check if two gfc_vectors are exactly the same

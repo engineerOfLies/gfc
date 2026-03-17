@@ -77,6 +77,23 @@ void gfc_list_swap_indices(GFC_List *list,Uint32 a, Uint32 b)
     list->elements[b].data = temp;
 }
 
+void *gfc_list_peek(GFC_List *list)
+{
+    if (!list)return NULL;
+    if (!list->count)return NULL;
+    return list->elements[list->count-1].data;
+}
+
+void *gfc_list_pop(GFC_List *list)
+{
+    void *data;
+    if (!list)return NULL;
+    if (!list->count)return NULL;
+    data = list->elements[list->count-1].data;
+    gfc_list_delete_last(list);
+    return data;
+}
+
 void *gfc_list_get_nth(GFC_List *list,Uint32 n)
 {
     if (!list)
@@ -110,6 +127,12 @@ int gfc_list_expand(GFC_List *list)
     list->elements = l->elements;//point to new memory address
     free(l);//free the temp list
     return 1;
+}
+
+
+void gfc_list_push(GFC_List *list,void *data)
+{
+    gfc_list_append(list,data);
 }
 
 void gfc_list_append(GFC_List *list,void *data)

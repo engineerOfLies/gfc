@@ -209,5 +209,26 @@ GFC_List *gfc_list_concat_free(GFC_List *a,GFC_List *b);
  */
 void gfc_list_sort(GFC_List *list,int (*compare)(void *a,void *b));
 
+/**
+ * @brief whean treating the list like a stack, this will peek the top (last) element in the stack.
+ * @param stack the list being used as a stack
+ * @return NULL if the stack is NULL or empty, a pointer to the top (last) data element otherwise.
+ */
+void *gfc_list_peek(GFC_List *stack);
+
+/**
+ * @brief whean treating the list like a stack, this will pop the top (last) element off the stack.
+ * @param stack the list being used as a stack
+ * @return NULL if the stack is NULL or empty, a pointer to the top (last) data element otherwise.
+ * @note the top element is also removed from the stack
+ */
+void *gfc_list_pop(GFC_List *stack);
+
+/**
+ * @brief when treating the list like a stack, this will push an element onto the top (last) of the stack
+ * @param stack the list being used as a stack
+ * @param data the data to push onto the stack
+ */
+void gfc_list_push(GFC_List *stack,void *data);
 
 #endif
