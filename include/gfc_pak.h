@@ -6,12 +6,9 @@
 
 /**
  * @purpose The Pak manager is meant to obscure game content / assets through zip compression.
- * Pak files (just rename the .zip extenstion to .pak or anything for that matter) are added to the manager.
- * Files can be loaded through the manager where it will first check to see if a file is on disk, and then iterate through all of the registered pak files looking for the file in question before giving up.
+ * This ended up being a thin layer on top of Physics FS  https://icculus.org/physfs/
  */
-/**
- * @note THIS IS BROKEN FOR WINDOWS.  Depricating until I can resolve it
- */
+
 /**
  * @brief initialize the internal pak manager, queueing up its cleanup on program exit
  */
@@ -25,6 +22,12 @@ void gfc_pak_manager_init();
 void gfc_pak_manager_add(const char *filename);
 
 /**
+ * @brief check if pak system (physics fs) is on
+ * @return 0 if not, 1 if it is
+ */
+int gfc_pak_initialized();
+
+/**
  * @brief extract a file from disk or an archive.
  * @param filename the name of the file to extract
  * @param fileSize [output] if provided, fileSize will be populated with the size of the file extracted
@@ -35,6 +38,8 @@ void *gfc_pak_file_extract(const char *filename,size_t *fileSize);
 
 /**
  * @brief parse json data from the pak files
+ * @note if the pak system is not enabled, this is just sj_load() so it will work regardless
+ * @return NULL if not found or error.  The json otherwise
  */
 SJson *gfc_pak_load_json(const char *filename);
 
