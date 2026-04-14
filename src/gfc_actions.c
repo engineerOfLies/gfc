@@ -1,5 +1,6 @@
 #include "simple_logger.h"
 
+#include "gfc_pak.h"
 #include "gfc_actions.h"
 
 static const char *actionTypes[] =
@@ -181,7 +182,7 @@ GFC_ActionList *gfc_action_list_load(const char *filename)
     GFC_ActionList *actionList;
     SJson *json;
     if (!filename)return NULL;
-    json = sj_load(filename);
+    json = gfc_pak_load_json(filename);
     if (!json)return NULL;
     actionList = gfc_action_list_parse(sj_object_get_value(json,"actionList"));
     sj_free(json);

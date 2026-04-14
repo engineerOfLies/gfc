@@ -67,8 +67,6 @@ void gfc_audio_init(
     gfc_sound_init(maxSounds);
 }
 
-
-
 void gfc_sound_close()
 {
     gfc_sound_clear_all();
@@ -167,7 +165,7 @@ void gfc_sound_init_config(const char *configFile)
     Uint8 masterVolume = MIX_MAX_VOLUME,effectsVolume = MIX_MAX_VOLUME;
     SJson *json,*soundGroups;
     if (!configFile)return;
-    json = sj_load(configFile);
+    json = gfc_pak_load_json(configFile);
     if (!json)
     {
         slog("failed to load audio config, using defaults");
@@ -477,8 +475,39 @@ void gfc_sound_sequence_channel_callback(int channel)
 
 Mix_Music *gfc_sound_load_music(const char *filename)
 {
+    char *buffer = NULL;
+    size_t fileSize = 0;
     Mix_Music *music;
-    music = Mix_LoadMUS(filename);
+    SDL_RWops *ops = NULL;
+    if (!gfc_pak_initialized())
+    {
+        music = Mix_LoadMUS(filename);
+        if (!music)
+        {
+            slog("failed to load music file: %s",filename);
+            return NULL;
+        }
+        return music;
+    }
+    buffer = gfc_pak_file_extract( filename,&fileSize);
+    if (!buffer)
+    {
+        return NULL;
+    }
+    ops = SDL_RWFromMem(buffer, fileSize);
+    if (!ops)
+    {
+        slog("failed to convert memory to SDL use for file: %s",filename);
+        free(buffer);
+        return NULL;
+    }
+    music = Mix_LoadMUS_RW(ops, 1);
+    if (!music)
+    {
+        slog("failed to load music file: %s",filename);
+        free(buffer);
+        return NULL;
+    }
     return music;
 }
 /*eol@eof*/

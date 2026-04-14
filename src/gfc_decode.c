@@ -2,6 +2,7 @@
 
 #include "simple_json_parse.h"
 
+#include "gfc_pak.h"
 #include "gfc_decode.h"
 
 SJson *gfc_decode_json_file(const char *filename)
@@ -102,7 +103,7 @@ void gfc_decode_convert_json_file(const char *inFilename, const char *outFilenam
         slog("gfc_decode_convert_json_file: missing parameters");
         return;
     }
-    json = sj_load(inFilename);
+    json = gfc_pak_load_json(inFilename);
     if (!json)return;
     gfc_encode_json_to_file(json, outFilename);
     sj_free(json);

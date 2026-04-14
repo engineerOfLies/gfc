@@ -93,7 +93,7 @@ void gfc_input_init(char *configFile)
         init = 1;//make sure we only ever queue up one cleanup
     }
     
-    json = sj_load(configFile);
+    json = gfc_pak_load_json(configFile);
     if (!json)
     {
         slog("failed load input config file %s",configFile);

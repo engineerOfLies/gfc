@@ -46,9 +46,10 @@ void gfc_audio_init(
 void gfc_sound_init_config(const char *configFile);
 
 /**
- * @brief load a music file (ogg or mp3 or other supported music file) from disk or pak
- * @param filename the name of the file (or path to it in the pak file)
- * @return NULL on error or a pointer to the music file.  Clean it up with Mix_FreeMusic(Mix_Music *music)
+ * @brief a simple wrapper around MIX_LoadMUS that will pull the file from pak if it is used
+ * @note if a pak is not used, this just directly loads the file normally
+ * @param filename   the path to the file to load
+ * @return NULL on failure, a Mix music handle otherwise.  Free normally with Mix_FreeMusic()
  */
 Mix_Music *gfc_sound_load_music(const char *filename);
 
@@ -138,6 +139,5 @@ void gfc_sound_pack_free(GFC_HashMap *pack);
  * @note it will not free or change the refcount for the sounds in the list, so keep them alive while needed
  */
 void gfc_sound_queue_sequence(GFC_List *sounds,int channel);
-
 
 #endif
