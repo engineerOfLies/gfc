@@ -271,6 +271,9 @@ GFC_Sound *gfc_sound_get_by_filename(const char * filename)
 
 GFC_Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
 {
+    char *buffer = NULL;
+    size_t fileSize = 0;
+    SDL_RWops *ops = NULL;
     GFC_Sound *sound;
     if (!filename)return NULL;
     if (strlen(filename) == 0)return NULL;
@@ -285,12 +288,38 @@ GFC_Sound *gfc_sound_load(const char *filename,float volume,int defaultChannel)
     {
         return NULL;
     }
-    sound->sound = Mix_LoadWAV(filename);
-    if (!sound->sound)
+    
+    if (!gfc_pak_initialized())
     {
-        slog("failed to load sound file %s",filename);
-        gfc_sound_free(sound);
-        return NULL;
+        sound->sound = Mix_LoadWAV(filename);
+        if (!sound->sound)
+        {
+            slog("failed to load sound file %s",filename);
+            gfc_sound_free(sound);
+            return NULL;
+        }
+    }
+    else
+    {
+        buffer = gfc_pak_file_extract( filename,&fileSize);
+        if (!buffer)
+        {
+            return NULL;
+        }
+        ops = SDL_RWFromMem(buffer, fileSize);
+        if (!ops)
+        {
+            slog("failed to convert memory to SDL use for file: %s",filename);
+            free(buffer);
+            return NULL;
+        }
+        sound->sound = Mix_LoadWAV_RW(ops, 1);
+        if (!sound->sound)
+        {
+            slog("failed to load sound file: %s",filename);
+            free(buffer);
+            return NULL;
+        }
     }
     sound->volume = volume;
     sound->defaultChannel = defaultChannel;
