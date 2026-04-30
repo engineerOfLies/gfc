@@ -7,40 +7,30 @@
 
 SJson *gfc_decode_json_file(const char *filename)
 {
-    FILE *file;
     SJson *json;
-    long size,read;
+    size_t size;
     char *buffer = NULL;
     char *decodedBuffer = NULL;
     size_t decodedBufferSize = 0;
     
-    file = fopen(filename,"r");
-    if (!file)
-    {
-        slog("failed to open file %s",filename);
-        return NULL;
-    }
-    size = get_file_Size(file);
-    if (size <= 0)
-    {
-        slog("error getting file size for %s",filename);
-        fclose(file);
-        return NULL;
-    }
-    buffer = gfc_allocate_array(sizeof(char),(size + 2));
-    
+    buffer = gfc_pak_file_extract(filename,&size);    
     if (buffer == NULL)
     {
         slog("failed to allocate character buffer for json file %s",filename);
-        fclose(file);
         return NULL;
     }
     
-    if ((read = fread(buffer, sizeof(char), size, file)) != size)
+    if (buffer[0] == '{')
     {
-        slog("expected to read %li characters, but read %li instead\n for file %s",size,read,filename);
+        //already a json file, no need to decode
+        json = sj_parse_buffer(buffer,size);
+        if (!json)
+        {
+            slog("file %s failed to parse\n",filename);
+        }
+        free(buffer);
+        return json;
     }
-    fclose(file);
     
     decodedBuffer = gfc_base64_decode (buffer, size, &decodedBufferSize);
     if (!decodedBuffer)
@@ -49,9 +39,8 @@ SJson *gfc_decode_json_file(const char *filename)
         free(buffer);
         return NULL;
     }
-    free(buffer);
     
-    json = sj_parse_buffer(decodedBuffer,read);
+    json = sj_parse_buffer(decodedBuffer,decodedBufferSize);
     if (!json)
     {
         slog("file %s failed to parse\n",filename);

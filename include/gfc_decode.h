@@ -14,6 +14,7 @@
  * @brief extract json from a file that has been encoded into base64
  * @param filename a file containing base64 encoded json
  * @return NULL on error, or parsed json that must be sj_free()'d
+ * @note if the file is not encoded, it will just parse it directly 
  */
 
 SJson *gfc_decode_json_file(const char *filename);
