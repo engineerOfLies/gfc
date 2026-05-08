@@ -5,6 +5,24 @@
 #include "gfc_pak.h"
 #include "gfc_decode.h"
 
+#define WHITESPACE 64
+#define EQUALS     65
+#define INVALID    66
+
+static const unsigned char d[] = {
+    66,66,66,66,66,66,66,66,66,66,64,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
+    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,62,66,66,66,63,52,53,
+    54,55,56,57,58,59,60,61,66,66,66,65,66,66,66, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+    10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,66,66,66,66,66,66,26,27,28,
+    29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,66,66,
+    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
+    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
+    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
+    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
+    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
+    66,66,66,66,66,66
+};
+
 SJson *gfc_decode_json_file(const char *filename)
 {
     SJson *json;
@@ -117,6 +135,7 @@ char *gfc_base64_encode(const void* input, size_t inputLength, size_t *newSize)
 {
     const char base64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     char *result;
+    char *outBuffer;
     const uint8_t *data = (const uint8_t *)input;
     size_t resultSize = 0;
     size_t resultIndex = 0;
@@ -125,7 +144,7 @@ char *gfc_base64_encode(const void* input, size_t inputLength, size_t *newSize)
     int padCount = inputLength % 3;
     uint8_t n0, n1, n2, n3;
 
-    resultSize = inputLength + (inputLength/2) + 1;
+    resultSize = (inputLength * 4) + 1;
     if (!input)return NULL;
     if (!resultSize) return NULL;
     result = gfc_allocate_array(sizeof(char),resultSize);
@@ -155,12 +174,18 @@ char *gfc_base64_encode(const void* input, size_t inputLength, size_t *newSize)
         */
         if(resultIndex >= resultSize)
         {
+            slog("failed to encode as base64, buffer too small");
             free(result);
             return NULL;   /* indicate failure: buffer too small */
+        }
+        if (base64chars[n0] == INVALID)
+        {
+            slog("");
         }
         result[resultIndex++] = base64chars[n0];
         if(resultIndex >= resultSize)
         {
+            slog("failed to encode as base64, buffer too small");
             free(result);
             return NULL;   /* indicate failure: buffer too small */
         }
@@ -174,6 +199,7 @@ char *gfc_base64_encode(const void* input, size_t inputLength, size_t *newSize)
         {
             if(resultIndex >= resultSize)
             {
+                slog("failed to encode as base64, buffer too small");
                 free(result);
                 return NULL;   /* indicate failure: buffer too small */
             }
@@ -188,6 +214,7 @@ char *gfc_base64_encode(const void* input, size_t inputLength, size_t *newSize)
         {
             if(resultIndex >= resultSize)
             {
+            slog("failed to encode as base64, buffer too small");
                 free(result);
                 return NULL;   /* indicate failure: buffer too small */
             }
@@ -199,47 +226,29 @@ char *gfc_base64_encode(const void* input, size_t inputLength, size_t *newSize)
     * create and add padding that is required if we did not have a multiple of 3
     * number of characters available
     */
-    if (padCount > 0) 
+    for (; padCount <= 3; padCount++) 
     { 
-        for (; padCount < 3; padCount++) 
-        { 
-            if(resultIndex >= resultSize)
-            {
-                free(result);
-                return NULL;   /* indicate failure: buffer too small */
-            }
-            result[resultIndex++] = '=';
-        } 
-    }
+        if(resultIndex >= resultSize)
+        {
+            slog("failed to encode as base64, buffer too small");
+            free(result);
+            return NULL;   /* indicate failure: buffer too small */
+        }
+        result[resultIndex++] = '=';
+    } 
     if(resultIndex >= resultSize)
     {
+        slog("failed to encode as base64, buffer too small");
         free(result);
         return NULL;   /* indicate failure: buffer too small */
     }
     result[resultIndex] = 0;
-    
-    if (newSize)*newSize = resultSize;
-    return result;   /* indicate success */
+    outBuffer = gfc_allocate_array(sizeof(char),resultIndex);
+    memcpy(outBuffer,result,sizeof(char)*(resultIndex));
+    free(result);
+    if (newSize)*newSize = resultIndex;
+    return outBuffer;   /* indicate success */
 }
-
-
-#define WHITESPACE 64
-#define EQUALS     65
-#define INVALID    66
-
-static const unsigned char d[] = {
-    66,66,66,66,66,66,66,66,66,66,64,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
-    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,62,66,66,66,63,52,53,
-    54,55,56,57,58,59,60,61,66,66,66,65,66,66,66, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,66,66,66,66,66,66,26,27,28,
-    29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,66,66,
-    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
-    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
-    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
-    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
-    66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,66,
-    66,66,66,66,66,66
-};
 
 char *gfc_base64_decode (const char *in, size_t inLen, size_t *outLen)
 { 
