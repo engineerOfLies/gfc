@@ -3,6 +3,36 @@
 #include <math.h>
 #include "gfc_vector.h"
 
+GFC_Vector2D gfc_vector2i2d(GFC_Vector2I i)
+{
+  return gfc_vector2d(i.x,i.y);
+}
+
+GFC_Vector3D gfc_vector3i3d(GFC_Vector3I i)
+{
+  return gfc_vector3d(i.x,i.y,i.z);
+}
+
+GFC_Vector4D gfc_vector4i4d(GFC_Vector4I i)
+{
+  return gfc_vector4d(i.x,i.y,i.z,i.w);
+}
+
+GFC_Vector2D gfc_vector2d2i(GFC_Vector2I i)
+{
+  return gfc_vector2d(i.x,i.y);
+}
+
+GFC_Vector3D gfc_vector3d3i(GFC_Vector3I i)
+{
+  return gfc_vector3d(i.x,i.y,i.z);
+}
+
+GFC_Vector4D gfc_vector4d4i(GFC_Vector4I i)
+{
+  return gfc_vector4d(i.x,i.y,i.z,i.w);
+}
+
 GFC_Vector2D gfc_vector3dxy(GFC_Vector3D v)
 {
   return gfc_vector2d(v.x,v.y);
@@ -50,6 +80,27 @@ GFC_Vector3D gfc_vector3d(float x, float y, float z)
 GFC_Vector4D gfc_vector4d(float x, float y, float z, float w)
 {
   GFC_Vector4D vec;
+  gfc_vector4d_set(vec,x, y, z, w);
+  return vec;
+}
+
+GFC_Vector2I gfc_vector2i(int x, int y)
+{
+  GFC_Vector2I vec;
+  gfc_vector2d_set(vec,x, y);
+  return vec;
+}
+
+GFC_Vector3I gfc_vector3i(int x, int y, int z)
+{
+  GFC_Vector3I vec;
+  gfc_vector3d_set(vec,x, y, z);
+  return vec;
+}
+
+GFC_Vector4I gfc_vector4i(int x, int y, int z, int w)
+{
+  GFC_Vector4I vec;
   gfc_vector4d_set(vec,x, y, z, w);
   return vec;
 }

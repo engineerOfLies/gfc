@@ -90,11 +90,33 @@ typedef struct
 #define gfc_vector3d_to_slog(vec) vec.x,vec.y,vec.z
 
 /**
- * @brief create and return an GFC_Vector2D
+ * @brief create and return an GFC_Vector*D
  */
 GFC_Vector2D gfc_vector2d(float x, float y);
 GFC_Vector3D gfc_vector3d(float x, float y, float z);
 GFC_Vector4D gfc_vector4d(float x, float y, float z, float w);
+
+/**
+ * @brief create and return an GFC_Vector*I
+ */
+GFC_Vector2I gfc_vector2i(int x, int y);
+GFC_Vector3I gfc_vector3i(int x, int y, int z);
+GFC_Vector4I gfc_vector4i(int x, int y, int z, int w);
+
+/**
+ * @brief convert from between integer and floating point vectors
+ */
+GFC_Vector2D gfc_vector2i2d(GFC_Vector2I i);
+GFC_Vector3D gfc_vector3i3d(GFC_Vector3I i);
+GFC_Vector4D gfc_vector4i4d(GFC_Vector4I i);
+
+/**
+ * @brief convert from between floating point and integer vectors
+ */
+GFC_Vector2D gfc_vector2d2i(GFC_Vector2I i);
+GFC_Vector3D gfc_vector3d3i(GFC_Vector3I i);
+GFC_Vector4D gfc_vector4d4i(GFC_Vector4I i);
+
 
 /**
  * @brief convert a 3d gfc_vector into a 2d gfc_vector, dropping the 3rd value
