@@ -113,9 +113,9 @@ GFC_Vector4D gfc_vector4i4d(GFC_Vector4I i);
 /**
  * @brief convert from between floating point and integer vectors
  */
-GFC_Vector2D gfc_vector2d2i(GFC_Vector2I i);
-GFC_Vector3D gfc_vector3d3i(GFC_Vector3I i);
-GFC_Vector4D gfc_vector4d4i(GFC_Vector4I i);
+GFC_Vector2I gfc_vector2d2i(GFC_Vector2D i);
+GFC_Vector3I gfc_vector3d3i(GFC_Vector3D i);
+GFC_Vector4I gfc_vector4d4i(GFC_Vector4D i);
 
 
 /**

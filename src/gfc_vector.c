@@ -18,19 +18,19 @@ GFC_Vector4D gfc_vector4i4d(GFC_Vector4I i)
   return gfc_vector4d(i.x,i.y,i.z,i.w);
 }
 
-GFC_Vector2D gfc_vector2d2i(GFC_Vector2I i)
+GFC_Vector2I gfc_vector2d2i(GFC_Vector2D i)
 {
-  return gfc_vector2d(i.x,i.y);
+  return gfc_vector2i(i.x,i.y);
 }
 
-GFC_Vector3D gfc_vector3d3i(GFC_Vector3I i)
+GFC_Vector3I gfc_vector3d3i(GFC_Vector3D i)
 {
-  return gfc_vector3d(i.x,i.y,i.z);
+  return gfc_vector3i(i.x,i.y,i.z);
 }
 
-GFC_Vector4D gfc_vector4d4i(GFC_Vector4I i)
+GFC_Vector4I gfc_vector4d4i(GFC_Vector4D i)
 {
-  return gfc_vector4d(i.x,i.y,i.z,i.w);
+  return gfc_vector4i(i.x,i.y,i.z,i.w);
 }
 
 GFC_Vector2D gfc_vector3dxy(GFC_Vector3D v)
