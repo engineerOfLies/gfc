@@ -831,22 +831,19 @@ Uint8 gfc_edge_intersect_poc(
     testy = a.y1 + (Ua * (a.y2 - a.y1));
 
   
-    if((Ua >= 0) && (Ua <= 1) && (Ub >= 0) && ( Ub <= 1))
+    if((Ua < 0) || (Ua > 1) || (Ub < 0) || ( Ub > 1))return 0;
+    if(contact != NULL)
     {
-        if(contact != NULL)
-        {
-            contact->x = testx;
-            contact->y = testy;
-        }
-        if (normal != NULL)
-        {
-            normal->x = b.y2 - b.y1;
-            normal->y = b.x2 - b.x1;
-            gfc_vector2d_normalize(normal);
-        }
-        return 1;
+        contact->x = testx;
+        contact->y = testy;
     }
-    return 0;  
+    if (normal != NULL)
+    {
+        normal->x = b.y2 - b.y1;
+        normal->y = b.x2 - b.x1;
+        gfc_vector2d_normalize(normal);
+    }
+    return 1;
 }
 
 Uint8 gfc_edge_intersect(GFC_Edge2D a,GFC_Edge2D b)
@@ -931,6 +928,8 @@ Uint8 gfc_rect_to_intersection_poc(GFC_Edge2D e, GFC_Rect r,GFC_Vector2D *poc,GF
     return 1;
 }
 
+
+//NOTE doesn't handle edge case of edge in rect
 Uint8 gfc_edge_rect_intersection_poc(GFC_Edge2D e, GFC_Rect r,GFC_Vector2D *poc,GFC_Vector2D *normal)
 {
     Uint8 ret = 0;
