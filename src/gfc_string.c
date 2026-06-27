@@ -150,25 +150,24 @@ void gfc_string_append(GFC_String *string,const char *text)
 void gfc_string_appendf(GFC_String *string,const char *format,...)
 {
     va_list ap;
-    size_t size = GFC_STRING_DEFAULT_LENGTH;
     char *buffer;
-    if (!format)return;
-    buffer = gfc_allocate_array(sizeof(char),size);
-    if (!buffer)return;
-    va_start(ap,format);
-    while (vsprintf(buffer,format,ap) < 0)
-    {
-        size *= 2;
-        if (buffer)free(buffer);
-        buffer = gfc_allocate_array(sizeof(char),size);
-        if (!buffer)
-        {
-            return;
-        }
-        va_end(ap);
-        va_start(ap,format);
-    }
+    int size;
+    if ((!format)||(!string))return;
+    
+    va_start(ap, format);
+    size = vsnprintf(NULL, 0, format, ap);
     va_end(ap);
+    
+    if (size <= 0)return;
+    
+    buffer = (char *)gfc_allocate_array(sizeof(char),size + 1);
+    
+    if (!buffer)return;
+        
+    va_start(ap, format);
+    vsprintf(buffer, format, ap);
+    va_end(ap);
+    
     gfc_string_append(string,buffer);
     free(buffer);
 }

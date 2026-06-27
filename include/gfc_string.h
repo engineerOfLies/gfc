@@ -1,6 +1,8 @@
 #ifndef __GFC_STRING_H__
 #define __GFC_STRING_H__
 
+#include "gfc_types.h"
+
 typedef struct
 {
     char   *buffer; /**<contains the character data*/
