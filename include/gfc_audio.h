@@ -81,6 +81,24 @@ void gfc_sound_play(GFC_Sound *sound,int loops,float volume,int channel);
 void gfc_sound_play_to_group(GFC_Sound *sound,int loops,float volume,const char *groupName);
 
 /**
+ * @brief set the master volume for the audio system
+ * @param master a value between 0 and 1.0
+ */
+void gfc_sound_set_master_volume(float master);
+
+/**
+ * @brief set the music volume for the audio system
+ * @param music a value between 0 and 1.0
+ */
+void gfc_sound_set_music_volume(float music);
+
+/**
+ * @brief set the sound effects volume for the audio system
+ * @param effects a value between 0 and 1.0
+ */
+void gfc_sound_set_effects_volume(float effects);
+
+/**
  * @brief decrement references to the sound.  Free it when needed
  * @param sound the sound file to free
  */

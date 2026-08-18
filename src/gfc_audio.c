@@ -23,7 +23,7 @@ typedef struct
     GFC_List  * sound_sequences;
     GFC_List  * channelGroups;
     float       masterVolume;
-    Uint8       musicVolume;
+    float       musicVolume;
     float       effectsVolume;
 
 }GFC_SoundManager;
@@ -158,11 +158,34 @@ void gfc_audio_parse_groups(SJson *json)
     }
 }
 
+void gfc_sound_set_master_volume(float master)
+{
+    if (master > 1.0)master = 1.0;
+    if (master < 0)master = 0;
+    sound_manager.masterVolume = master;
+    gfc_sound_set_music_volume(sound_manager.musicVolume);
+}
+
+void gfc_sound_set_music_volume(float music)
+{
+    if (music > 1.0)music = 1.0;
+    if (music < 0)music = 0;
+    sound_manager.musicVolume = music;
+    Mix_VolumeMusic((int)(sound_manager.musicVolume  * sound_manager.masterVolume * MIX_MAX_VOLUME));
+}
+
+void gfc_sound_set_effects_volume(float effects)
+{
+    if (effects > 1.0)effects = 1.0;
+    if (effects < 0)effects = 0;
+    sound_manager.effectsVolume = effects;
+}
+
 void gfc_sound_init_config(const char *configFile)
 {
     Uint32 maxSounds = 256;
     Uint8 enableMp3 = 0,enableOgg = 0;
-    Uint8 masterVolume = MIX_MAX_VOLUME,effectsVolume = MIX_MAX_VOLUME;
+    float masterVolume = 1,musicVolume = 1, effectsVolume = 1;
     SJson *json,*soundGroups;
     if (!configFile)return;
     json = gfc_pak_load_json(configFile);
@@ -178,17 +201,18 @@ void gfc_sound_init_config(const char *configFile)
     
     gfc_audio_init(maxSounds,enableMp3,enableOgg);
     
-    sj_object_get_uint8(json,"masterVolume",&masterVolume);
-    if (masterVolume > MIX_MAX_VOLUME)masterVolume = MIX_MAX_VOLUME;
-    sound_manager.masterVolume = masterVolume / (float)MIX_MAX_VOLUME;
-    sj_object_get_uint8(json,"musicVolume",&sound_manager.musicVolume);
-    sound_manager.musicVolume = (float)sound_manager.musicVolume * sound_manager.masterVolume;
-    sj_object_get_uint8(json,"effectsVolume",&effectsVolume);
-    if (effectsVolume > MIX_MAX_VOLUME)effectsVolume = MIX_MAX_VOLUME;
-    sound_manager.effectsVolume = effectsVolume / (float)MIX_MAX_VOLUME;
+
+    sj_object_get_float(json,"musicVolume",&musicVolume);
+    gfc_sound_set_music_volume(musicVolume);
+
+    sj_object_get_float(json,"masterVolume",&masterVolume);
+    gfc_sound_set_master_volume(masterVolume);
+    
+    
+    sj_object_get_float(json,"effectsVolume",&effectsVolume);
+    gfc_sound_set_effects_volume(effectsVolume);
     
     soundGroups = sj_object_get_value(json,"soundGroups");
-    Mix_VolumeMusic(sound_manager.musicVolume);
     gfc_audio_parse_groups(soundGroups);
 }
 
@@ -342,7 +366,7 @@ void gfc_sound_play_to_group(GFC_Sound *sound,int loops,float volume,const char 
 void gfc_sound_play(GFC_Sound *sound,int loops,float volume,int channel)
 {
     int chan;
-    float netVolume = sound_manager.masterVolume;
+    float netVolume = sound_manager.masterVolume * sound_manager.effectsVolume;
     if (!sound)return;
     if (!sound->sound)return;
     if (volume > 0)
