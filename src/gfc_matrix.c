@@ -655,7 +655,7 @@ void gfc_matrix4_perspective(
 
     gfc_matrix4_zero(out);
     out[0][0] = 1 / (aspect * halftanfov);
-    out[1][1] = 1 / (halftanfov);
+    out[1][1] = 1 / (-halftanfov);
     out[2][2] = - ((far + near) / (far - near));
     out[2][3] = -1;
     if ((far - near) == 0)
